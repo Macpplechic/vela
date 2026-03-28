@@ -1,0 +1,74 @@
+{
+  "expo": {
+    "name": "Vela",
+    "slug": "vela",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3D1F3A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.vela.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "Vela uses HealthKit to help you track your wellness journey through perimenopause.",
+        "NSHealthUpdateUsageDescription": "Vela may write wellness data to HealthKit to help you track your progress.",
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#3D1F3A"
+      },
+      "package": "com.vela.app",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#3D1F3A",
+          "image": "./assets/splash.png",
+          "resizeMode": "contain"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#3D1F3A",
+          "sounds": [],
+          "mode": "production"
+        }
+      ]
+    ],
+    "scheme": "vela",
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "57213143-3e60-46dc-9f16-87839ac1bf4c"
+      },
+      "router": {}
+    }
+  }
+}
