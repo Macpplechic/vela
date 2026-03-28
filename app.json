@@ -16,15 +16,18 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.vela.app",
+      "bundleIdentifier": "com.macapplechic.velaapp",
       "buildNumber": "1",
       "infoPlist": {
         "NSHealthShareUsageDescription": "Vela uses HealthKit to help you track your wellness journey through perimenopause.",
         "NSHealthUpdateUsageDescription": "Vela may write wellness data to HealthKit to help you track your progress.",
         "UIBackgroundModes": [
           "fetch",
+          "remote-notification",
+          "fetch",
           "remote-notification"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -32,7 +35,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#3D1F3A"
       },
-      "package": "com.vela.app",
+      "package": "com.macapplechic.velaapp",
       "versionCode": 1
     },
     "web": {
