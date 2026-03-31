@@ -40,6 +40,7 @@ export default function ProfileScreen() {
     startFluxTrial, startCoolTrial, resetOnboarding,
     history, sleepHistory, streak, lastStreakDate, topSymptoms, avgNutrients, suppAdherence,
   } = useVelaStore();
+  const _mySuppsDataTyped = mySuppsData as any[];
 
   const pd = PHASES[phase ?? 'late'];
   const [showDoctor, setShowDoctor] = useState(false);
@@ -323,9 +324,9 @@ export default function ProfileScreen() {
               <Text allowFontScaling={false} style={styles.manageBadgeText}>+ manage</Text>
             </TouchableOpacity>
           </View>
-          <Text allowFontScaling={false} style={styles.cardSub}>{(mySuppsData as any[]).length} supplements · {adherence}% adherence last 30 days</Text>
+          <Text allowFontScaling={false} style={styles.cardSub}>{_mySuppsDataTyped.length} supplements · {adherence}% adherence last 30 days</Text>
           <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
-            {(mySuppsData as any[]).map((s:any) => (
+            {_mySuppsDataTyped.map((s:any) => (
               <View key={s.id} style={styles.suppChip}>
                 <Text allowFontScaling={false} style={styles.suppChipText}>{s.name}</Text>
               </View>
@@ -464,7 +465,7 @@ export default function ProfileScreen() {
             ))}
           </ScrollView>
           <ScrollView contentContainerStyle={{ padding:20 }}>
-            {SUPP_LIBRARY.filter(s => s.category === suppCat).map(s => {
+            {(SUPP_LIBRARY as any[]).filter((s:any) => s.category === suppCat).map((s:any) => {
               const inR = mySupps.includes(s.id);
               return (
                 <View key={s.id} style={styles.suppLibRow}>
@@ -480,9 +481,9 @@ export default function ProfileScreen() {
               );
             })}
             <View style={styles.routineSummary}>
-              <Text allowFontScaling={false} style={styles.routineLabel}>Your routine ({(mySuppsData as any[]).length})</Text>
+              <Text allowFontScaling={false} style={styles.routineLabel}>Your routine ({_mySuppsDataTyped.length})</Text>
               <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6, marginTop:8 }}>
-                {(mySuppsData as any[]).map((s:any) => (
+                {_mySuppsDataTyped.map((s:any) => (
                   <View key={s.id} style={styles.suppChip}><Text allowFontScaling={false} style={styles.suppChipText}>{s.name}</Text></View>
                 ))}
               </View>
@@ -592,6 +593,15 @@ const styles = StyleSheet.create({
   phaseDesc:{ fontFamily:Fonts.sans, fontSize:13, color:Colors.mist, marginBottom:16 },
   retakeBtn:{ backgroundColor:Colors.plum, borderRadius:12, padding:12, alignItems:'center' },
   retakeBtnText:{ fontFamily:Fonts.sans, fontSize:13, color:Colors.parchment },
+
+  streakCard:{ flexDirection:'row', alignItems:'center', backgroundColor:Colors.cream, borderWidth:0.5, borderColor:Colors.parchmentDark, borderRadius:18, padding:18, marginBottom:12, gap:12 },
+  streakCardLabel:{ fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, letterSpacing:2, textTransform:'uppercase', marginBottom:4 },
+  streakCardNum:{ fontFamily:Fonts.sansMedium, fontSize:20, color:Colors.plum, marginBottom:2 },
+  streakCardSub:{ fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, lineHeight:18 },
+  streakRing:{ width:56, height:56, borderRadius:28, borderWidth:1.5, borderColor:Colors.gold, alignItems:'center', justifyContent:'center', backgroundColor:Colors.goldPale },
+  streakRingNum:{ fontFamily:Fonts.sansMedium, fontSize:20, color:Colors.plum },
+  streakRingLabel:{ fontFamily:Fonts.sans, fontSize:9, color:Colors.mist },
+  notifToggle:{ paddingVertical:8, paddingHorizontal:16, borderRadius:20 },
   footer:{ fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, textAlign:'center', letterSpacing:2, textTransform:'uppercase', paddingVertical:16 },
   modalHeader:{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', padding:20, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark },
   modalTitle:{ fontFamily:Fonts.serif, fontSize:22, color:Colors.plum },

@@ -295,7 +295,7 @@ export function useVelaStore() {
   const fluxActive   = fluxUnlocked || (fluxTrialStarted !== null && (fluxDaysLeft ?? 0) > 0);
   const coolActive   = coolUnlocked || (coolTrialStarted !== null && (coolDaysLeft ?? 0) > 0);
   const totals       = calcTotals(foods);
-  const mySuppsData  = mySupps.map(id => SUPP_LIBRARY.find(s => s.id === id)).filter(Boolean);
+  const mySuppsData = (mySupps.map((id: string) => SUPP_LIBRARY.find((s: any) => s.id === id)).filter(Boolean)) as any[];
 
   // ── Monthly helpers ───────────────────────────────────────────────────────
 

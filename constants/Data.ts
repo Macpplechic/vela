@@ -1,3 +1,7 @@
+import { SUPP_DB_FULL } from './SUPP_DB_generated';
+
+import { FOOD_DB_FULL } from './FOOD_DB_generated';
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type PhaseKey = 'early' | 'late' | 'post';
@@ -111,46 +115,11 @@ export const PHASES: Record<PhaseKey, Phase> = {
 
 // ─── Food Database ─────────────────────────────────────────────────────────────
 
-export const FOOD_DB: Food[] = [
-  { id:'salmon',    name:'Wild Salmon',        category:'protein',   protein:20, fiber:0,  calcium:12,  magnesium:27,  omega3:2.2, phyto:0,  cal:208, ai:9,  phase:['early','late','post'] },
-  { id:'sardines',  name:'Sardines',           category:'protein',   protein:25, fiber:0,  calcium:382, magnesium:39,  omega3:1.5, phyto:0,  cal:208, ai:8,  phase:['early','late','post'] },
-  { id:'chicken',   name:'Chicken Breast',     category:'protein',   protein:31, fiber:0,  calcium:15,  magnesium:29,  omega3:0.1, phyto:0,  cal:165, ai:6,  phase:['early','late','post'] },
-  { id:'eggs',      name:'Pasture-Raised Eggs',category:'protein',   protein:13, fiber:0,  calcium:56,  magnesium:12,  omega3:0.3, phyto:0,  cal:155, ai:7,  phase:['early','late','post'] },
-  { id:'tempeh',    name:'Tempeh',             category:'protein',   protein:19, fiber:0,  calcium:111, magnesium:81,  omega3:0,   phyto:8,  cal:193, ai:8,  phase:['early','late','post'] },
-  { id:'spinach',   name:'Spinach',            category:'vegetable', protein:3,  fiber:2,  calcium:99,  magnesium:79,  omega3:0.1, phyto:8,  cal:23,  ai:9,  phase:['early','late','post'] },
-  { id:'broccoli',  name:'Broccoli',           category:'vegetable', protein:3,  fiber:3,  calcium:47,  magnesium:21,  omega3:0.1, phyto:7,  cal:34,  ai:8,  phase:['early','late','post'] },
-  { id:'kale',      name:'Kale',               category:'vegetable', protein:4,  fiber:4,  calcium:150, magnesium:34,  omega3:0.2, phyto:6,  cal:33,  ai:9,  phase:['early','late','post'] },
-  { id:'edamame',   name:'Edamame',            category:'legume',    protein:11, fiber:5,  calcium:60,  magnesium:64,  omega3:0.3, phyto:9,  cal:121, ai:9,  phase:['early','late','post'] },
-  { id:'lentils',   name:'Lentils',            category:'legume',    protein:9,  fiber:8,  calcium:19,  magnesium:36,  omega3:0,   phyto:5,  cal:116, ai:7,  phase:['early','late','post'] },
-  { id:'flaxseed',  name:'Ground Flaxseed',    category:'fat',       protein:5,  fiber:8,  calcium:71,  magnesium:110, omega3:2.4, phyto:10, cal:150, ai:10, phase:['early','late','post'] },
-  { id:'walnuts',   name:'Walnuts',            category:'fat',       protein:4,  fiber:2,  calcium:28,  magnesium:45,  omega3:2.5, phyto:4,  cal:185, ai:9,  phase:['early','late','post'] },
-  { id:'avocado',   name:'Avocado',            category:'fat',       protein:2,  fiber:7,  calcium:12,  magnesium:29,  omega3:0.1, phyto:3,  cal:160, ai:8,  phase:['early','late','post'] },
-  { id:'blueberry', name:'Blueberries',        category:'fruit',     protein:1,  fiber:4,  calcium:6,   magnesium:6,   omega3:0,   phyto:9,  cal:57,  ai:10, phase:['early','late','post'] },
-  { id:'sweetpot',  name:'Sweet Potato',       category:'vegetable', protein:2,  fiber:4,  calcium:30,  magnesium:25,  omega3:0,   phyto:6,  cal:86,  ai:8,  phase:['early','late','post'] },
-  { id:'quinoa',    name:'Quinoa',             category:'grain',     protein:4,  fiber:3,  calcium:17,  magnesium:64,  omega3:0,   phyto:3,  cal:120, ai:6,  phase:['late','post'] },
-  { id:'greektyog', name:'Greek Yogurt',       category:'dairy',     protein:10, fiber:0,  calcium:111, magnesium:11,  omega3:0,   phyto:0,  cal:59,  ai:6,  phase:['late','post'] },
-  { id:'tofu',      name:'Firm Tofu',          category:'protein',   protein:8,  fiber:0,  calcium:350, magnesium:30,  omega3:0,   phyto:10, cal:76,  ai:8,  phase:['early','late','post'] },
-];
+export const FOOD_DB = FOOD_DB_FULL;
 
 // ─── Supplement Library ────────────────────────────────────────────────────────
 
-export const SUPP_LIBRARY: Supplement[] = [
-  { id:'omega3',      name:'Omega-3 Fish Oil',      icon:'🐟', dose:'2–3g EPA+DHA',        timing:'With meals',        why:'Reduces inflammation, supports brain and heart health, helps regulate mood.',                         category:'essential',   phase:['early','late','post'] },
-  { id:'vitd',        name:'Vitamin D3 + K2',       icon:'☀️', dose:'2000–5000 IU D3',      timing:'With fatty meal',   why:'Critical for bone density, hormone production, immune function, and mood.',                          category:'essential',   phase:['early','late','post'] },
-  { id:'mag',         name:'Magnesium Glycinate',   icon:'🌙', dose:'300–400mg',            timing:'Before bed',        why:'Supports deep sleep, reduces cortisol, eases muscle tension and anxiety.',                           category:'essential',   phase:['early','late','post'] },
-  { id:'creatine',    name:'Creatine Monohydrate',  icon:'💪', dose:'3–5g daily',           timing:'Any time',          why:'Preserves muscle mass, supports cognitive function and cellular energy.',                            category:'essential',   phase:['early','late','post'] },
-  { id:'collagen',    name:'Collagen Peptides',     icon:'✨', dose:'10–20g daily',         timing:'Morning or post-workout', why:'Supports skin elasticity, joint cushioning, and gut lining integrity.',                    category:'essential',   phase:['early','late','post'] },
-  { id:'probiotic',   name:'Probiotic (Multi-strain)',icon:'🦠',dose:'10–50 billion CFU',  timing:'Morning, fasted',   why:'Supports gut microbiome, estrogen metabolism, digestion, and immune resilience.',                   category:'essential',   phase:['early','late','post'] },
-  { id:'ashwagandha', name:'Ashwagandha KSM-66',    icon:'🌿', dose:'300–600mg extract',   timing:'Evening',           why:'Lowers cortisol, supports thyroid function, reduces anxiety and improves sleep quality.',            category:'calm',        phase:['early','late','post'] },
-  { id:'ltheanine',   name:'L-Theanine',            icon:'🍵', dose:'100–200mg',           timing:'As needed or evening', why:'Promotes calm alertness, reduces stress response without sedation.',                            category:'calm',        phase:['early','late','post'] },
-  { id:'melatonin',   name:'Melatonin (low-dose)',  icon:'🌛', dose:'0.5–1mg',             timing:'30 min before bed', why:'Regulates sleep-wake cycles — low doses are more effective than high.',                             category:'calm',        phase:['late','post'] },
-  { id:'berberine',   name:'Berberine',             icon:'🔥', dose:'500mg 2–3× daily',    timing:'Before meals',      why:'Supports blood sugar balance, gut health, and metabolic function.',                                  category:'metabolism',  phase:['late','post'] },
-  { id:'vitc',        name:'Vitamin C',             icon:'🍊', dose:'500–1000mg daily',    timing:'With meals',        why:'Antioxidant, supports collagen synthesis, adrenal health, and immune function.',                     category:'energy',      phase:['early','late','post'] },
-  { id:'zinc',        name:'Zinc Bisglycinate',     icon:'⚡', dose:'15–30mg daily',       timing:'With meals',        why:'Supports hormone production, immune function, skin repair, and thyroid health.',                     category:'energy',      phase:['early','late','post'] },
-  { id:'biotin',      name:'Biotin',                icon:'💇', dose:'2500–5000mcg daily',  timing:'Morning',           why:'Supports hair thickness, nail strength, and keratin production.',                                   category:'glow',        phase:['early','late','post'] },
-  { id:'silica',      name:'Silica (Bamboo extract)',icon:'🌾',dose:'300–500mg daily',     timing:'Morning',           why:'Strengthens collagen matrix, supports skin firmness and hair structure.',                            category:'glow',        phase:['late','post'] },
-  { id:'maca',        name:'Maca Root',             icon:'🌱', dose:'1500–3000mg daily',   timing:'Morning',           why:'Adaptogen that may ease hot flashes, support libido, and reduce fatigue.',                           category:'energy',      phase:['early','late'] },
-];
+// replaced
 
 // ─── Symptoms ──────────────────────────────────────────────────────────────────
 
@@ -251,3 +220,5 @@ export const DOCTOR_QUESTIONS: string[] = [
   'What lifestyle changes will have the highest impact for my specific symptoms?',
   'Can you refer me to a menopause specialist if needed?',
 ];
+
+export const SUPP_LIBRARY = SUPP_DB_FULL;
