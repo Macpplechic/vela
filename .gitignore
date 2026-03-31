@@ -1,19 +1,12 @@
-# Expo
 node_modules/
 .expo/
 dist/
 web-build/
 expo-env.d.ts
-
-# Build scripts (contain API keys)
 build_food_db.js
 build_supp_db.js
-
-# Fix scripts (temporary)
 fix2.js
 fix_final.js
 fix_supp.js
-
-# OS
 .DS_Store
 *.log
