@@ -21,13 +21,18 @@ const PHASE_MAP: Record<number, Record<number, PhaseKey>> = {
 export default function QuizScreen() {
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[]>([]);
   const { setPhase, setOnboarded } = useVelaStore();
 
   const handleNext = async () => {
     if (selected === null) return;
+    const newAnswers = [...answers, selected];
+    setAnswers(newAnswers);
     if (step < QUESTIONS.length - 1) { setStep(step + 1); setSelected(null); }
     else {
-      const detectedPhase: PhaseKey = PHASE_MAP[step][selected] ?? 'late';
+      const scores: Record<PhaseKey, number> = { early:0, late:0, post:0 };
+      newAnswers.forEach((a, i) => { const p = PHASE_MAP[i]?.[a]; if (p) scores[p]++; });
+      const detectedPhase: PhaseKey = (Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0] as PhaseKey) ?? 'late';
       await setPhase(detectedPhase);
       await setOnboarded(true);
       router.replace('/(tabs)/ritual');

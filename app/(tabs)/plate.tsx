@@ -85,7 +85,7 @@ export default function PlateScreen() {
               style={styles.searchInput}
               value={search}
               onChangeText={setSearch}
-              placeholder="Search anti-inflammatory foods..."
+              placeholder="Type to search 2,400+ foods..."
               placeholderTextColor={Colors.mist}
             />
             <ScrollView style={{ maxHeight: 240 }} nestedScrollEnabled>
