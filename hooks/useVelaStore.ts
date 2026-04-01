@@ -234,6 +234,9 @@ export function useVelaStore() {
     await AsyncStorage.setItem(K.LIKED_POSTS, JSON.stringify(ids));
   }, []);
 
+  const unlockFlux = async () => { setFluxUnlockedState(true); await AsyncStorage.setItem(K.FLUX_UNLOCKED, JSON.stringify(true)); };
+  const unlockCool = async () => { setCoolUnlockedState(true); await AsyncStorage.setItem(K.COOL_UNLOCKED, JSON.stringify(true)); };
+
   const setFluxLogs = useCallback(async (logs: FluxLog[]) => {
     setFluxLogsState(logs);
     await AsyncStorage.setItem(K.FLUX_LOGS, JSON.stringify(logs));
@@ -362,7 +365,7 @@ export function useVelaStore() {
     isLoading, phase, onboarded, mySupps, mySuppsData, checkedSupps, symptoms,
     journal, foods, totals, likedPosts, fluxLogs, sleepLog,
     fluxTrialStarted, coolTrialStarted, fluxUnlocked, coolUnlocked,
-    fluxDaysLeft, coolDaysLeft, fluxActive, coolActive,
+    fluxDaysLeft, coolDaysLeft, fluxActive, coolActive, unlockFlux, unlockCool,
     history, sleepHistory, streak, lastStreakDate, getMonthHistory, topSymptoms, avgNutrients, suppAdherence,
     setPhase, setOnboarded, setMySupps, setCheckedSupps, setSymptoms,
     setJournal, setFoods, setLikedPosts, setFluxLogs, setSleepLog, saveSleepEntry, incrementStreak,
