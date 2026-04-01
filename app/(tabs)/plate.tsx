@@ -13,7 +13,7 @@ export default function PlateScreen() {
 
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
-  const filteredFoods = FOOD_DB.filter(f => f.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredFoods = search.length > 1 ? FOOD_DB.filter(f => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
 
   const addFood = async (f: Food) => {
     await setFoods([...foods, f]);

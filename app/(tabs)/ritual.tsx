@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Dimensions } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Fonts } from '../../constants/Colors';
-import { PHASES, SUPP_LIBRARY, SYMPTOMS } from '../../constants/Data';
+import { PHASES, SYMPTOMS } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 const { width } = Dimensions.get('window');
@@ -13,7 +13,7 @@ export default function RitualScreen() {
   const {
     phase, mySuppsData, checkedSupps, setCheckedSupps,
     symptoms, setSymptoms, journal, setJournal,
-    totals, foods, resetOnboarding, streak, lastStreakDate, incrementStreak,
+    totals, foods, streak, lastStreakDate, incrementStreak,
   } = useVelaStore();
   const [journalSaved, setJournalSaved] = useState(false);
 

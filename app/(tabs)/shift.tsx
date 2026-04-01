@@ -26,7 +26,7 @@ export default function ShiftScreen() {
         <Text style={styles.logoText}>vela</Text>
         <Text style={styles.subText}>your shift. your terms.</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{flex:1}} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.pageTitle}>The Shift</Text>
         <Text style={styles.pageSub}>Women who get it, because they're living it.</Text>
 
