@@ -134,7 +134,7 @@ export default function ProfileScreen() {
   }, [monthEntries]);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Text allowFontScaling={false} style={styles.logoText}>vela</Text>
         <Text allowFontScaling={false} style={styles.subText}>your shift. your terms.</Text>
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   logoText:{ fontFamily:Fonts.serif, fontSize:24, color:Colors.goldLight, letterSpacing:4 },
   subText:{ fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, letterSpacing:3, textTransform:'uppercase', marginTop:1 },
   scroll:{ flex:1 },
-  content:{ padding:20 },
+  content:{ padding:20, paddingBottom:100 },
   pageTitle:{ fontFamily:Fonts.serif, fontSize:26, color:Colors.plum, marginBottom:20 },
   sectionTitle:{ fontFamily:Fonts.serif, fontSize:18, color:Colors.plum, marginBottom:12 },
   statsRow:{ flexDirection:'row', gap:8, marginBottom:12 },

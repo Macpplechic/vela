@@ -44,8 +44,8 @@ export default function RitualScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={[styles.header, { width }]}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
+      <View style={styles.header}>
         <View>
           <Text style={styles.logoText}>vela</Text>
           <Text style={styles.subText}>your shift. your terms.</Text>
@@ -62,7 +62,7 @@ export default function RitualScreen() {
         </View>
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { width }]} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.dateText}>{today}</Text>
         <Text style={styles.greeting}>{greeting}, beautiful.</Text>
         <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>

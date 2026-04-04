@@ -33,7 +33,7 @@ export default function PlateScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.logoText}>vela</Text>
         <Text style={styles.subText}>your shift. your terms.</Text>
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   logoText: { fontFamily: Fonts.serif, fontSize:24, color: Colors.goldLight, letterSpacing:4 },
   subText: { fontFamily: Fonts.sans, fontSize:10, color: Colors.mist, letterSpacing:3, textTransform:'uppercase', marginTop:1 },
   scroll: { flex:1 },
-  content: { padding:20 },
+  content: { padding:20, paddingBottom:100 },
   titleRow: { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:20 },
   pageTitle: { fontFamily: Fonts.serif, fontSize:24, color: Colors.plum },
   addButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:9, paddingHorizontal:18 },
