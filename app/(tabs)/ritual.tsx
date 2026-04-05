@@ -103,8 +103,13 @@ export default function RitualScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Morning supplement ritual</Text>
-          <Text style={styles.cardSub}>{mySuppsData.length===0?'Tap + manage to add supplements':`${checkedSupps.length} of ${mySuppsData.length} taken today`}</Text>
+          <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+            <Text style={styles.cardTitle}>Morning supplement ritual</Text>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
+              <Text style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold }}>+ manage</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.cardSub}>{mySuppsData.length===0?'Add supplements to track your morning ritual':`${checkedSupps.length} of ${mySuppsData.length} taken today`}</Text>
           {(mySuppsData as any[]).map((s: any) => {
             const on = checkedSupps.includes(s.id);
             return (
