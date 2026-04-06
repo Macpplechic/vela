@@ -21,7 +21,6 @@ export default function CoolScreen() {
   const [activeProtocol, setActiveProtocol] = useState<number | null>(null);
 
   useEffect(() => {
-    Purchases.configure({ apiKey: RC_API_KEY });
     loadOffering();
   }, []);
 

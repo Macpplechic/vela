@@ -14,7 +14,6 @@ export default function FluxScreen() {
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
 
   useEffect(() => {
-    Purchases.configure({ apiKey: RC_API_KEY });
     loadOffering();
   }, []);
 

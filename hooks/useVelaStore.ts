@@ -65,7 +65,7 @@ const K = {
 const today = () => new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
 const TRIAL_DAYS = 7;
 const HISTORY_DAYS = 90;
-const DEFAULT_SUPPS = ['omega3', 'vitd', 'mag', 'creatine', 'collagen', 'probiotic'];
+const DEFAULT_SUPPS: string[] = [];
 
 const calcTotals = (foods: Food[]): NutrientTotals =>
   foods.reduce(
