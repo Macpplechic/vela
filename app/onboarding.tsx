@@ -1,71 +1,132 @@
 import { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import { Colors, Fonts } from '../constants/Colors';
+import { useVelaStore } from '../hooks/useVelaStore';
 
 const { width } = Dimensions.get('window');
 
 const SLIDES = [
-  { glyph:'\u25d0', title:'You are not losing your mind.', subtitle:'Perimenopause affects 1 billion women worldwide. Vela gives you the tools, knowledge, and community to navigate it with clarity.', color:Colors.gold, bg:Colors.goldPale },
-  { glyph:'\u25c8', title:'Your body. Your data.', subtitle:'Track what you eat, how you sleep, and which symptoms show up — then watch Vela surface patterns your doctor never had time to find.', color:Colors.sage, bg:Colors.sagePale },
-  { glyph:'\u25ce', title:'Science-backed. Women-led.', subtitle:'Every supplement, food, and breathwork protocol in Vela is rooted in peer-reviewed research on hormonal health and the menopausal transition.', color:Colors.teal, bg:Colors.tealPale },
-  { glyph:'\u25c9', title:'Your shift. Your terms.', subtitle:'Vela does not tell you how to feel about this chapter. It gives you everything you need to move through it on your own terms.', color:Colors.plum, bg:Colors.parchmentDark },
+  {
+    glyph: '◈',
+    color: Colors.sage,
+    pale: Colors.sagePale ?? '#EEF5EE',
+    title: 'Your body is not\nbetraying you.',
+    body: 'Perimenopause is one of the most significant hormonal shifts of your life. Vela gives you the tools to understand what\'s happening — and why.',
+    feature: 'Daily ritual · Symptom tracking · 90-day patterns',
+  },
+  {
+    glyph: '◎',
+    color: Colors.teal,
+    pale: Colors.tealPale ?? '#E8F4F2',
+    title: 'Track what\nactually matters.',
+    body: 'Log food, supplements, symptoms and sleep every day. Vela surfaces patterns so you finally understand what your body is doing.',
+    feature: 'The Peri Plate · FluxLog · CoolDown protocols',
+  },
+  {
+    glyph: '✦',
+    color: Colors.gold,
+    pale: Colors.goldPale ?? '#FDF6E3',
+    title: 'Come to every\nappointment prepared.',
+    body: 'Generate a beautiful 90-day health report and share it with your doctor. You deserve a thorough conversation.',
+    feature: 'Doctor PDF · Symptom history · Nutrition data',
+  },
+  {
+    glyph: '◇',
+    color: Colors.plumLight ?? '#7B5EA7',
+    pale: '#F3EEF9',
+    title: 'You are not\nalone in this.',
+    body: 'The Shift connects you with women who are living it too. Share wins, ask questions, find support from a community that gets it.',
+    feature: 'The Shift community · Creator program',
+  },
 ];
 
 export default function OnboardingScreen() {
-  const [slide, setSlide] = useState(0);
+  const { setOnboarded } = useVelaStore();
+  const [current, setCurrent] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
-  const goTo = (index: number) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSlide(index);
-    scrollRef.current?.scrollTo({ x: index * width, animated: true });
+  const goTo = (idx: number) => {
+    setCurrent(idx);
+    scrollRef.current?.scrollTo({ x: idx * width, animated: true });
   };
 
   const handleNext = () => {
-    if (slide < SLIDES.length - 1) { goTo(slide + 1); }
-    else { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); router.replace('/quiz'); }
+    if (current < SLIDES.length - 1) {
+      goTo(current + 1);
+    } else {
+      handleDone();
+    }
   };
 
-  const s = SLIDES[slide];
+  const handleDone = async () => {
+    await setOnboarded(true);
+    router.replace('/(tabs)/ritual');
+  };
+
+  const slide = SLIDES[current];
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.topRow}>
-        <View style={styles.dots}>
-          {SLIDES.map((_, i) => (
-            <TouchableOpacity key={i} onPress={() => goTo(i)}>
-              <View style={[styles.dot, { backgroundColor: i===slide ? Colors.plum : Colors.parchmentDark, width: i===slide ? 20 : 6 }]} />
-            </TouchableOpacity>
-          ))}
-        </View>
-        <TouchableOpacity onPress={() => router.replace('/quiz')} style={styles.skipBtn}>
-          <Text allowFontScaling={false} style={styles.skipText}>Skip</Text>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      {/* Skip */}
+      <TouchableOpacity style={styles.skip} onPress={handleDone}>
+        <Text style={styles.skipText}>Skip</Text>
+      </TouchableOpacity>
 
-      <ScrollView ref={scrollRef} horizontal pagingEnabled scrollEnabled={false} showsHorizontalScrollIndicator={false} style={{ flex:1 }}>
-        {SLIDES.map((sl, i) => (
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEnabled={false}
+        style={{ flex: 1 }}
+      >
+        {SLIDES.map((s, i) => (
           <View key={i} style={[styles.slide, { width }]}>
-            <View style={[styles.glyphContainer, { backgroundColor: sl.bg }]}>
-              <Text allowFontScaling={false} style={[styles.glyph, { color: sl.color }]}>{sl.glyph}</Text>
+            {/* Glyph circle */}
+            <View style={[styles.glyphCircle, { backgroundColor: s.pale, borderColor: s.color }]}>
+              <Text style={[styles.glyph, { color: s.color }]}>{s.glyph}</Text>
             </View>
-            <Text allowFontScaling={false} style={styles.title}>{sl.title}</Text>
-            <Text allowFontScaling={false} style={styles.subtitle}>{sl.subtitle}</Text>
+
+            {/* Text */}
+            <Text style={styles.title}>{s.title}</Text>
+            <Text style={styles.body}>{s.body}</Text>
+
+            {/* Feature pill */}
+            <View style={[styles.featurePill, { backgroundColor: s.pale, borderColor: s.color + '40' }]}>
+              <Text style={[styles.featureText, { color: s.color }]}>{s.feature}</Text>
+            </View>
           </View>
         ))}
       </ScrollView>
 
-      <View style={styles.bottom}>
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
-          <Text allowFontScaling={false} style={styles.nextBtnText}>
-            {slide < SLIDES.length - 1 ? 'Continue \u2192' : 'Find my phase \u2192'}
+      {/* Dots */}
+      <View style={styles.dots}>
+        {SLIDES.map((_, i) => (
+          <TouchableOpacity key={i} onPress={() => goTo(i)}>
+            <View style={[styles.dot, {
+              backgroundColor: i === current ? Colors.plum : Colors.parchmentDark,
+              width: i === current ? 24 : 8,
+            }]} />
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* CTA */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[styles.nextBtn, { backgroundColor: slide.color }]}
+          onPress={handleNext}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.nextBtnText}>
+            {current === SLIDES.length - 1 ? 'Start my ritual ✦' : 'Continue →'}
           </Text>
         </TouchableOpacity>
-        {slide === SLIDES.length - 1 && (
-          <Text allowFontScaling={false} style={styles.legalText}>By continuing you agree to our Terms of Service and Privacy Policy.</Text>
+
+        {current === SLIDES.length - 1 && (
+          <Text style={styles.footerNote}>Free to start · No credit card required</Text>
         )}
       </View>
     </SafeAreaView>
@@ -73,19 +134,20 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe:{ flex:1, backgroundColor:Colors.parchment },
-  topRow:{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingHorizontal:24, paddingTop:8, paddingBottom:16 },
-  dots:{ flexDirection:'row', gap:6, alignItems:'center' },
-  dot:{ height:6, borderRadius:3 },
-  skipBtn:{ padding:8 },
-  skipText:{ fontFamily:Fonts.sans, fontSize:13, color:Colors.mist },
-  slide:{ paddingHorizontal:32, alignItems:'center', justifyContent:'center', paddingBottom:40 },
-  glyphContainer:{ width:120, height:120, borderRadius:60, alignItems:'center', justifyContent:'center', marginBottom:40 },
-  glyph:{ fontSize:56 },
-  title:{ fontFamily:Fonts.serif, fontSize:28, color:Colors.plum, textAlign:'center', lineHeight:38, marginBottom:20 },
-  subtitle:{ fontFamily:Fonts.sans, fontSize:15, color:Colors.mist, textAlign:'center', lineHeight:24 },
-  bottom:{ paddingHorizontal:24, paddingBottom:32, gap:12 },
-  nextBtn:{ backgroundColor:Colors.plum, borderRadius:30, padding:18, alignItems:'center' },
-  nextBtnText:{ fontFamily:Fonts.sansMedium, fontSize:15, color:Colors.parchment, letterSpacing:1 },
-  legalText:{ fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, textAlign:'center', lineHeight:16 },
+  safe: { flex: 1, backgroundColor: Colors.parchment },
+  skip: { alignSelf: 'flex-end', padding: 20 },
+  skipText: { fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist },
+  slide: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 20 },
+  glyphCircle: { width: 120, height: 120, borderRadius: 60, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', marginBottom: 40 },
+  glyph: { fontSize: 52 },
+  title: { fontFamily: Fonts.serif, fontSize: 32, color: Colors.plum, textAlign: 'center', lineHeight: 40, marginBottom: 20 },
+  body: { fontFamily: Fonts.sans, fontSize: 15, color: Colors.mist, textAlign: 'center', lineHeight: 24, marginBottom: 28 },
+  featurePill: { borderWidth: 1, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 18 },
+  featureText: { fontFamily: Fonts.sans, fontSize: 12, letterSpacing: 0.5 },
+  dots: { flexDirection: 'row', gap: 8, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 },
+  dot: { height: 8, borderRadius: 4, backgroundColor: Colors.parchmentDark },
+  footer: { paddingHorizontal: 32, paddingBottom: 40, alignItems: 'center', gap: 12 },
+  nextBtn: { width: '100%', borderRadius: 30, paddingVertical: 16, alignItems: 'center' },
+  nextBtnText: { fontFamily: Fonts.sansMedium, fontSize: 16, color: Colors.parchment, letterSpacing: 0.5 },
+  footerNote: { fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist },
 });
