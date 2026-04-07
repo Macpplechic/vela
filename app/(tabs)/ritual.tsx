@@ -67,6 +67,22 @@ export default function RitualScreen() {
         <Text style={styles.greeting}>{greeting}, beautiful.</Text>
         <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>
 
+        {history.length === 0 && (
+          <View style={styles.welcomeCard}>
+            <Text style={styles.welcomeTitle}>Welcome to Vela ✦</Text>
+            <Text style={styles.welcomeSub}>HERE'S WHAT TO DO EACH DAY</Text>
+            {[['◈','Ritual','Check off supplements and log symptoms'],['◇','Plate','Log food for hormone insights'],['◎','FluxLog','Track your cycle patterns'],['◇','CoolDown','Guided hot flash relief'],['✦','Profile','Build your supplement stack']].map(([g,tab,desc]) => (
+              <View key={tab} style={styles.welcomeRow}>
+                <Text style={styles.welcomeGlyph}>{g}</Text>
+                <View style={{ flex:1 }}>
+                  <Text style={styles.welcomeTab}>{tab}</Text>
+                  <Text style={styles.welcomeDesc}>{desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
         <View style={[styles.ritualCard, { backgroundColor: pd.bg, borderLeftColor: pd.color }]}>
           <Text style={[styles.ritualLabel, { color: pd.color }]}>Today's ritual · {pd.label}</Text>
           <Text style={styles.ritualText}>{pd.ritual}</Text>
@@ -209,4 +225,11 @@ const styles = StyleSheet.create({
   journalInput: { borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:12, padding:12, fontSize:13, fontFamily: Fonts.sans, color: Colors.plum, backgroundColor: Colors.parchment, minHeight:80, textAlignVertical:'top', marginBottom:10 },
   saveButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:8, paddingHorizontal:20, alignSelf:'flex-start' },
   saveButtonText: { fontFamily: Fonts.sans, fontSize:12, color: Colors.parchment },
+  welcomeCard: { backgroundColor: Colors.plum, borderRadius: 20, padding: 20, marginBottom: 20 },
+  welcomeTitle: { fontFamily: Fonts.serif, fontSize: 20, color: Colors.goldLight, marginBottom: 4 },
+  welcomeSub: { fontFamily: Fonts.sans, fontSize: 10, color: 'rgba(245,239,230,0.6)', marginBottom: 14, letterSpacing: 2 },
+  welcomeRow: { flexDirection: 'row', gap: 12, marginBottom: 10, alignItems: 'flex-start' },
+  welcomeGlyph: { fontFamily: Fonts.sans, fontSize: 14, color: Colors.gold, marginTop: 2 },
+  welcomeTab: { fontFamily: Fonts.sansMedium, fontSize: 13, color: Colors.goldLight, marginBottom: 1 },
+  welcomeDesc: { fontFamily: Fonts.sans, fontSize: 11, color: 'rgba(245,239,230,0.65)', lineHeight: 17 },
 });
