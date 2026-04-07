@@ -104,7 +104,7 @@ export default function RitualScreen() {
 
         <View style={styles.card}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-            <Text style={styles.cardTitle}>Morning supplement ritual</Text>
+            <Text style={[styles.cardTitle, { flex:1, marginBottom:0, fontSize:16 }]}>Morning supplement ritual</Text>
             <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
               <Text style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold }}>+ manage</Text>
             </TouchableOpacity>
