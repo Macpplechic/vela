@@ -13,7 +13,7 @@ export default function RitualScreen() {
   const {
     phase, mySuppsData, checkedSupps, setCheckedSupps,
     symptoms, setSymptoms, journal, setJournal,
-    totals, foods, streak, lastStreakDate, incrementStreak,
+    totals, foods, streak, lastStreakDate, incrementStreak, history: velaHistory, history,
   } = useVelaStore();
   const [journalSaved, setJournalSaved] = useState(false);
 
@@ -67,16 +67,16 @@ export default function RitualScreen() {
         <Text style={styles.greeting}>{greeting}, beautiful.</Text>
         <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>
 
-        {history.length === 0 && (
+        {velaHistory.length === 0 && (
           <View style={styles.welcomeCard}>
             <Text style={styles.welcomeTitle}>Welcome to Vela ✦</Text>
-            <Text style={styles.welcomeSub}>HERE'S WHAT TO DO EACH DAY</Text>
+            <Text style={styles.welcomeSub}>HERE IS WHAT TO DO EACH DAY</Text>
             {[['◈','Ritual','Check off supplements and log symptoms'],['◇','Plate','Log food for hormone insights'],['◎','FluxLog','Track your cycle patterns'],['◇','CoolDown','Guided hot flash relief'],['✦','Profile','Build your supplement stack']].map(([g,tab,desc]) => (
               <View key={tab} style={styles.welcomeRow}>
-                <Text style={styles.welcomeGlyph}>{g}</Text>
+                <Text style={styles.welcomeGlyph}>{g as string}</Text>
                 <View style={{ flex:1 }}>
-                  <Text style={styles.welcomeTab}>{tab}</Text>
-                  <Text style={styles.welcomeDesc}>{desc}</Text>
+                  <Text style={styles.welcomeTab}>{tab as string}</Text>
+                  <Text style={styles.welcomeDesc}>{desc as string}</Text>
                 </View>
               </View>
             ))}

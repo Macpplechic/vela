@@ -62,7 +62,7 @@ export default function OnboardingScreen() {
 
   const handleDone = async () => {
     await setOnboarded(true);
-    router.replace('/(tabs)/ritual');
+    setTimeout(() => router.replace('/quiz'), 100);
   };
 
   const slide = SLIDES[current];
