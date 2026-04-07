@@ -90,7 +90,7 @@ export default function CoolScreen() {
                 </View>
                 {activeProtocol===i && <Text style={styles.protocolDesc}>{p.desc}</Text>}
                 {activeProtocol===i && (
-                  <TouchableOpacity style={styles.startBtn}>
+                  <TouchableOpacity style={styles.startBtn} onPress={() => {}} activeOpacity={0.8}>
                     <Text style={styles.startBtnText}>Start protocol →</Text>
                   </TouchableOpacity>
                 )}
