@@ -450,7 +450,7 @@ export default function ProfileScreen() {
 
       {/* ── Supplement Library Modal ── */}
       <Modal visible={showSuppLib} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowSuppLib(false)}>
-        <SafeAreaView style={{ flex:1, backgroundColor: Colors.cream }}>
+        <SafeAreaView style={{ flex:1, backgroundColor: Colors.cream }} edges={["top"]}>
           <View style={styles.modalHeader}>
             <Text allowFontScaling={false} style={styles.modalTitle}>Supplement library</Text>
             <TouchableOpacity onPress={() => setShowSuppLib(false)}>
@@ -464,7 +464,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <ScrollView contentContainerStyle={{ padding:20 }}>
+          <ScrollView contentContainerStyle={{ padding:20, paddingBottom: 60 }}>
             {(SUPP_LIBRARY as any[]).filter((s:any) => s.category === suppCat).map((s:any) => {
               const inR = mySupps.includes(s.id);
               return (

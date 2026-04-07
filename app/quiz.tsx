@@ -42,7 +42,7 @@ export default function QuizScreen() {
   const q = QUESTIONS[step];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text allowFontScaling={false} style={styles.logo}>vela</Text>
         <Text allowFontScaling={false} style={styles.stepLabel}>Question {step + 1} of {QUESTIONS.length}</Text>

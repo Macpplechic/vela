@@ -270,7 +270,7 @@ export default function CoolScreen() {
         p => p.product.identifier === 'com.velawellness.app.cooldown_monthly'
       ) ?? null;
       if (found) setPkg(found);
-    } catch (e) { console.log('Offerings error:', e); }
+    } catch (e) { /* offerings unavailable */ }
   };
 
   const handlePurchase = async () => {

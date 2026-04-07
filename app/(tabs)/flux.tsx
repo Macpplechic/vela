@@ -24,7 +24,7 @@ export default function FluxScreen() {
         p => p.product.identifier === 'com.velawellness.app.fluxlog_monthly'
       );
       if (monthly) setPkg(monthly);
-    } catch (e) { console.log('Offerings error:', e); }
+    } catch (e) { /* offerings unavailable */ }
   };
 
   const handlePurchase = async () => {
@@ -63,7 +63,7 @@ export default function FluxScreen() {
         <Text style={styles.logoText}>vela</Text>
         <Text style={styles.subText}>your shift. your terms.</Text>
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.pageTitle}>FluxLog ◎</Text>
         <Text style={styles.pageSub}>Cycle tracking designed for the peri years.</Text>
         {fluxActive ? (
@@ -72,7 +72,7 @@ export default function FluxScreen() {
               <Text style={styles.cardTitle}>Log today</Text>
               <Text style={styles.cardSub}>Track flow, spotting, and irregularities.</Text>
               {['Light spotting','Light flow','Moderate flow','Heavy flow','No period'].map(opt => (
-                <TouchableOpacity key={opt} style={styles.optRow}>
+                <TouchableOpacity key={opt} style={styles.optRow} onPress={() => {}} activeOpacity={0.7}>
                   <View style={styles.optDot} />
                   <Text style={styles.optText}>{opt}</Text>
                 </TouchableOpacity>

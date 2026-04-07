@@ -21,12 +21,12 @@ export default function ShiftScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.logoText}>vela</Text>
         <Text style={styles.subText}>your shift. your terms.</Text>
       </View>
-      <ScrollView style={{flex:1}} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{flex:1}} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.pageTitle}>The Shift</Text>
         <Text style={styles.pageSub}>Women who get it, because they're living it.</Text>
 
@@ -77,7 +77,7 @@ export default function ShiftScreen() {
                   {likedPosts.includes(p.id) ? '♥' : '♡'} {p.likes + (likedPosts.includes(p.id) ? 1 : 0)}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn}>
+              <TouchableOpacity style={styles.actionBtn} onPress={() => {}}>
                 <Text style={styles.actionText}>◎ reply</Text>
               </TouchableOpacity>
             </View>

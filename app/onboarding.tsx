@@ -32,7 +32,7 @@ export default function OnboardingScreen() {
   const s = SLIDES[slide];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.topRow}>
         <View style={styles.dots}>
           {SLIDES.map((_, i) => (
