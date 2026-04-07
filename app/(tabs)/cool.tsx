@@ -1,17 +1,249 @@
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Alert } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Alert, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
+import * as Haptics from 'expo-haptics';
 import { Colors, Fonts } from '../../constants/Colors';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 const RC_API_KEY = 'appl_ZXvRoLscVYwTsOwsgaswQuLvRgC';
-const PROTOCOLS = [
-  { title:'4-7-8 Breath', duration:'4 min', desc:'Inhale 4 counts, hold 7, exhale 8. Activates the parasympathetic nervous system to cool core temperature.' },
-  { title:'Cold Water Reset', duration:'2 min', desc:'Run cold water over your wrists and back of neck. Rapid cooling of pulse points reduces flush intensity.' },
-  { title:'Progressive Muscle Release', duration:'6 min', desc:'Systematically tense and release muscle groups from feet to face. Releases stored heat and tension.' },
-  { title:'Paced Breathing', duration:'5 min', desc:'Breathe in for 5 counts, out for 5. Studies show paced breathing reduces hot flash frequency by up to 50%.' },
+
+interface Step {
+  label: string;
+  duration: number; // seconds
+  instruction: string;
+  color: string;
+}
+
+interface Protocol {
+  title: string;
+  duration: string;
+  desc: string;
+  steps: Step[];
+}
+
+const PROTOCOLS: Protocol[] = [
+  {
+    title: '4-7-8 Breath',
+    duration: '4 min',
+    desc: 'Inhale 4 counts, hold 7, exhale 8. Activates the parasympathetic nervous system to cool core temperature.',
+    steps: [
+      { label: 'Inhale', duration: 4, instruction: 'Breathe in slowly through your nose', color: '#4A9B8E' },
+      { label: 'Hold', duration: 7, instruction: 'Hold your breath gently', color: '#7B5EA7' },
+      { label: 'Exhale', duration: 8, instruction: 'Breathe out completely through your mouth', color: '#B8934A' },
+      { label: 'Inhale', duration: 4, instruction: 'Breathe in slowly through your nose', color: '#4A9B8E' },
+      { label: 'Hold', duration: 7, instruction: 'Hold your breath gently', color: '#7B5EA7' },
+      { label: 'Exhale', duration: 8, instruction: 'Breathe out completely through your mouth', color: '#B8934A' },
+      { label: 'Inhale', duration: 4, instruction: 'Breathe in slowly through your nose', color: '#4A9B8E' },
+      { label: 'Hold', duration: 7, instruction: 'Hold your breath gently', color: '#7B5EA7' },
+      { label: 'Exhale', duration: 8, instruction: 'Breathe out completely through your mouth', color: '#B8934A' },
+      { label: 'Inhale', duration: 4, instruction: 'Breathe in slowly through your nose', color: '#4A9B8E' },
+      { label: 'Hold', duration: 7, instruction: 'Hold your breath gently', color: '#7B5EA7' },
+      { label: 'Exhale', duration: 8, instruction: 'Breathe out completely through your mouth', color: '#B8934A' },
+    ],
+  },
+  {
+    title: 'Cold Water Reset',
+    duration: '2 min',
+    desc: 'Run cold water over your wrists and back of neck. Rapid cooling of pulse points reduces flush intensity.',
+    steps: [
+      { label: 'Prepare', duration: 10, instruction: 'Go to a sink with cold water. Take a slow breath.', color: '#4A9B8E' },
+      { label: 'Wrists', duration: 30, instruction: 'Run cold water over your inner wrists and pulse points', color: '#4A9B8E' },
+      { label: 'Breathe', duration: 10, instruction: 'Breathe slowly while the cool water works', color: '#7B5EA7' },
+      { label: 'Neck', duration: 30, instruction: 'Cup cold water and apply to the back of your neck', color: '#4A9B8E' },
+      { label: 'Breathe', duration: 10, instruction: 'Keep breathing slowly and steadily', color: '#7B5EA7' },
+      { label: 'Face', duration: 20, instruction: 'Splash cold water gently on your face if comfortable', color: '#4A9B8E' },
+      { label: 'Rest', duration: 10, instruction: 'Pat dry and notice the cooling sensation spreading', color: '#B8934A' },
+    ],
+  },
+  {
+    title: 'Progressive Muscle Release',
+    duration: '6 min',
+    desc: 'Systematically tense and release muscle groups from feet to face. Releases stored heat and tension.',
+    steps: [
+      { label: 'Settle', duration: 15, instruction: 'Sit or lie comfortably. Close your eyes.', color: '#7B5EA7' },
+      { label: 'Feet — tense', duration: 5, instruction: 'Curl your toes tightly', color: '#B8934A' },
+      { label: 'Feet — release', duration: 10, instruction: 'Let your feet go completely loose', color: '#4A9B8E' },
+      { label: 'Calves — tense', duration: 5, instruction: 'Flex your calf muscles hard', color: '#B8934A' },
+      { label: 'Calves — release', duration: 10, instruction: 'Release and feel the warmth flow out', color: '#4A9B8E' },
+      { label: 'Thighs — tense', duration: 5, instruction: 'Squeeze your thigh muscles', color: '#B8934A' },
+      { label: 'Thighs — release', duration: 10, instruction: 'Let them drop completely', color: '#4A9B8E' },
+      { label: 'Abdomen — tense', duration: 5, instruction: 'Pull your belly in tightly', color: '#B8934A' },
+      { label: 'Abdomen — release', duration: 10, instruction: 'Let your belly soften completely', color: '#4A9B8E' },
+      { label: 'Hands — tense', duration: 5, instruction: 'Make tight fists', color: '#B8934A' },
+      { label: 'Hands — release', duration: 10, instruction: 'Open your hands and let them go limp', color: '#4A9B8E' },
+      { label: 'Shoulders — tense', duration: 5, instruction: 'Raise your shoulders to your ears', color: '#B8934A' },
+      { label: 'Shoulders — release', duration: 10, instruction: 'Drop them completely and feel the release', color: '#4A9B8E' },
+      { label: 'Face — tense', duration: 5, instruction: 'Scrunch your whole face tight', color: '#B8934A' },
+      { label: 'Face — release', duration: 15, instruction: 'Let every muscle in your face go soft', color: '#4A9B8E' },
+      { label: 'Rest', duration: 20, instruction: 'Breathe naturally. Feel the stillness.', color: '#7B5EA7' },
+    ],
+  },
+  {
+    title: 'Paced Breathing',
+    duration: '5 min',
+    desc: 'Breathe in for 5 counts, out for 5. Studies show paced breathing reduces hot flash frequency by up to 50%.',
+    steps: [
+      { label: 'Settle', duration: 15, instruction: 'Sit comfortably. Place one hand on your chest.', color: '#7B5EA7' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Inhale', duration: 5, instruction: 'Breathe in slowly — 1, 2, 3, 4, 5', color: '#4A9B8E' },
+      { label: 'Exhale', duration: 5, instruction: 'Breathe out slowly — 1, 2, 3, 4, 5', color: '#B8934A' },
+      { label: 'Rest', duration: 15, instruction: 'Breathe naturally. You did it.', color: '#7B5EA7' },
+    ],
+  },
 ];
+
+function ProtocolTimer({ protocol, onClose }: { protocol: Protocol; onClose: () => void }) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(protocol.steps[0].duration);
+  const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(false);
+  const progress = useRef(new Animated.Value(1)).current;
+
+  const currentStep = protocol.steps[stepIndex];
+  const totalSteps = protocol.steps.length;
+
+  useEffect(() => {
+    if (!running) return;
+    if (secondsLeft <= 0) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      if (stepIndex < totalSteps - 1) {
+        const next = stepIndex + 1;
+        setStepIndex(next);
+        setSecondsLeft(protocol.steps[next].duration);
+        progress.setValue(1);
+        Animated.timing(progress, { toValue: 0, duration: protocol.steps[next].duration * 1000, useNativeDriver: false }).start();
+      } else {
+        setRunning(false);
+        setDone(true);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      return;
+    }
+    const timer = setTimeout(() => setSecondsLeft(s => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [running, secondsLeft, stepIndex]);
+
+  const handleStart = () => {
+    setRunning(true);
+    progress.setValue(1);
+    Animated.timing(progress, { toValue: 0, duration: currentStep.duration * 1000, useNativeDriver: false }).start();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleReset = () => {
+    setRunning(false);
+    setDone(false);
+    setStepIndex(0);
+    setSecondsLeft(protocol.steps[0].duration);
+    progress.setValue(1);
+  };
+
+  const bgColor = currentStep.color + '22';
+
+  return (
+    <View style={timerStyles.container}>
+      <TouchableOpacity style={timerStyles.closeBtn} onPress={onClose}>
+        <Text style={timerStyles.closeTxt}>✕ Close</Text>
+      </TouchableOpacity>
+
+      <Text style={timerStyles.protocolName}>{protocol.title}</Text>
+      <Text style={timerStyles.stepCount}>{done ? 'Complete' : `Step ${stepIndex + 1} of ${totalSteps}`}</Text>
+
+      {/* Circle timer */}
+      <View style={[timerStyles.circle, { backgroundColor: bgColor, borderColor: currentStep.color }]}>
+        {done ? (
+          <Text style={timerStyles.doneGlyph}>✦</Text>
+        ) : (
+          <>
+            <Text style={[timerStyles.countdown, { color: currentStep.color }]}>{secondsLeft}</Text>
+            <Text style={timerStyles.stepLabel}>{currentStep.label}</Text>
+          </>
+        )}
+      </View>
+
+      {/* Progress bar */}
+      {!done && (
+        <View style={timerStyles.progressTrack}>
+          <Animated.View style={[timerStyles.progressFill, {
+            backgroundColor: currentStep.color,
+            width: progress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+          }]} />
+        </View>
+      )}
+
+      {/* Instruction */}
+      <View style={[timerStyles.instructionBox, { backgroundColor: bgColor }]}>
+        <Text style={[timerStyles.instruction, { color: done ? Colors.sage : currentStep.color }]}>
+          {done ? 'Well done. Your nervous system has been reset.' : currentStep.instruction}
+        </Text>
+      </View>
+
+      {/* Step dots */}
+      <View style={timerStyles.dots}>
+        {protocol.steps.map((_, i) => (
+          <View key={i} style={[timerStyles.dot, {
+            backgroundColor: i < stepIndex ? Colors.sage : i === stepIndex ? currentStep.color : Colors.parchmentDark,
+            width: i === stepIndex ? 10 : 6,
+            height: i === stepIndex ? 10 : 6,
+          }]} />
+        ))}
+      </View>
+
+      {/* Action button */}
+      {done ? (
+        <TouchableOpacity style={[timerStyles.actionBtn, { backgroundColor: Colors.sage }]} onPress={handleReset}>
+          <Text style={timerStyles.actionBtnTxt}>Do it again</Text>
+        </TouchableOpacity>
+      ) : running ? (
+        <TouchableOpacity style={[timerStyles.actionBtn, { backgroundColor: Colors.parchmentDark }]} onPress={() => { setRunning(false); progress.stopAnimation(); }}>
+          <Text style={[timerStyles.actionBtnTxt, { color: Colors.mist }]}>Pause</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={[timerStyles.actionBtn, { backgroundColor: currentStep.color }]} onPress={handleStart} activeOpacity={0.85}>
+          <Text style={timerStyles.actionBtnTxt}>{stepIndex === 0 && secondsLeft === protocol.steps[0].duration ? 'Begin' : 'Resume'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+const timerStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.parchment, alignItems: 'center', justifyContent: 'center', padding: 30 },
+  closeBtn: { position: 'absolute', top: 20, right: 20, padding: 8 },
+  closeTxt: { fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist },
+  protocolName: { fontFamily: Fonts.serif, fontSize: 22, color: Colors.plum, marginBottom: 4, textAlign: 'center' },
+  stepCount: { fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 32 },
+  circle: { width: 180, height: 180, borderRadius: 90, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
+  countdown: { fontFamily: Fonts.sansMedium, fontSize: 56, lineHeight: 64 },
+  stepLabel: { fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist, marginTop: 4 },
+  doneGlyph: { fontSize: 48, color: Colors.sage },
+  progressTrack: { width: '100%', height: 4, backgroundColor: Colors.parchmentDark, borderRadius: 2, marginBottom: 24, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 2 },
+  instructionBox: { borderRadius: 16, padding: 16, width: '100%', marginBottom: 24, minHeight: 60, alignItems: 'center', justifyContent: 'center' },
+  instruction: { fontFamily: Fonts.sans, fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  dots: { flexDirection: 'row', gap: 5, alignItems: 'center', marginBottom: 32 },
+  dot: { borderRadius: 5 },
+  actionBtn: { borderRadius: 30, paddingVertical: 14, paddingHorizontal: 40 },
+  actionBtnTxt: { fontFamily: Fonts.sansMedium, fontSize: 15, color: Colors.parchment, letterSpacing: 0.5 },
+});
 
 export default function CoolScreen() {
   const { coolActive, unlockCool } = useVelaStore();
@@ -19,18 +251,25 @@ export default function CoolScreen() {
   const [loading, setLoading] = useState(false);
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
   const [activeProtocol, setActiveProtocol] = useState<number | null>(null);
+  const [runningProtocol, setRunningProtocol] = useState<Protocol | null>(null);
 
-  useEffect(() => {
-    loadOffering();
-  }, []);
+  useEffect(() => { loadOffering(); }, []);
 
   const loadOffering = async () => {
     try {
       const offerings = await Purchases.getOfferings();
-      const monthly = offerings.current?.availablePackages.find(
+      let found = null;
+      const allOfferings = Object.values(offerings.all);
+      for (const offering of allOfferings) {
+        const match = offering.availablePackages.find(
+          p => p.product.identifier === 'com.velawellness.app.cooldown_monthly'
+        );
+        if (match) { found = match; break; }
+      }
+      if (!found) found = offerings.current?.availablePackages.find(
         p => p.product.identifier === 'com.velawellness.app.cooldown_monthly'
-      );
-      if (monthly) setPkg(monthly);
+      ) ?? null;
+      if (found) setPkg(found);
     } catch (e) { console.log('Offerings error:', e); }
   };
 
@@ -39,11 +278,9 @@ export default function CoolScreen() {
     setLoading(true);
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg);
-      if (customerInfo.entitlements.active['cooldown']) {
-        await unlockCool();
-        setShowPaywall(false);
-        Alert.alert('Welcome to CoolDown ◇', 'Your hot flash protocols are now unlocked.');
-      }
+      await unlockCool();
+      setShowPaywall(false);
+      Alert.alert('Welcome to CoolDown ◇', 'Your hot flash protocols are now unlocked.');
     } catch (e: any) {
       if (!e.userCancelled) Alert.alert('Purchase failed', e.message ?? 'Something went wrong.');
     } finally { setLoading(false); }
@@ -64,13 +301,22 @@ export default function CoolScreen() {
 
   const price = pkg?.product.priceString ?? '$4.99';
 
+  // Show guided timer modal
+  if (runningProtocol) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <ProtocolTimer protocol={runningProtocol} onClose={() => setRunningProtocol(null)} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.logoText}>vela</Text>
         <Text style={styles.subText}>your shift. your terms.</Text>
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.pageTitle}>CoolDown ◇</Text>
         <Text style={styles.pageSub}>Science-backed protocols for hot flash relief.</Text>
         {coolActive ? (
@@ -90,8 +336,16 @@ export default function CoolScreen() {
                 </View>
                 {activeProtocol===i && <Text style={styles.protocolDesc}>{p.desc}</Text>}
                 {activeProtocol===i && (
-                  <TouchableOpacity style={styles.startBtn} onPress={() => {}} activeOpacity={0.8}>
-                    <Text style={styles.startBtnText}>Start protocol →</Text>
+                  <TouchableOpacity
+                    style={styles.startBtn}
+                    activeOpacity={0.85}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      setRunningProtocol(p);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    }}
+                  >
+                    <Text style={styles.startBtnText}>▶  Start guided session</Text>
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
@@ -114,8 +368,8 @@ export default function CoolScreen() {
             </View>
           </>
         )}
-        <View style={{ height: 20 }} />
       </ScrollView>
+
       <Modal visible={showPaywall} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowPaywall(false)}>
         <SafeAreaView style={styles.modalSafe}>
           <TouchableOpacity style={styles.modalClose} onPress={() => setShowPaywall(false)}>
@@ -167,8 +421,8 @@ const styles = StyleSheet.create({
   protocolDuration:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist},
   protocolChevron:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist},
   protocolDesc:{fontFamily:Fonts.sans,fontSize:13,color:Colors.plum,lineHeight:20,marginTop:12},
-  startBtn:{backgroundColor:Colors.teal,borderRadius:20,paddingVertical:8,paddingHorizontal:20,alignSelf:'flex-start',marginTop:12},
-  startBtnText:{fontFamily:Fonts.sansMedium,fontSize:12,color:Colors.cream},
+  startBtn:{backgroundColor:Colors.teal,borderRadius:20,paddingVertical:10,paddingHorizontal:20,alignSelf:'flex-start',marginTop:14},
+  startBtnText:{fontFamily:Fonts.sansMedium,fontSize:13,color:Colors.cream},
   lockedCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:24,marginBottom:16,alignItems:'center'},
   lockedGlyph:{fontSize:40,color:Colors.plumLight,marginBottom:16},
   lockedTitle:{fontFamily:Fonts.serif,fontSize:20,color:Colors.plum,textAlign:'center',marginBottom:10},
