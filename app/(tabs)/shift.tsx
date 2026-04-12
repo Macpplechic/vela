@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '../../constants/Colors';
 import { PHASES, COMMUNITY_POSTS } from '../../constants/Data';
@@ -9,6 +9,9 @@ export default function ShiftScreen() {
   const { phase, likedPosts, setLikedPosts } = useVelaStore();
   const [filter, setFilter] = useState('all');
   const [newPost, setNewPost] = useState('');
+  const [reportTarget, setReportTarget] = useState<{ id: number; user: string } | null>(null);
+  const [reportReason, setReportReason] = useState('');
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const pd = PHASES[phase ?? 'late'];
 
   const filtered = filter === 'all' ? COMMUNITY_POSTS : COMMUNITY_POSTS.filter(p => p.tag === filter);
@@ -19,6 +22,34 @@ export default function ShiftScreen() {
     const next = likedPosts.includes(id) ? likedPosts.filter(x => x !== id) : [...likedPosts, id];
     await setLikedPosts(next);
   };
+
+  const submitReport = () => {
+    if (!reportReason) { Alert.alert('Select a reason', 'Please choose a reason.'); return; }
+    setReportTarget(null); setReportReason('');
+    Alert.alert('Report submitted', 'Thanks. We review all reports within 24 hours.');
+  };
+
+  if (!hasAcceptedTerms) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Text style={styles.logoText}>vela</Text>
+          <Text style={styles.subText}>your shift. your terms.</Text>
+        </View>
+        <View style={styles.termsGate}>
+          <Text style={styles.termsTitle}>Community Guidelines</Text>
+          <Text style={styles.termsBody}>
+            {'The Shift is a space for honest, supportive conversation. By joining you agree to our '}
+            <Text style={styles.termsLink} onPress={() => Linking.openURL('https://velaforwomen.com/terms')}>Terms of Use</Text>
+            {'. Zero tolerance for harassment or abusive content.'}
+          </Text>
+          <TouchableOpacity style={styles.termsBtn} onPress={() => setHasAcceptedTerms(true)} activeOpacity={0.85}>
+            <Text style={styles.termsBtnText}>I Agree — Enter The Shift</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -69,6 +100,9 @@ export default function ShiftScreen() {
               <View style={[styles.tagBadge, { backgroundColor:`${tagColors[p.tag] ?? Colors.gold}20` }]}>
                 <Text style={[styles.tagText, { color: tagColors[p.tag] ?? Colors.gold }]}>{p.tag}</Text>
               </View>
+              <TouchableOpacity onPress={() => setReportTarget({ id: p.id, user: p.user })} hitSlop={{ top:8,bottom:8,left:8,right:8 }}>
+                <Text style={styles.moreBtn}>···</Text>
+              </TouchableOpacity>
             </View>
             <Text style={styles.postText}>{p.text}</Text>
             <View style={styles.postActions}>
@@ -85,6 +119,25 @@ export default function ShiftScreen() {
         ))}
         <View style={{ height:20 }} />
       </ScrollView>
+      <Modal visible={!!reportTarget} transparent animationType="fade" onRequestClose={() => setReportTarget(null)}>
+        <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setReportTarget(null)} />
+        <View style={styles.reportSheet}>
+          <Text style={styles.reportTitle}>Report {reportTarget?.user}</Text>
+          <Text style={styles.reportSub}>Anonymous. Reviewed within 24 hours.</Text>
+          {['Spam','Harassment or bullying','Misinformation','Inappropriate content','Other'].map(r => (
+            <TouchableOpacity key={r} style={[styles.reasonRow, reportReason===r && styles.reasonRowActive]} onPress={() => setReportReason(r)}>
+              <Text style={[styles.reasonText, reportReason===r && styles.reasonTextActive]}>{r}</Text>
+              {reportReason===r && <Text style={styles.reasonCheck}>✓</Text>}
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity style={[styles.reportBtn, !reportReason && styles.reportBtnDisabled]} onPress={submitReport} disabled={!reportReason} activeOpacity={0.85}>
+            <Text style={styles.reportBtnText}>Submit Report</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.cancelBtn} onPress={() => { setReportTarget(null); setReportReason(''); }}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -119,4 +172,25 @@ const styles = StyleSheet.create({
   postActions:{flexDirection:'row',gap:16},
   actionBtn:{},
   actionText:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist},
+  moreBtn:{fontFamily:Fonts.sans,fontSize:18,color:Colors.mist,paddingHorizontal:4},
+  termsGate:{flex:1,justifyContent:'center',alignItems:'center',padding:32},
+  termsTitle:{fontFamily:Fonts.serif,fontSize:22,color:Colors.plum,marginBottom:16,textAlign:'center'},
+  termsBody:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum,lineHeight:22,textAlign:'center',marginBottom:28},
+  termsLink:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum,textDecorationLine:'underline'},
+  termsBtn:{backgroundColor:Colors.plum,borderRadius:28,paddingVertical:16,paddingHorizontal:40},
+  termsBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment},
+  modalBackdrop:{position:'absolute',top:0,left:0,right:0,bottom:0,backgroundColor:'rgba(0,0,0,0.5)'},
+  reportSheet:{position:'absolute',bottom:0,left:0,right:0,backgroundColor:Colors.parchment,borderTopLeftRadius:20,borderTopRightRadius:20,padding:24,paddingBottom:40},
+  reportTitle:{fontFamily:Fonts.serif,fontSize:18,color:Colors.plum,marginBottom:4},
+  reportSub:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,marginBottom:16},
+  reasonRow:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingVertical:13,paddingHorizontal:12,borderRadius:10,marginBottom:6,backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark},
+  reasonRowActive:{backgroundColor:'#3C204015',borderColor:Colors.plum},
+  reasonText:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum},
+  reasonTextActive:{fontFamily:Fonts.sansMedium,color:Colors.plum},
+  reasonCheck:{fontFamily:Fonts.sansMedium,fontSize:14,color:Colors.plum},
+  reportBtn:{backgroundColor:Colors.plum,borderRadius:28,paddingVertical:15,alignItems:'center',marginTop:8,marginBottom:8},
+  reportBtnDisabled:{opacity:0.4},
+  reportBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment},
+  cancelBtn:{alignItems:'center',paddingVertical:10},
+  cancelText:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist},
 });

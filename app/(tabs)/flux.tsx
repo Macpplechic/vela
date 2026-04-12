@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -247,7 +247,13 @@ export default function FluxScreen() {
             <TouchableOpacity style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
               <Text style={styles.restoreBtnText}>Restore purchase</Text>
             </TouchableOpacity>
-            <Text style={styles.legalText}>Subscription auto-renews monthly. Cancel anytime in Apple ID settings.</Text>
+            <View style={styles.legalRow}>
+              <Text style={styles.legalText}>{'FluxLog is $4.99/mo. Auto-renews unless cancelled 24hrs before renewal. Manage in App Store settings. '}
+                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://velaforwomen.com/terms')}>Terms of Use</Text>
+                <Text style={styles.legalText}>{' · '}</Text>
+                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://velaforwomen.com/privacy')}>Privacy Policy</Text>
+              </Text>
+            </View>
           </ScrollView>
         </SafeAreaView>
       </Modal>
@@ -311,5 +317,7 @@ const styles = StyleSheet.create({
   purchaseBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment,letterSpacing:0.5},
   restoreBtn:{paddingVertical:12,alignItems:'center'},
   restoreBtnText:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist},
-  legalText:{fontFamily:Fonts.sans,fontSize:10,color:Colors.mist,textAlign:'center',lineHeight:16,marginTop:16},
+  legalRow:{marginTop:16,paddingHorizontal:8},
+  legalText:{fontFamily:Fonts.sans,fontSize:10,color:Colors.mist,textAlign:'center',lineHeight:16},
+  legalLink:{fontFamily:Fonts.sans,fontSize:10,color:Colors.plum,textDecorationLine:'underline'},
 });
