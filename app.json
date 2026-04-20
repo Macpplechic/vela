@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.velawellness.app",
-      "buildNumber": "13",
+      "buildNumber": "14",
       "infoPlist": {
         "NSHealthShareUsageDescription": "Vela uses HealthKit to help you track your wellness journey through perimenopause.",
         "NSHealthUpdateUsageDescription": "Vela may write wellness data to HealthKit to help you track your progress.",
