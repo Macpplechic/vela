@@ -207,7 +207,7 @@ export default function FluxScreen() {
         )}
       </ScrollView>
 
-      <Modal visible={showPaywall} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowPaywall(false)}>
+      <Modal visible={showPaywall} animationType="slide" onRequestClose={() => setShowPaywall(false)}>
         <SafeAreaView style={styles.modalSafe} edges={['top']}>
           <TouchableOpacity style={styles.modalClose} onPress={() => setShowPaywall(false)}>
             <Text style={styles.modalCloseText}>✕</Text>

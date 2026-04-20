@@ -18,6 +18,7 @@ import {
 } from '@expo-google-fonts/jost';
 
 import { scheduleVelaNotifications } from '../hooks/useNotifications';
+import Purchases from 'react-native-purchases';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,6 +36,10 @@ export default function RootLayout() {
     Jost_400Regular,
     Jost_500Medium,
   });
+
+  useEffect(() => {
+    Purchases.configure({ apiKey: 'appl_ZXvRoLscVYwTsOwsgaswQuLvRgC' });
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync();
