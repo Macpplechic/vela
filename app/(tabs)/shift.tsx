@@ -6,7 +6,7 @@ import { PHASES, COMMUNITY_POSTS } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 export default function ShiftScreen() {
-  const { phase, likedPosts, setLikedPosts } = useVelaStore();
+  const { phase, likedPosts, setLikedPosts, blockedUsers, setBlockedUsers } = useVelaStore();
   const [filter, setFilter] = useState('all');
   const [newPost, setNewPost] = useState('');
   const [reportTarget, setReportTarget] = useState<{ id: number; user: string } | null>(null);
@@ -14,7 +14,32 @@ export default function ShiftScreen() {
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const pd = PHASES[phase ?? 'late'];
 
-  const filtered = filter === 'all' ? COMMUNITY_POSTS : COMMUNITY_POSTS.filter(p => p.tag === filter);
+  const visiblePosts = COMMUNITY_POSTS.filter(p => !blockedUsers.includes(p.user));
+  const filtered = filter === 'all' ? visiblePosts : visiblePosts.filter(p => p.tag === filter);
+
+  const notifyDeveloper = async (blockedUser: string) => {
+    try {
+      await fetch('https://formsubmit.co/ajax/support@velaforwomen.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          subject: 'Vela Wellness – User Blocked',
+          message: `A community member has blocked user: "${blockedUser}". Their posts have been removed from that user's feed.`,
+        }),
+      });
+    } catch { /* silent — notification is best-effort */ }
+  };
+
+  const blockUser = async () => {
+    if (!reportTarget) return;
+    const { user } = reportTarget;
+    setReportTarget(null);
+    setReportReason('');
+    const updated = blockedUsers.includes(user) ? blockedUsers : [...blockedUsers, user];
+    await setBlockedUsers(updated);
+    await notifyDeveloper(user);
+    Alert.alert('User blocked', `${user} has been blocked. Their posts have been removed from your feed.`);
+  };
   const phaseColors: Record<string, string> = { early:Colors.gold, late:Colors.rose, post:Colors.sage };
   const tagColors: Record<string, string> = { wins:Colors.sage, tips:Colors.gold, questions:Colors.plumLight, health:Colors.rose };
 
@@ -133,6 +158,9 @@ export default function ShiftScreen() {
           <TouchableOpacity style={[styles.reportBtn, !reportReason && styles.reportBtnDisabled]} onPress={submitReport} disabled={!reportReason} activeOpacity={0.85}>
             <Text style={styles.reportBtnText}>Submit Report</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.blockBtn} onPress={blockUser} activeOpacity={0.85}>
+            <Text style={styles.blockBtnText}>Block {reportTarget?.user}</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.cancelBtn} onPress={() => { setReportTarget(null); setReportReason(''); }}>
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
@@ -191,6 +219,8 @@ const styles = StyleSheet.create({
   reportBtn:{backgroundColor:Colors.plum,borderRadius:28,paddingVertical:15,alignItems:'center',marginTop:8,marginBottom:8},
   reportBtnDisabled:{opacity:0.4},
   reportBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment},
+  blockBtn:{borderWidth:1,borderColor:'#C0392B',borderRadius:28,paddingVertical:13,alignItems:'center',marginBottom:8},
+  blockBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:'#C0392B'},
   cancelBtn:{alignItems:'center',paddingVertical:10},
   cancelText:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist},
 });
