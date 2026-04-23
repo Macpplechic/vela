@@ -170,7 +170,7 @@ export default function RitualScreen() {
             multiline
             numberOfLines={4}
           />
-          <TouchableOpacity style={styles.saveButton} onPress={() => { setJournal(journal); setJournalSaved(true); }} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.saveButton} onPress={async () => { await setJournal(journal); setJournalSaved(true); }} activeOpacity={0.8}>
             <Text style={styles.saveButtonText}>{journalSaved ? '✓ Saved' : 'Save'}</Text>
           </TouchableOpacity>
         </View>

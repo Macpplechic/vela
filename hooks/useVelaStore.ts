@@ -249,8 +249,10 @@ export function useVelaStore() {
 
   const incrementStreak = useCallback(async (currentStreak: number, lastDate: string | null) => {
     const todayS = new Date().toISOString().split('T')[0];
-    if (lastDate === todayS) return currentStreak; // already incremented today
-    const newStreak = currentStreak + 1;
+    if (lastDate === todayS) return currentStreak;
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yesterdayS = yesterday.toISOString().split('T')[0];
+    const newStreak = lastDate === yesterdayS ? currentStreak + 1 : 1;
     setStreakState(newStreak);
     setLastStreakDateState(todayS);
     await AsyncStorage.setItem(K.STREAK, JSON.stringify(newStreak));
