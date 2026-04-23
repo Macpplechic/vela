@@ -249,9 +249,9 @@ export default function FluxScreen() {
             </TouchableOpacity>
             <View style={styles.legalRow}>
               <Text style={styles.legalText}>{'FluxLog is $4.99/mo. Auto-renews unless cancelled 24hrs before renewal. Manage in App Store settings. '}
-                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://velaforwomen.com/terms')}>Terms of Use</Text>
+                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
                 <Text style={styles.legalText}>{' · '}</Text>
-                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://velaforwomen.com/privacy')}>Privacy Policy</Text>
+                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/privacy')}>Privacy Policy</Text>
               </Text>
             </View>
           </ScrollView>

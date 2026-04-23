@@ -57,6 +57,7 @@ export default function ProfileScreen() {
   });
 
   const handleExportPDF = async () => {
+    if (history.length === 0) { require('react-native').Alert.alert('No data yet', 'Start logging symptoms, food, and supplements to generate your report.'); return; }
     setPdfLoading(true);
     try {
       await generateDoctorReport({
@@ -513,9 +514,9 @@ export default function ProfileScreen() {
             ))}
             <View style={styles.linkBox}>
               <Text allowFontScaling={false} style={styles.linkBoxLabel}>Your referral link</Text>
-              <Text allowFontScaling={false} style={styles.linkBoxVal}>vela.app/ref/yourname</Text>
+              <Text allowFontScaling={false} style={styles.linkBoxVal}>macpplechic.github.io/vela/support</Text>
             </View>
-            <TouchableOpacity style={styles.plumBtn}>
+            <TouchableOpacity style={styles.plumBtn} onPress={() => require('react-native').Linking.openURL('mailto:hello@velaforwomen.com?subject=Creator%20Program%20Application')}>
               <Text allowFontScaling={false} style={styles.plumBtnText}>Apply to join ✦</Text>
             </TouchableOpacity>
           </ScrollView>

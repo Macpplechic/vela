@@ -12,9 +12,11 @@ export default function ShiftScreen() {
   const [reportTarget, setReportTarget] = useState<{ id: number; user: string } | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const pd = PHASES[phase ?? 'late'];
 
-  const filtered = filter === 'all' ? COMMUNITY_POSTS : COMMUNITY_POSTS.filter(p => p.tag === filter);
+  const allFiltered = filter === 'all' ? COMMUNITY_POSTS : COMMUNITY_POSTS.filter(p => p.tag === filter);
+  const filtered = allFiltered.filter(p => !blockedUsers.includes(p.user));
   const phaseColors: Record<string, string> = { early:Colors.gold, late:Colors.rose, post:Colors.sage };
   const tagColors: Record<string, string> = { wins:Colors.sage, tips:Colors.gold, questions:Colors.plumLight, health:Colors.rose };
 
@@ -40,7 +42,7 @@ export default function ShiftScreen() {
           <Text style={styles.termsTitle}>Community Guidelines</Text>
           <Text style={styles.termsBody}>
             {'The Shift is a space for honest, supportive conversation. By joining you agree to our '}
-            <Text style={styles.termsLink} onPress={() => Linking.openURL('https://velaforwomen.com/terms')}>Terms of Use</Text>
+            <Text style={styles.termsLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
             {'. Zero tolerance for harassment or abusive content.'}
           </Text>
           <TouchableOpacity style={styles.termsBtn} onPress={() => setHasAcceptedTerms(true)} activeOpacity={0.85}>
@@ -73,7 +75,7 @@ export default function ShiftScreen() {
           />
           <View style={styles.composeFooter}>
             <Text style={styles.composeAs}>Sharing as {pd.label}</Text>
-            <TouchableOpacity onPress={() => setNewPost('')} style={styles.postButton}>
+            <TouchableOpacity onPress={() => { if (newPost.trim()) { Alert.alert('Posted!', 'Your post has been shared.'); setNewPost(''); } }} style={styles.postButton}>
               <Text style={styles.postButtonText}>Post</Text>
             </TouchableOpacity>
           </View>
@@ -111,7 +113,7 @@ export default function ShiftScreen() {
                   {likedPosts.includes(p.id) ? '♥' : '♡'} {p.likes + (likedPosts.includes(p.id) ? 1 : 0)}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn} onPress={() => {}}>
+              <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Replies coming soon', 'This feature is in progress.')  }>
                 <Text style={styles.actionText}>◎ reply</Text>
               </TouchableOpacity>
             </View>
@@ -132,6 +134,9 @@ export default function ShiftScreen() {
           ))}
           <TouchableOpacity style={[styles.reportBtn, !reportReason && styles.reportBtnDisabled]} onPress={submitReport} disabled={!reportReason} activeOpacity={0.85}>
             <Text style={styles.reportBtnText}>Submit Report</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.blockBtn} onPress={() => { setBlockedUsers(prev => [...prev, reportTarget?.user ?? '']); setReportTarget(null); setReportReason(''); Alert.alert('User blocked', `${reportTarget?.user} has been blocked and removed from your feed.`); }} activeOpacity={0.85}>
+            <Text style={styles.blockBtnText}>🚫 Block this user</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelBtn} onPress={() => { setReportTarget(null); setReportReason(''); }}>
             <Text style={styles.cancelText}>Cancel</Text>
@@ -191,6 +196,8 @@ const styles = StyleSheet.create({
   reportBtn:{backgroundColor:Colors.plum,borderRadius:28,paddingVertical:15,alignItems:'center',marginTop:8,marginBottom:8},
   reportBtnDisabled:{opacity:0.4},
   reportBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment},
+  blockBtn:{backgroundColor:'#FFF0F0',borderWidth:1,borderColor:Colors.rose,borderRadius:28,paddingVertical:13,alignItems:'center',marginBottom:8},
+  blockBtnText:{fontFamily:Fonts.sans,fontSize:14,color:Colors.rose},
   cancelBtn:{alignItems:'center',paddingVertical:10},
   cancelText:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist},
 });
