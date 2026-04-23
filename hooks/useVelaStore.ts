@@ -58,6 +58,7 @@ const K = {
   SLEEP_HISTORY:      '@vela_sleep_history',
   STREAK:             '@vela_streak',
   LAST_STREAK_DATE:   '@vela_last_streak_date',
+  BLOCKED_USERS:      '@vela_blocked_users',
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -112,6 +113,7 @@ export function useVelaStore() {
   const [sleepHistory, setSleepHistoryState]    = useState<SleepEntry[]>([]);
   const [streak, setStreakState]                = useState(0);
   const [lastStreakDate, setLastStreakDateState] = useState<string | null>(null);
+  const [blockedUsers, setBlockedUsersState]    = useState<string[]>([]);
 
   // ── Load & daily reset ────────────────────────────────────────────────────
 
@@ -131,8 +133,9 @@ export function useVelaStore() {
         if (stored[K.SLEEP_LOG])    setSleepLogState(JSON.parse(stored[K.SLEEP_LOG]!));
         if (stored[K.FLUX_TRIAL_STARTED]) setFluxTrialState(stored[K.FLUX_TRIAL_STARTED]);
         if (stored[K.COOL_TRIAL_STARTED]) setCoolTrialState(stored[K.COOL_TRIAL_STARTED]);
-        if (stored[K.FLUX_UNLOCKED]) setFluxUnlockedState(JSON.parse(stored[K.FLUX_UNLOCKED]!));
-        if (stored[K.COOL_UNLOCKED]) setCoolUnlockedState(JSON.parse(stored[K.COOL_UNLOCKED]!));
+        if (stored[K.FLUX_UNLOCKED])  setFluxUnlockedState(JSON.parse(stored[K.FLUX_UNLOCKED]!));
+        if (stored[K.COOL_UNLOCKED])  setCoolUnlockedState(JSON.parse(stored[K.COOL_UNLOCKED]!));
+        if (stored[K.BLOCKED_USERS])  setBlockedUsersState(JSON.parse(stored[K.BLOCKED_USERS]!));
 
         // Load history
         const hist: DailyEntry[] = stored[K.HISTORY] ? JSON.parse(stored[K.HISTORY]!) : [];
@@ -281,6 +284,11 @@ export function useVelaStore() {
     await AsyncStorage.setItem(K.COOL_TRIAL_STARTED, date);
   }, []);
 
+  const setBlockedUsers = useCallback(async (users: string[]) => {
+    setBlockedUsersState(users);
+    await AsyncStorage.setItem(K.BLOCKED_USERS, JSON.stringify(users));
+  }, []);
+
   const resetOnboarding = useCallback(async () => {
     setPhaseState(null);
     setOnboardedState(false);
@@ -372,5 +380,6 @@ export function useVelaStore() {
     setPhase, setOnboarded, setMySupps, setCheckedSupps, setSymptoms,
     setJournal, setFoods, setLikedPosts, setFluxLogs, setSleepLog, saveSleepEntry, incrementStreak,
     startFluxTrial, startCoolTrial, resetOnboarding,
+    blockedUsers, setBlockedUsers,
   };
 }

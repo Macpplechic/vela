@@ -6,7 +6,7 @@ import { PHASES, COMMUNITY_POSTS } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 export default function ShiftScreen() {
-  const { phase, likedPosts, setLikedPosts } = useVelaStore();
+  const { phase, likedPosts, setLikedPosts, blockedUsers, setBlockedUsers } = useVelaStore();
   const [filter, setFilter] = useState('all');
   const [newPost, setNewPost] = useState('');
   const [reportTarget, setReportTarget] = useState<{ id: number; user: string } | null>(null);
