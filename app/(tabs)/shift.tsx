@@ -6,7 +6,7 @@ import { PHASES, COMMUNITY_POSTS } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 export default function ShiftScreen() {
-  const { phase, likedPosts, setLikedPosts, blockedUsers, setBlockedUsers } = useVelaStore();
+  const { phase, likedPosts, setLikedPosts } = useVelaStore();
   const [filter, setFilter] = useState('all');
   const [newPost, setNewPost] = useState('');
   const [reportTarget, setReportTarget] = useState<{ id: number; user: string } | null>(null);
@@ -135,7 +135,7 @@ export default function ShiftScreen() {
           <TouchableOpacity style={[styles.reportBtn, !reportReason && styles.reportBtnDisabled]} onPress={submitReport} disabled={!reportReason} activeOpacity={0.85}>
             <Text style={styles.reportBtnText}>Submit Report</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.blockBtn} onPress={() => { setBlockedUsers(prev => [...prev, reportTarget?.user ?? '']); setReportTarget(null); setReportReason(''); Alert.alert('User blocked', `${reportTarget?.user} has been blocked and removed from your feed.`); }} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.blockBtn} onPress={() => { setBlockedUsers([...blockedUsers, reportTarget?.user ?? '']); setReportTarget(null); setReportReason(''); Alert.alert('User blocked', `${reportTarget?.user} has been blocked and removed from your feed.`); }} activeOpacity={0.85}>
             <Text style={styles.blockBtnText}>🚫 Block this user</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelBtn} onPress={() => { setReportTarget(null); setReportReason(''); }}>
