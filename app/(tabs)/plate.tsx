@@ -10,91 +10,65 @@ export default function PlateScreen() {
   const { phase, foods, setFoods, totals } = useVelaStore();
   const [search, setSearch] = useState('');
   const [showFood, setShowFood] = useState(false);
-  const [scanning, setScanning] = useState(false);
+
   const [scannedImage, setScannedImage] = useState<string | null>(null);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
-  const [loadingAdvice, setLoadingAdvice] = useState(false);
+
   const pd = PHASES[phase ?? 'late'];
 
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
-  const getAiAdvice = async () => {
-    setLoadingAdvice(true);
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          messages: [{
-            role: 'user',
-            content: `I am a woman in ${pd.label} phase of perimenopause. Today I have eaten: ${foods.length > 0 ? foods.map(f => f.name).join(', ') : 'nothing yet'}. My protein is ${Math.round(totals.protein)}g of ${pd.targets.protein}g target. Give me ONE specific food recommendation for my next meal that will most improve my hormone balance today. Be specific, practical, and under 2 sentences. No preamble.`
-          }]
-        })
-      });
-      const data = await response.json();
-      setAiAdvice(data.content[0].text);
-    } catch (e) {
-      setAiAdvice('Add wild salmon, flaxseed, or broccoli to support estrogen balance today.');
-    } finally {
-      setLoadingAdvice(false);
-    }
+  const getAiAdvice = () => {
+    const phaseKey = pd.label?.toLowerCase() ?? '';
+    const p = Math.round(totals.protein);
+    const proteinTarget = pd.targets.protein;
+    const fiberTarget = pd.targets.fiber;
+    const f = Math.round(totals.fiber);
+    const aiS = aiScore;
+
+    // Pick the most urgent nutrient gap
+    const gaps = [
+      { nutrient: 'protein', pct: p / proteinTarget, tips: [
+        'Add 3oz of wild salmon — 22g protein, richest omega-3 source available.',
+        'Stir 2 tbsp hemp seeds into yogurt — 10g complete protein, done in 30 seconds.',
+        'Hard-boil 2 eggs tonight — 12g protein, keeps in the fridge all week.',
+      ]},
+      { nutrient: 'fiber', pct: f / fiberTarget, tips: [
+        'Add half an avocado to your next meal — 5g fiber, hormone-supportive fats.',
+        'Toss a handful of edamame into whatever you're eating — 8g fiber, 17g protein.',
+        'Swap your bread for a small sweet potato — 4g fiber, phytoestrogen boost.',
+      ]},
+      { nutrient: 'anti-inflammatory', pct: aiS / 100, tips: [
+        'Add fresh ginger or turmeric to your next meal — top-tier anti-inflammatory.',
+        'A small handful of walnuts right now — best plant-based anti-inflammatory food.',
+        'Add dark leafy greens to any meal — spinach or kale doubles your score.',
+      ]},
+    ].sort((a, b) => a.pct - b.pct);
+
+    const gap = gaps[0];
+    const tip = gap.tips[Math.floor(Math.random() * gap.tips.length)];
+    setAiAdvice(tip);
   };
 
   const scanMeal = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Camera access needed', 'Please allow camera access to scan your meal.');
+      Alert.alert('Camera access needed', 'Please allow camera access to photograph your meal.');
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      base64: true,
-      quality: 0.7,
+      quality: 0.5,
     });
-    if (result.canceled || !result.assets[0].base64) return;
-
-    setScanning(true);
+    if (result.canceled) return;
     setScannedImage(result.assets[0].uri);
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: 'image/jpeg', data: result.assets[0].base64 }
-              },
-              {
-                type: 'text',
-                text: 'Identify every food item visible in this meal photo. For each food, estimate the portion size and provide: name, calories, protein (g), fiber (g), calcium (mg), omega3 (g), phytoestrogens (mg), magnesium (mg), and anti-inflammatory score (1-10). Respond ONLY with a JSON array like: [{"name":"Grilled Salmon","cal":250,"protein":30,"fiber":0,"calcium":20,"omega3":2.5,"phyto":0,"magnesium":35,"ai":9}]. No other text.'
-              }
-            ]
-          }]
-        })
-      });
-      const data = await response.json();
-      const text = data.content[0].text.replace(/```json|```/g, '').trim();
-      const identified: any[] = JSON.parse(text);
-      for (const food of identified) {
-        await setFoods([...foods, food]);
-      }
-      Alert.alert(
-        `Found ${identified.length} food${identified.length !== 1 ? 's' : ''} ✦`,
-        identified.map(f => `• ${f.name}`).join('\n')
-      );
-    } catch (e) {
-      Alert.alert('Could not identify foods', 'Try again with better lighting or a clearer photo.');
-    } finally {
-      setScanning(false);
-      setScannedImage(null);
-    }
+    // Show search after photo so user can find and log the foods they photographed
+    setShowFood(true);
+    Alert.alert(
+      '📷 Meal captured!',
+      'Search for the foods in your photo below and tap to add them to your plate.',
+      [{ text: 'Got it', style: 'default' }]
+    );
   };
 
   const filteredFoods = search.length > 1 ? FOOD_DB.filter(f => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
@@ -125,11 +99,8 @@ export default function PlateScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle}>The Peri Plate</Text>
-          <TouchableOpacity style={styles.scanButton} onPress={scanMeal} disabled={scanning}>
-            {scanning
-              ? <ActivityIndicator color={Colors.parchment} size="small" />
-              : <Text style={styles.scanButtonText}>📷 scan meal</Text>
-            }
+          <TouchableOpacity style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
+            <Text style={styles.scanButtonText}>📷 photo log</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.addButton} onPress={() => setShowFood(!showFood)}>
             <Text style={styles.addButtonText}>+ log food</Text>
@@ -168,11 +139,8 @@ export default function PlateScreen() {
         </View>
 
         {/* Food search */}
-        <TouchableOpacity style={styles.aiAdviceBtn} onPress={getAiAdvice} disabled={loadingAdvice} activeOpacity={0.85}>
-          {loadingAdvice
-            ? <ActivityIndicator color={Colors.parchment} size="small" />
-            : <Text style={styles.aiAdviceBtnText}>✦ What should I eat today?</Text>
-          }
+        <TouchableOpacity style={styles.aiAdviceBtn} onPress={getAiAdvice} activeOpacity={0.85}>
+          <Text style={styles.aiAdviceBtnText}>✦ What should I eat today?</Text>
         </TouchableOpacity>
 
         {aiAdvice && (
@@ -210,13 +178,9 @@ export default function PlateScreen() {
           </View>
         )}
 
-        {scannedImage && scanning && (
+        {scannedImage && !showFood && (
           <View style={styles.scanPreview}>
             <Image source={{ uri: scannedImage }} style={styles.scanImage} />
-            <View style={styles.scanOverlay}>
-              <ActivityIndicator color={Colors.parchment} size="large" />
-              <Text style={styles.scanOverlayText}>Identifying your meal...</Text>
-            </View>
           </View>
         )}
 

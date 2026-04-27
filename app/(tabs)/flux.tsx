@@ -33,7 +33,7 @@ export default function FluxScreen() {
   const [selectedFlow, setSelectedFlow] = useState<string | null>(null);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [cycleInsight, setCycleInsight] = useState<string | null>(null);
-  const [loadingInsight, setLoadingInsight] = useState(false);
+
 
   useEffect(() => {
     loadOffering();
@@ -44,29 +44,18 @@ export default function FluxScreen() {
     return () => clearInterval(t);
   }, []);
 
-  const getCycleInsight = async () => {
-    if (!selectedFlow) { Alert.alert('Log your flow first', 'Tap a flow option above to log today before getting your insight.'); return; }
-    setLoadingInsight(true);
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 200,
-          messages: [{
-            role: 'user',
-            content: `I am in perimenopause and logged "${selectedFlow}" flow today. Give me ONE practical tip for managing this specific type of flow during perimenopause. Be warm, specific, and under 2 sentences. No preamble or diagnosis.`
-          }]
-        })
-      });
-      const data = await response.json();
-      setCycleInsight(data.content[0].text);
-    } catch(e) {
-      setCycleInsight('Track for 2-3 cycles to start seeing patterns. Every log counts.');
-    } finally {
-      setLoadingInsight(false);
-    }
+  const getCycleInsight = () => {
+    const insights: Record<string, string> = {
+      'Light spotting': 'Spotting between cycles is very common in perimenopause — estrogen fluctuations cause the lining to shed irregularly. Track it consistently; if it continues for 3+ months, bring your log to your doctor.',
+      'Light flow': 'Lighter periods often mean your cycle is changing — this is normal in early perimenopause. Staying hydrated and reducing stress can help regulate things.',
+      'Moderate flow': 'Moderate flow is your body in transition. Magnesium-rich foods like pumpkin seeds and dark chocolate can help reduce cramping and mood dips.',
+      'Heavy flow': 'Heavy flow can cause iron depletion — add iron-rich foods like lentils, spinach, and red meat this week. If soaking through pads hourly, talk to your doctor.',
+      'No period': 'A skipped period is one of the hallmark signs of perimenopause. Track the date — this data is valuable for your doctor and for understanding your pattern.',
+      'Skipped month': 'Skipped months become more frequent as you move through perimenopause. This is your body shifting. Log every occurrence — patterns emerge over 3–6 months.',
+      'Irregular': 'Irregular cycles are the norm in perimenopause, not the exception. Reducing caffeine and alcohol can help stabilize frequency. Keep logging — consistency is key.',
+    };
+    const insight = insights[selectedFlow ?? ''] ?? 'Every log you make builds a clearer picture of your hormonal pattern. Keep going — data is power.';
+    setCycleInsight(insight);
   };
 
   const loadOffering = async () => {
@@ -161,11 +150,8 @@ export default function FluxScreen() {
             </View>
 
             {selectedFlow && (
-              <TouchableOpacity style={{backgroundColor:Colors.plum,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:8,alignItems:'center'}} onPress={getCycleInsight} disabled={loadingInsight}>
-                {loadingInsight
-                  ? <ActivityIndicator color={Colors.parchment} size="small" />
-                  : <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.parchment}}>✦ Get insight for today's flow</Text>
-                }
+              <TouchableOpacity style={{backgroundColor:Colors.plum,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:8,alignItems:'center'}} onPress={getCycleInsight} activeOpacity={0.85}>
+                <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.parchment}}>✦ What does this mean?</Text>
               </TouchableOpacity>
             )}
             {cycleInsight && (
