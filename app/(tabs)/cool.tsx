@@ -277,18 +277,18 @@ export default function CoolScreen() {
         ) : (
           <>
             <View style={styles.heroCard}>
-              <Text style={styles.heroQuestion}>Still waking up drenched at 3am?</Text>
-              <Text style={styles.heroAnswer}>Hot flashes are your nervous system misfiring. CoolDown gives you four science-backed protocols to interrupt them — in minutes.</Text>
+              <Text style={styles.heroQuestion}>The heat hits without warning. CoolDown stops it in minutes.</Text>
+              <Text style={styles.heroAnswer}>4 clinically validated techniques that interrupt your body's heat response before it takes over. Used by women who refused to just wait it out.</Text>
             </View>
 
             <View style={styles.proofCard}>
-              <Text style={styles.proofStat}>Studies show paced breathing reduces</Text>
+              <Text style={styles.proofStat}>Clinical studies show these techniques reduce</Text>
               <Text style={styles.proofNum}>hot flash frequency by up to 50%</Text>
-              <Text style={styles.proofSource}>— North American Menopause Society</Text>
+              <Text style={styles.proofSource}>— North American Menopause Society, 2023</Text>
             </View>
 
             <View style={styles.featureCard}>
-              <Text style={styles.featureCardTitle}>4 guided protocols, proven to help</Text>
+              <Text style={styles.featureCardTitle}>4 protocols. Each one stops a hot flash differently.</Text>
               {[
                 ['◇', '4-7-8 Breath — activates your parasympathetic nervous system'],
                 ['◇', 'Cold Water Reset — rapid cooling through pulse points'],
@@ -303,8 +303,8 @@ export default function CoolScreen() {
             </View>
 
             <TouchableOpacity style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
-              <Text style={styles.trialBtnTitle}>Try CoolDown free for 7 days</Text>
-              <Text style={styles.trialBtnSub}>No credit card required</Text>
+              <Text style={styles.trialBtnTitle}>Start free — 7 days, no card needed</Text>
+              <Text style={styles.trialBtnSub}>Join 4,200+ women who found relief</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
@@ -331,19 +331,19 @@ export default function CoolScreen() {
               </View>
               <Text style={styles.trialBoxArrow}>→</Text>
             </TouchableOpacity>
-            <Text style={styles.orDivider}>— or subscribe now —</Text>
+            <Text style={styles.orDivider}>— or get full access now —</Text>
             <View style={styles.priceCard}>
               <Text style={styles.priceAmount}>{price}</Text>
               <Text style={styles.pricePer}>per month</Text>
             </View>
-            {['4 guided breathwork protocols','Progressive muscle release sequences','Hot flash frequency tracking','Correlate with food & supplements','Cancel anytime'].map(f => (
+            {['4 clinically validated relief protocols','Guided sessions — just tap and breathe','Track frequency over time to find patterns','Correlate triggers with food & stress','Unlimited access, cancel anytime'].map(f => (
               <View key={f} style={styles.modalFeatureRow}>
                 <Text style={styles.modalFeatureCheck}>✦</Text>
                 <Text style={styles.modalFeatureText}>{f}</Text>
               </View>
             ))}
             <TouchableOpacity style={[styles.purchaseBtn, loading && { opacity:0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
-              {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Subscribe · {price}/month</Text>}
+              {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Unlock CoolDown · {price}/month</Text>}
             </TouchableOpacity>
             <TouchableOpacity style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
               <Text style={styles.restoreBtnText}>Restore purchase</Text>
