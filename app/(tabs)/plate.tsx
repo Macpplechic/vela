@@ -38,7 +38,7 @@ export default function PlateScreen() {
         };
         return {
           id: `usda_${f.fdcId}`,
-          name: f.description?.split(',')[0]?.replace(/raw$/i,'').trim() ?? f.description,
+          name: f.description?.split(',')[0]?.replace(/raw$/i, '').trim() ?? f.description,
           category: 'usda',
           protein: get('protein'),
           fiber: get('fiber'),
@@ -47,37 +47,12 @@ export default function PlateScreen() {
           omega3: get('18:3') || get('omega'),
           phyto: 0,
           cal: get('energy') || get('calor'),
-          ai: Math.min(10, Math.round((get('18:3') * 2 + (get('fiber') > 3 ? 2 : 0) + (get('protein') > 15 ? 1 : 0)))),
-          phase: ['early','late','post'] as any,
+          ai: Math.min(10, Math.round(get('18:3') * 2 + (get('fiber') > 3 ? 2 : 0) + (get('protein') > 15 ? 1 : 0))),
+          phase: ['early', 'late', 'post'] as any,
         };
       }).filter((f: any) => f.cal > 0 || f.protein > 0);
       setApiResults(mapped);
-    } catch(e) {
-      // fallback to local search
-      setApiResults([]);
-    } finally {
-      setApiLoading(false);
-    }
-  };
-
-        return {
-          id: `usda_${f.fdcId}`,
-          name: f.description?.split(',')[0]?.replace(/raw$/i,'').trim() ?? f.description,
-          category: 'usda',
-          protein: get('protein'),
-          fiber: get('fiber'),
-          calcium: get('calcium'),
-          magnesium: get('magnesium'),
-          omega3: get('18:3') || get('omega'),
-          phyto: 0,
-          cal: get('energy') || get('calor'),
-          ai: Math.min(10, Math.round((get('18:3') * 2 + (get('fiber') > 3 ? 2 : 0) + (get('protein') > 15 ? 1 : 0)))),
-          phase: ['early','late','post'] as any,
-        };
-      }).filter((f: any) => f.cal > 0 || f.protein > 0);
-      setApiResults(mapped);
-    } catch(e) {
-      // fallback to local search
+    } catch (e) {
       setApiResults([]);
     } finally {
       setApiLoading(false);
