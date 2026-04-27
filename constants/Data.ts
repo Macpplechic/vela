@@ -196,30 +196,6 @@ export const BREATHWORK: BreathExercise[] = [
       { label:'Exhale',  secs:6, color:'#6A9E72' },
     ],
   },
-];
-
-// ─── Somatic Techniques ────────────────────────────────────────────────────────
-
-export const SOMATIC: SomaticTechnique[] = [
-  { id:'shake',   name:'Neurogenic Tremoring',        duration:'5 min',  desc:'Stand with feet wide, knees slightly bent. Allow your legs to begin shaking naturally. This discharges stress hormones stored in muscle tissue — it is safe and effective.' },
-  { id:'tapping', name:'EFT Tapping',                 duration:'7 min',  desc:'Tap gently on 8 meridian points while naming what you are feeling. Combines elements of acupressure and cognitive therapy to reduce cortisol rapidly.' },
-  { id:'scan',    name:'Body Scan Release',           duration:'10 min', desc:'Lie down and bring attention slowly through your body from feet to head. At each area, notice tension and intentionally soften. Activates the rest-and-digest system.' },
-  { id:'cold',    name:'Cold Water Face Plunge',      duration:'1 min',  desc:'Fill a bowl with cold water and ice. Submerge your face for 30 seconds. Activates the diving reflex and lowers heart rate within 30–60 seconds.' },
-  { id:'pelvic',  name:'Pelvic Floor Release',        duration:'8 min',  desc:'Lie on your back, knees bent. Slowly tilt your pelvis and release 10 times. Then hold a gentle inward breath and release fully. Releases deep pelvic tension linked to anxiety.' },
-];
-
-// ─── Doctor Questions ──────────────────────────────────────────────────────────
-
-export const DOCTOR_QUESTIONS: string[] = [
-  'What are my options for managing symptoms — both hormonal and non-hormonal?',
-  'Am I a candidate for HRT? If not, why specifically?',
-  'What baseline tests do you recommend? (hormones, bone density, thyroid, lipids)',
-  'How do you define menopause and how will we track my transition?',
-  'What symptoms would warrant an urgent follow-up?',
-  'How does my family history affect my risk profile here?',
-  'What lifestyle changes will have the highest impact for my specific symptoms?',
-  'Can you refer me to a menopause specialist if needed?',
-
   { id:"sardines", name:"Sardines (3oz)", category:"protein", protein:21, fiber:0, calcium:325, magnesium:33, omega3:1.4, phyto:0, cal:177, ai:9, phase:["early","late","post"] },
   { id:"mackerel", name:"Mackerel (3oz)", category:"protein", protein:20, fiber:0, calcium:13, magnesium:76, omega3:2.5, phyto:0, cal:223, ai:9, phase:["early","late","post"] },
   { id:"tuna_fresh", name:"Tuna Steak (3oz)", category:"protein", protein:25, fiber:0, calcium:18, magnesium:54, omega3:0.9, phyto:0, cal:156, ai:8, phase:["early","late","post"] },
@@ -317,5 +293,29 @@ export const DOCTOR_QUESTIONS: string[] = [
   { id:"ginger_fresh", name:"Fresh Ginger (1 tsp grated)", category:"spices", protein:0, fiber:0.1, calcium:2, magnesium:3, omega3:0, phyto:0, cal:2, ai:9, phase:["early","late","post"] },
   { id:"cinnamon", name:"Cinnamon (1 tsp)", category:"spices", protein:0, fiber:1.4, calcium:26, magnesium:2, omega3:0, phyto:0, cal:6, ai:8, phase:["early","late","post"] },
 ];
+];
+];
+
+// ─── Somatic Techniques ────────────────────────────────────────────────────────
+
+export const SOMATIC: SomaticTechnique[] = [
+  { id:'shake',   name:'Neurogenic Tremoring',        duration:'5 min',  desc:'Stand with feet wide, knees slightly bent. Allow your legs to begin shaking naturally. This discharges stress hormones stored in muscle tissue — it is safe and effective.' },
+  { id:'tapping', name:'EFT Tapping',                 duration:'7 min',  desc:'Tap gently on 8 meridian points while naming what you are feeling. Combines elements of acupressure and cognitive therapy to reduce cortisol rapidly.' },
+  { id:'scan',    name:'Body Scan Release',           duration:'10 min', desc:'Lie down and bring attention slowly through your body from feet to head. At each area, notice tension and intentionally soften. Activates the rest-and-digest system.' },
+  { id:'cold',    name:'Cold Water Face Plunge',      duration:'1 min',  desc:'Fill a bowl with cold water and ice. Submerge your face for 30 seconds. Activates the diving reflex and lowers heart rate within 30–60 seconds.' },
+  { id:'pelvic',  name:'Pelvic Floor Release',        duration:'8 min',  desc:'Lie on your back, knees bent. Slowly tilt your pelvis and release 10 times. Then hold a gentle inward breath and release fully. Releases deep pelvic tension linked to anxiety.' },
+
+// ─── Doctor Questions ──────────────────────────────────────────────────────────
+
+export const DOCTOR_QUESTIONS: string[] = [
+  'What are my options for managing symptoms — both hormonal and non-hormonal?',
+  'Am I a candidate for HRT? If not, why specifically?',
+  'What baseline tests do you recommend? (hormones, bone density, thyroid, lipids)',
+  'How do you define menopause and how will we track my transition?',
+  'What symptoms would warrant an urgent follow-up?',
+  'How does my family history affect my risk profile here?',
+  'What lifestyle changes will have the highest impact for my specific symptoms?',
+  'Can you refer me to a menopause specialist if needed?',
+
 
 export const SUPP_LIBRARY = SUPP_DB_FULL;
