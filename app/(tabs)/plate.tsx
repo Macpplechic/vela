@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '../../constants/Colors';
+import * as ImagePicker from 'expo-image-picker';
 import { PHASES, FOOD_DB, Food } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
@@ -9,10 +10,67 @@ export default function PlateScreen() {
   const { phase, foods, setFoods, totals } = useVelaStore();
   const [search, setSearch] = useState('');
   const [showFood, setShowFood] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scannedImage, setScannedImage] = useState<string | null>(null);
   const pd = PHASES[phase ?? 'late'];
 
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
+  const scanMeal = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Camera access needed', 'Please allow camera access to scan your meal.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+      quality: 0.7,
+    });
+    if (result.canceled || !result.assets[0].base64) return;
+
+    setScanning(true);
+    setScannedImage(result.assets[0].uri);
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: { type: 'base64', media_type: 'image/jpeg', data: result.assets[0].base64 }
+              },
+              {
+                type: 'text',
+                text: 'Identify every food item visible in this meal photo. For each food, estimate the portion size and provide: name, calories, protein (g), fiber (g), calcium (mg), omega3 (g), phytoestrogens (mg), magnesium (mg), and anti-inflammatory score (1-10). Respond ONLY with a JSON array like: [{"name":"Grilled Salmon","cal":250,"protein":30,"fiber":0,"calcium":20,"omega3":2.5,"phyto":0,"magnesium":35,"ai":9}]. No other text.'
+              }
+            ]
+          }]
+        })
+      });
+      const data = await response.json();
+      const text = data.content[0].text.replace(/```json|```/g, '').trim();
+      const identified: any[] = JSON.parse(text);
+      for (const food of identified) {
+        await setFoods([...foods, food]);
+      }
+      Alert.alert(
+        `Found ${identified.length} food${identified.length !== 1 ? 's' : ''} ✦`,
+        identified.map(f => `• ${f.name}`).join('\n')
+      );
+    } catch (e) {
+      Alert.alert('Could not identify foods', 'Try again with better lighting or a clearer photo.');
+    } finally {
+      setScanning(false);
+      setScannedImage(null);
+    }
+  };
+
   const filteredFoods = search.length > 1 ? FOOD_DB.filter(f => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
 
   const addFood = async (f: Food) => {
@@ -41,6 +99,12 @@ export default function PlateScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle}>The Peri Plate</Text>
+          <TouchableOpacity style={styles.scanButton} onPress={scanMeal} disabled={scanning}>
+            {scanning
+              ? <ActivityIndicator color={Colors.parchment} size="small" />
+              : <Text style={styles.scanButtonText}>📷 scan meal</Text>
+            }
+          </TouchableOpacity>
           <TouchableOpacity style={styles.addButton} onPress={() => setShowFood(!showFood)}>
             <Text style={styles.addButtonText}>+ log food</Text>
           </TouchableOpacity>
@@ -99,6 +163,16 @@ export default function PlateScreen() {
                   <Text style={styles.suggestName}>{s.name}</Text>
                 </TouchableOpacity>
               ))}
+            </View>
+          </View>
+        )}
+
+        {scannedImage && scanning && (
+          <View style={styles.scanPreview}>
+            <Image source={{ uri: scannedImage }} style={styles.scanImage} />
+            <View style={styles.scanOverlay}>
+              <ActivityIndicator color={Colors.parchment} size="large" />
+              <Text style={styles.scanOverlayText}>Identifying your meal...</Text>
             </View>
           </View>
         )}
@@ -169,6 +243,12 @@ const styles = StyleSheet.create({
   content: { padding:20, paddingBottom:100 },
   titleRow: { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:20 },
   pageTitle: { fontFamily: Fonts.serif, fontSize:24, color: Colors.plum },
+  scanButton:{backgroundColor:Colors.teal,borderRadius:20,paddingVertical:9,paddingHorizontal:14,marginRight:8},
+  scanButtonText:{fontFamily:Fonts.sans,fontSize:12,color:Colors.parchment,letterSpacing:0.5},
+  scanPreview:{borderRadius:18,overflow:'hidden',marginBottom:12,height:200},
+  scanImage:{width:'100%',height:200,borderRadius:18},
+  scanOverlay:{position:'absolute',top:0,left:0,right:0,bottom:0,backgroundColor:'rgba(61,31,58,0.7)',alignItems:'center',justifyContent:'center',gap:12},
+  scanOverlayText:{fontFamily:Fonts.sansMedium,fontSize:14,color:Colors.parchment},
   addButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:9, paddingHorizontal:18 },
   addButtonText: { fontFamily: Fonts.sans, fontSize:12, color: Colors.parchment, letterSpacing:1 },
   scoreRow: { flexDirection:'row', gap:10, marginBottom:16 },
