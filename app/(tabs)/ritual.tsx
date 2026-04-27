@@ -16,6 +16,8 @@ export default function RitualScreen() {
     totals, foods, streak, lastStreakDate, incrementStreak, history: velaHistory, history,
   } = useVelaStore();
   const [journalSaved, setJournalSaved] = useState(false);
+  const [waterCount, setWaterCount] = useState(0);
+  const [sleepQuality, setSleepQuality] = useState(0);
 
   const pd = PHASES[phase ?? 'late'];
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
@@ -148,16 +150,16 @@ export default function RitualScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Hydration today 💧</Text>
           <Text style={styles.cardSub}>Dehydration amplifies hot flashes & brain fog</Text>
-          <View style={{flexDirection:'row', alignItems:'center', gap:10, marginBottom:8}}>
+          <View style={{flexDirection:'row', alignItems:'center', gap:8, marginBottom:8, flexWrap:'wrap'}}>
             {[1,2,3,4,5,6,7,8].map(n => (
               <TouchableOpacity key={n}
-                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-                style={{width:32,height:32,borderRadius:16,backgroundColor: n <= 4 ? Colors.teal : Colors.parchmentDark, alignItems:'center', justifyContent:'center'}}>
-                <Text style={{fontSize:14}}>💧</Text>
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setWaterCount(waterCount === n ? n - 1 : n); }}
+                style={{width:34,height:34,borderRadius:17,backgroundColor: n <= waterCount ? Colors.teal : Colors.parchmentDark, alignItems:'center', justifyContent:'center'}}>
+                <Text style={{fontSize:15}}>💧</Text>
               </TouchableOpacity>
             ))}
           </View>
-          <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>Tap each glass as you drink it — aim for 8 daily</Text>
+          <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>{waterCount === 0 ? 'Tap each glass as you drink it — aim for 8 daily' : waterCount >= 8 ? '✦ Fully hydrated today!' : `${waterCount} of 8 glasses — keep going`}</Text>
         </View>
 
         <View style={styles.card}>

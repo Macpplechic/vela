@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '../../constants/Colors';
 import * as ImagePicker from 'expo-image-picker';
+import * as Haptics from 'expo-haptics';
 import { PHASES, FOOD_DB, Food } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
@@ -123,8 +124,11 @@ export default function PlateScreen() {
   const filteredFoods = search.length > 1 ? FOOD_DB.filter(f => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
 
   const addFood = async (f: Food) => {
-    await setFoods([...foods, f]);
+    const updated = [...foods, f];
+    await setFoods(updated);
     setSearch('');
+    setApiResults([]);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
   const removeFood = async (i: number) => {
     await setFoods(foods.filter((_, j) => j !== i));
