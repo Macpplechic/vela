@@ -77,7 +77,7 @@ export default function PlateScreen() {
       ]},
       { nutrient: 'fiber', pct: f / fiberTarget, tips: [
         'Add half an avocado to your next meal — 5g fiber, hormone-supportive fats.',
-        'Toss a handful of edamame into whatever you're eating — 8g fiber, 17g protein.',
+        `Toss a handful of edamame into whatever you're eating — 8g fiber, 17g protein.`,
         'Swap your bread for a small sweet potato — 4g fiber, phytoestrogen boost.',
       ]},
       { nutrient: 'anti-inflammatory', pct: aiS / 100, tips: [
