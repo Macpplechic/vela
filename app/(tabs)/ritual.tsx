@@ -68,6 +68,17 @@ export default function RitualScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.dateText}>{today}</Text>
         <Text style={styles.greeting}>{greeting}, beautiful. {greetingEmoji}</Text>
+        {streak >= 3 && (
+          <View style={styles.streakCelebration}>
+            <Text style={styles.streakCelebrationText}>
+              {streak === 3 ? '🎉 3-day streak — you're building something real' :
+               streak === 7 ? '🏆 One full week. You are unstoppable.' :
+               streak === 14 ? '💎 Two weeks straight. Vela is proud of you.' :
+               streak === 30 ? '👑 30 days. You changed your life.' :
+               streak >= 7 ? `🔥 ${streak} days strong` : `🌱 ${streak} days — keep it up`}
+            </Text>
+          </View>
+        )}
         <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>
 
         {velaHistory.length === 0 && (
@@ -305,6 +316,8 @@ const styles = StyleSheet.create({
   weekDayLetterDone:{color:Colors.parchment},
   weekDayDot:{fontSize:8,color:Colors.gold},
   weeklyMotivation:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,textAlign:'center'},
+  streakCelebration:{backgroundColor:Colors.gold,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:16,alignItems:'center'},
+  streakCelebrationText:{fontFamily:Fonts.sansMedium,fontSize:13,color:Colors.plum,textAlign:'center'},
   welcomeCard: { backgroundColor: Colors.plum, borderRadius: 20, padding: 20, marginBottom: 20 },
   welcomeTitle: { fontFamily: Fonts.serif, fontSize: 20, color: Colors.goldLight, marginBottom: 4 },
   welcomeSub: { fontFamily: Fonts.sans, fontSize: 10, color: 'rgba(245,239,230,0.6)', marginBottom: 14, letterSpacing: 2 },

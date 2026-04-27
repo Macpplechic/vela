@@ -134,6 +134,15 @@ export const SYMPTOMS: string[] = [
 
 // ─── Community Posts ───────────────────────────────────────────────────────────
 
+// Extra posts added
+const EXTRA_POSTS = [  // new
+  { id:20, user:'Maya R.', av:'M', phase:'early' as PhaseKey, tag:'wins', text:'Tried the 4-7-8 breathing during a hot flash at work today. It actually worked. I did it in the bathroom and came back to my desk like nothing happened. 🙌', likes:34, time:'2h' },
+  { id:21, user:'Diane C.', av:'D', phase:'late' as PhaseKey, tag:'questions', text:'Has anyone tried magnesium glycinate for sleep? My doctor mentioned it but I want to hear from real people who have actually used it through perimenopause.', likes:28, time:'3h' },
+  { id:22, user:'Priya S.', av:'P', phase:'post' as PhaseKey, tag:'tips', text:'GAME CHANGER: I started logging my food in Vela and realized coffee was spiking my hot flashes every single time. Switched to matcha. Flashes down by half in one week.', likes:67, time:'5h' },
+  { id:23, user:'Keisha M.', av:'K', phase:'early' as PhaseKey, tag:'health', text:'My doctor actually looked at my Vela report and said it was the most useful thing a patient has ever brought in. She could see my patterns immediately. Do the report ladies.', likes:89, time:'6h' },
+  { id:24, user:'Sandra T.', av:'S', phase:'late' as PhaseKey, tag:'wins', text:'Day 14 streak!! I have never been consistent with anything health-related in my life. Something about Vela makes it feel manageable. Small steps.', likes:45, time:'8h' },
+  { id:25, user:'Beth W.', av:'B', phase:'early' as PhaseKey, tag:'tips', text:'Flaxseed in overnight oats. Every. Single. Morning. My hormonal acne cleared up in 3 weeks. I know it sounds too simple but phytoestrogens are real and they work.', likes:52, time:'10h' },];
+
 export const COMMUNITY_POSTS: CommunityPost[] = [
   { id:1,  user:'Sarah M.',    av:'SM', phase:'early', tag:'wins',      text:"Flaxseed every morning for 3 weeks — hot flashes down by half. I was skeptical but here we are. ✦",                                                    likes:47, time:'2h' },
   { id:2,  user:'Dr. Reyes',   av:'DR', phase:'post',  tag:'tips',      text:"Reminder: bone density loss accelerates most in the first 5 years post-menopause. Strength training 2-3x per week is non-negotiable. Your bones will thank you.",  likes:89, time:'4h' },

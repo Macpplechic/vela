@@ -99,7 +99,7 @@ export default function PlateScreen() {
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'] as any,
       quality: 0.5,
     });
     if (result.canceled) return;
@@ -110,7 +110,7 @@ export default function PlateScreen() {
       'Type the main food in your photo to search and add it',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Search', onPress: (text) => {
+        { text: 'Search', onPress: (text: string | undefined) => {
           if (text) {
             setSearch(text);
             searchUSDA(text);
