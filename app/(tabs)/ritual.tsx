@@ -146,6 +146,21 @@ export default function RitualScreen() {
         </View>
 
         <View style={styles.card}>
+          <Text style={styles.cardTitle}>Hydration today 💧</Text>
+          <Text style={styles.cardSub}>Dehydration amplifies hot flashes & brain fog</Text>
+          <View style={{flexDirection:'row', alignItems:'center', gap:10, marginBottom:8}}>
+            {[1,2,3,4,5,6,7,8].map(n => (
+              <TouchableOpacity key={n}
+                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+                style={{width:32,height:32,borderRadius:16,backgroundColor: n <= 4 ? Colors.teal : Colors.parchmentDark, alignItems:'center', justifyContent:'center'}}>
+                <Text style={{fontSize:14}}>💧</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>Tap each glass as you drink it — aim for 8 daily</Text>
+        </View>
+
+        <View style={styles.card}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <Text style={[styles.cardTitle, { flex:1, marginBottom:0, fontSize:16 }]}>Morning supplement ritual</Text>
             <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
