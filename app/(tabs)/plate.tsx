@@ -78,6 +78,31 @@ export default function PlateScreen() {
         </View>
 
         {/* Food search */}
+        {!showFood && foods.length === 0 && (
+          <View style={styles.suggestCard}>
+            <Text style={styles.suggestTitle}>✦ Best foods for {pd.label}</Text>
+            <Text style={styles.suggestSub}>Tap any to add instantly</Text>
+            <View style={styles.suggestRow}>
+              {[
+                {name:'Wild salmon', emoji:'🐟'},
+                {name:'Flaxseed', emoji:'🌱'},
+                {name:'Broccoli', emoji:'🥦'},
+                {name:'Edamame', emoji:'🫘'},
+                {name:'Walnuts', emoji:'🥜'},
+              ].map(s => (
+                <TouchableOpacity key={s.name} style={styles.suggestChip}
+                  onPress={() => {
+                    const food = FOOD_DB.find(f => f.name.toLowerCase().includes(s.name.toLowerCase().split(' ')[0]));
+                    if (food) addFood(food);
+                  }}>
+                  <Text style={styles.suggestEmoji}>{s.emoji}</Text>
+                  <Text style={styles.suggestName}>{s.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
         {showFood && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Add food</Text>
@@ -171,6 +196,13 @@ const styles = StyleSheet.create({
   loggedMeta: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist },
   removeBtn: { padding:4 },
   removeBtnText: { fontSize:18, color: Colors.mist },
+  suggestCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:12},
+  suggestTitle:{fontFamily:Fonts.serif,fontSize:16,color:Colors.plum,marginBottom:2},
+  suggestSub:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,marginBottom:12},
+  suggestRow:{flexDirection:'row',flexWrap:'wrap',gap:8},
+  suggestChip:{flexDirection:'row',alignItems:'center',gap:6,backgroundColor:Colors.parchment,borderRadius:20,paddingVertical:7,paddingHorizontal:12,borderWidth:0.5,borderColor:Colors.parchmentDark},
+  suggestEmoji:{fontSize:14},
+  suggestName:{fontFamily:Fonts.sans,fontSize:12,color:Colors.plum},
   emptyState: { alignItems:'center', paddingVertical:48 },
   emptyIcon: { fontFamily: Fonts.serif, fontSize:32, color: Colors.parchmentDark, marginBottom:12 },
   emptyTitle: { fontFamily: Fonts.sans, fontSize:14, color: Colors.plum, marginBottom:6 },

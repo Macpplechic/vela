@@ -89,6 +89,32 @@ export default function RitualScreen() {
           <Text style={styles.ritualText}>{pd.ritual}</Text>
         </View>
 
+        <View style={styles.weeklyCard}>
+          <Text style={styles.weeklyTitle}>This week</Text>
+          <View style={styles.weeklyRow}>
+            {[0,1,2,3,4,5,6].map(i => {
+              const d = new Date(); d.setDate(d.getDate() - (6-i));
+              const ds = d.toISOString().split('T')[0];
+              const hasEntry = history.some(e => e.date === ds);
+              const isToday = ds === new Date().toISOString().split('T')[0];
+              return (
+                <View key={i} style={[styles.weekDay, hasEntry && styles.weekDayDone, isToday && styles.weekDayToday]}>
+                  <Text style={[styles.weekDayLetter, hasEntry && styles.weekDayLetterDone]}>
+                    {['S','M','T','W','T','F','S'][d.getDay()]}
+                  </Text>
+                  {hasEntry && <Text style={styles.weekDayDot}>✦</Text>}
+                </View>
+              );
+            })}
+          </View>
+          <Text style={styles.weeklyMotivation}>
+            {streak >= 7 ? `🔥 ${streak} day streak — you're unstoppable` :
+             streak >= 3 ? `🔥 ${streak} days strong — keep it going` :
+             streak === 1 ? 'Day 1 — every streak starts here ✦' :
+             'Log today to start your streak ◇'}
+          </Text>
+        </View>
+
         <View style={styles.card}>
           <View style={styles.scoreRow}>
             <View style={{ flex: 1 }}>
@@ -226,6 +252,16 @@ const styles = StyleSheet.create({
   journalInput: { borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:12, padding:12, fontSize:13, fontFamily: Fonts.sans, color: Colors.plum, backgroundColor: Colors.parchment, minHeight:80, textAlignVertical:'top', marginBottom:10 },
   saveButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:8, paddingHorizontal:20, alignSelf:'flex-start' },
   saveButtonText: { fontFamily: Fonts.sans, fontSize:12, color: Colors.parchment },
+  weeklyCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:12},
+  weeklyTitle:{fontFamily:Fonts.sansMedium,fontSize:11,color:Colors.mist,letterSpacing:2,textTransform:'uppercase',marginBottom:12},
+  weeklyRow:{flexDirection:'row',justifyContent:'space-between',marginBottom:12},
+  weekDay:{width:36,height:48,borderRadius:10,alignItems:'center',justifyContent:'center',backgroundColor:Colors.parchment,borderWidth:0.5,borderColor:Colors.parchmentDark,gap:2},
+  weekDayDone:{backgroundColor:Colors.plum,borderColor:Colors.plum},
+  weekDayToday:{borderColor:Colors.gold,borderWidth:1.5},
+  weekDayLetter:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist},
+  weekDayLetterDone:{color:Colors.parchment},
+  weekDayDot:{fontSize:8,color:Colors.gold},
+  weeklyMotivation:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,textAlign:'center'},
   welcomeCard: { backgroundColor: Colors.plum, borderRadius: 20, padding: 20, marginBottom: 20 },
   welcomeTitle: { fontFamily: Fonts.serif, fontSize: 20, color: Colors.goldLight, marginBottom: 4 },
   welcomeSub: { fontFamily: Fonts.sans, fontSize: 10, color: 'rgba(245,239,230,0.6)', marginBottom: 14, letterSpacing: 2 },

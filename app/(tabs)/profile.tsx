@@ -172,6 +172,21 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        <View style={styles.badgeRow}>
+          {[
+            { days: 1,  icon: '🌱', label: 'First log',   earned: history.length >= 1 },
+            { days: 7,  icon: '🔥', label: '7-day streak', earned: streak >= 7 },
+            { days: 14, icon: '⚡', label: '2 weeks',      earned: streak >= 14 },
+            { days: 30, icon: '🌙', label: '30 days',      earned: history.length >= 30 },
+            { days: 90, icon: '✦',  label: '90-day report', earned: history.length >= 90 },
+          ].map(b => (
+            <View key={b.days} style={[styles.badge, !b.earned && styles.badgeLocked]}>
+              <Text style={styles.badgeIcon}>{b.earned ? b.icon : '○'}</Text>
+              <Text style={[styles.badgeLabel, !b.earned && styles.badgeLabelLocked]}>{b.label}</Text>
+            </View>
+          ))}
+        </View>
+
         {topSyms.length > 0 && (
           <View style={[styles.card, { marginTop: 4 }]}>
             <Text allowFontScaling={false} style={styles.cardTitle}>Top symptoms this month</Text>
@@ -383,6 +398,21 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        <View style={styles.badgeRow}>
+          {[
+            { days: 1,  icon: '🌱', label: 'First log',   earned: history.length >= 1 },
+            { days: 7,  icon: '🔥', label: '7-day streak', earned: streak >= 7 },
+            { days: 14, icon: '⚡', label: '2 weeks',      earned: streak >= 14 },
+            { days: 30, icon: '🌙', label: '30 days',      earned: history.length >= 30 },
+            { days: 90, icon: '✦',  label: '90-day report', earned: history.length >= 90 },
+          ].map(b => (
+            <View key={b.days} style={[styles.badge, !b.earned && styles.badgeLocked]}>
+              <Text style={styles.badgeIcon}>{b.earned ? b.icon : '○'}</Text>
+              <Text style={[styles.badgeLabel, !b.earned && styles.badgeLabelLocked]}>{b.label}</Text>
+            </View>
+          ))}
+        </View>
+
         {topSyms.length > 0 && (
                 <View style={[styles.symptomsBox, { borderColor:Colors.gold, backgroundColor:Colors.goldPale }]}>
                   <Text allowFontScaling={false} style={[styles.symptomsBoxLabel, { color:Colors.gold }]}>Most frequent last 30 days</Text>
@@ -541,6 +571,12 @@ const styles = StyleSheet.create({
   cardTitle:{ fontFamily:Fonts.serif, fontSize:18, color:Colors.plum, marginBottom:4 },
   cardSub:{ fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginBottom:14 },
   chevron:{ fontSize:18, color:Colors.mist },
+  badgeRow:{flexDirection:'row',justifyContent:'space-between',marginBottom:16},
+  badge:{alignItems:'center',flex:1,backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.gold,borderRadius:14,padding:10,marginHorizontal:3},
+  badgeLocked:{borderColor:Colors.parchmentDark,backgroundColor:Colors.parchment,opacity:0.5},
+  badgeIcon:{fontSize:20,marginBottom:4},
+  badgeLabel:{fontFamily:Fonts.sans,fontSize:9,color:Colors.plum,textAlign:'center',letterSpacing:0.5},
+  badgeLabelLocked:{color:Colors.mist},
   symStatChip:{ flexDirection:'row', alignItems:'center', gap:5, backgroundColor:Colors.rosePale, borderWidth:0.5, borderColor:Colors.rose, borderRadius:12, paddingVertical:4, paddingHorizontal:10 },
   symStatText:{ fontFamily:Fonts.sans, fontSize:11, color:Colors.rose },
   symStatCount:{ fontFamily:Fonts.sansMedium, fontSize:11, color:Colors.rose },

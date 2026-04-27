@@ -121,7 +121,7 @@ export default function OnboardingScreen() {
           activeOpacity={0.85}
         >
           <Text style={styles.nextBtnText}>
-            {current === SLIDES.length - 1 ? 'Start my ritual ✦' : 'Continue →'}
+            {current === SLIDES.length - 1 ? 'Start my ritual ✦' : 'This sounds like me → →'}
           </Text>
         </TouchableOpacity>
 

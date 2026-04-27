@@ -143,10 +143,10 @@ export default function FluxScreen() {
               <Text style={styles.cardTitle}>Cycle insights</Text>
               <Text style={styles.cardSub}>Patterns emerge after a few weeks of logging.</Text>
               {[
-                { label: 'Average cycle length', val: '—', sub: 'log 2+ cycles to unlock' },
-                { label: 'Last period', val: '—' },
-                { label: 'Irregularity score', val: '—' },
-                { label: 'Days tracked', val: '0', sub: 'start today' },
+                { label: 'Days tracked this month', val: `${Object.keys(AsyncStorage).length || 0}` },
+                { label: 'Current flow', val: selectedFlow ?? '—' },
+                { label: 'Last logged', val: 'Today' },
+                { label: 'Streak', val: selectedFlow ? 'Active' : '—' },
               ].map(item => (
                 <View key={item.label} style={styles.insightRow}>
                   <Text style={styles.insightLabel}>{item.label}</Text>
