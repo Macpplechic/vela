@@ -15,7 +15,7 @@ export default function PlateScreen() {
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [apiResults, setApiResults] = useState<any[]>([]);
   const [apiLoading, setApiLoading] = useState(false);
-  const USDA_KEY = 'DEMO_KEY'; // Replace with your free key from fdc.nal.usda.gov
+  const USDA_KEY = 'WVDorwLRz7lTRdTvDE3IJy22xCZr0ptzhXwdNFQn'; // Replace with your free key from fdc.nal.usda.gov
 
   const pd = PHASES[phase ?? 'late'];
 
