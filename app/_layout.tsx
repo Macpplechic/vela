@@ -19,6 +19,7 @@ import {
 
 import { scheduleVelaNotifications } from '../hooks/useNotifications';
 import Purchases from 'react-native-purchases';
+import Constants from 'expo-constants';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,7 +39,10 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    Purchases.configure({ apiKey: 'appl_ZXvRoLscVYwTsOwsgaswQuLvRgC' });
+    const isExpoGo = Constants.appOwnership === 'expo';
+    if (!isExpoGo) {
+      Purchases.configure({ apiKey: 'appl_ZXvRoLscVYwTsOwsgaswQuLvRgC' });
+    }
   }, []);
 
   useEffect(() => {
