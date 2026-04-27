@@ -70,13 +70,13 @@ export default function RitualScreen() {
         <Text style={styles.greeting}>{greeting}, beautiful. {greetingEmoji}</Text>
         {streak >= 3 && (
           <View style={styles.streakCelebration}>
-            <Text style={styles.streakCelebrationText}>
-              {streak === 3 ? '🎉 3-day streak — you're building something real' :
-               streak === 7 ? '🏆 One full week. You are unstoppable.' :
-               streak === 14 ? '💎 Two weeks straight. Vela is proud of you.' :
-               streak === 30 ? '👑 30 days. You changed your life.' :
-               streak >= 7 ? `🔥 ${streak} days strong` : `🌱 ${streak} days — keep it up`}
-            </Text>
+            <Text style={styles.streakCelebrationText}>{
+              streak >= 365 ? '👑 A full year. You changed your life.' :
+              streak >= 30 ? `🌙 ${streak} days — you are unstoppable` :
+              streak >= 14 ? `💎 ${streak} days — two weeks strong` :
+              streak >= 7 ? '🏆 One full week. Keep going.' :
+              '🎉 3-day streak — you are building something real'
+            }</Text>
           </View>
         )}
         <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>
