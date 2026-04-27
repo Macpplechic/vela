@@ -166,8 +166,8 @@ export default function FluxScreen() {
           <>
             {/* Pain-led hero */}
             <View style={styles.heroCard}>
-              <Text style={styles.heroQuestion}>Has your period disappeared for months — then returned twice in one week?</Text>
-              <Text style={styles.heroAnswer}>This is perimenopause. FluxLog is built specifically for cycles like yours.</Text>
+              <Text style={styles.heroQuestion}>Your cycle stopped making sense. FluxLog is built for exactly that.</Text>
+              <Text style={styles.heroAnswer}>Irregular, unpredictable, confusing — perimenopause cycles don't fit any other app. This one was made for yours.</Text>
             </View>
 
             {/* Rotating testimonial */}
@@ -180,10 +180,10 @@ export default function FluxScreen() {
             <View style={styles.featureCard}>
               <Text style={styles.featureCardTitle}>FluxLog tracks what other apps can't</Text>
               {[
-                ['◎', 'Irregular cycles, spotting, skipped months'],
-                ['◎', 'Correlate flow with food, stress & sleep'],
-                ['◎', 'Included in your 90-day doctor report'],
-                ['◎', 'Designed for perimenopause — not fertility'],
+                ['◎', 'Built for irregular, skipped, and surprise cycles'],
+                ['◎', 'Find your triggers — food, stress, sleep, caffeine'],
+                ['◎', 'Auto-builds your 90-day doctor report'],
+                ['◎', 'Designed for peri — not fertility, not teens'],
               ].map(([glyph, text]) => (
                 <View key={text} style={styles.featureRow}>
                   <Text style={styles.featureGlyph}>{glyph}</Text>
@@ -194,12 +194,12 @@ export default function FluxScreen() {
 
             {/* Trial CTA */}
             <TouchableOpacity style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
-              <Text style={styles.trialBtnTitle}>Try FluxLog free for 7 days</Text>
-              <Text style={styles.trialBtnSub}>No credit card required</Text>
+              <Text style={styles.trialBtnTitle}>Start free — 7 days, no card needed</Text>
+              <Text style={styles.trialBtnSub}>3,800+ women tracking their peri cycles</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
-              <Text style={styles.subscribeBtnText}>Subscribe · {price}/month</Text>
+              <Text style={styles.subscribeBtnText}>Unlock FluxLog · {price}/month</Text>
             </TouchableOpacity>
 
             <Text style={styles.legalSmall}>Cancel anytime · Billed monthly through Apple</Text>
@@ -215,13 +215,14 @@ export default function FluxScreen() {
           <ScrollView contentContainerStyle={[styles.modalContent, { paddingBottom: 60 }]}>
             <Text style={styles.modalGlyph}>◎</Text>
             <Text style={styles.modalTitle}>FluxLog</Text>
-            <Text style={styles.modalHook}>Your period stopped making sense.{'\n'}FluxLog helps you understand why.</Text>
+            <Text style={styles.modalHook}>Your body is changing. FluxLog helps you
+understand it — and take back control.</Text>
 
             {/* Trial box */}
             <TouchableOpacity style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
               <View>
-                <Text style={styles.trialBoxTitle}>✦  Start 7-day free trial</Text>
-                <Text style={styles.trialBoxSub}>Full access, cancel anytime, no charge today</Text>
+                <Text style={styles.trialBoxTitle}>✦  Start free — full access, 7 days</Text>
+                <Text style={styles.trialBoxSub}>No card required · Cancel anytime · Instant access</Text>
               </View>
               <Text style={styles.trialBoxArrow}>→</Text>
             </TouchableOpacity>
@@ -233,7 +234,7 @@ export default function FluxScreen() {
               <Text style={styles.pricePer}>per month</Text>
             </View>
 
-            {['Log flow, spotting & irregularities','Track patterns over time','Correlate with symptoms & supplements','Included in your 90-day doctor report','Cancel anytime'].map(f => (
+            {['Log any cycle — spotting, skipped, irregular','Patterns emerge within 2 weeks of logging','Correlate flow with food, stress & caffeine','Auto-builds your doctor report in 90 days','Cancel anytime, no questions asked'].map(f => (
               <View key={f} style={styles.modalFeatureRow}>
                 <Text style={styles.modalFeatureCheck}>✦</Text>
                 <Text style={styles.modalFeatureText}>{f}</Text>
@@ -241,14 +242,14 @@ export default function FluxScreen() {
             ))}
 
             <TouchableOpacity style={[styles.purchaseBtn, loading && { opacity: 0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
-              {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Subscribe · {price}/month</Text>}
+              {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Unlock FluxLog · {price}/month</Text>}
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
-              <Text style={styles.restoreBtnText}>Restore purchase</Text>
+              <Text style={styles.restoreBtnText}>Already subscribed? Restore access</Text>
             </TouchableOpacity>
             <View style={styles.legalRow}>
-              <Text style={styles.legalText}>{'FluxLog is $4.99/mo. Auto-renews unless cancelled 24hrs before renewal. Manage in App Store settings. '}
+              <Text style={styles.legalText}>{'FluxLog is less than a coffee a week. Auto-renews unless cancelled 24hrs before renewal. Manage in App Store settings. '}
                 <Text style={styles.legalLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
                 <Text style={styles.legalText}>{' · '}</Text>
                 <Text style={styles.legalLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/privacy')}>Privacy Policy</Text>

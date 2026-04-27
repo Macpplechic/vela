@@ -318,7 +318,7 @@ export default function CoolScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
-              <Text style={styles.subscribeBtnText}>Unlock CoolDown · {price}/month</Text>
+              <Text style={styles.subscribeBtnText}>Get full access · {price}/month</Text>
             </TouchableOpacity>
             <Text style={styles.legalSmall}>Cancel anytime · Less than 17¢ a day · Billed by Apple</Text>
             <Text style={[styles.legalSmall, { color: Colors.teal, marginTop: 2 }]}>✦ Most women notice relief within 3 sessions</Text>
