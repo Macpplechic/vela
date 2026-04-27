@@ -456,7 +456,7 @@ export default function ProfileScreen() {
 
         <View style={styles.card}>
           <Text allowFontScaling={false} style={styles.cardTitle}>Doctor report</Text>
-          <Text allowFontScaling={false} style={styles.cardSub}>90-day PDF — symptoms, sleep, nutrition, supplements</Text>
+          <Text allowFontScaling={false} style={styles.cardSub}>Symptoms · nutrition · supplements · sleep · patterns — 90 days of data your doctor actually needs. Takes 3 seconds to generation, supplements</Text>
           <TouchableOpacity
             onPress={handleExportPDF}
             disabled={pdfLoading}
