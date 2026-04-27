@@ -63,6 +63,20 @@ export default function ShiftScreen() {
         <Text style={styles.pageTitle}>The Shift</Text>
         <Text style={styles.pageSub}>Women who get it, because they're living it.</Text>
 
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:10}} contentContainerStyle={{gap:8,paddingRight:16}}>
+          {[
+            "Anyone else get heart palpitations?",
+            "What's helping your sleep?",
+            "Best supplement for brain fog?",
+            "Hot flash trigger I discovered:",
+            "Win I want to share ✦",
+          ].map(prompt => (
+            <TouchableOpacity key={prompt} style={styles.promptChip} onPress={() => setNewPost(prompt + ' ')}>
+              <Text style={styles.promptChipText}>{prompt}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
         <View style={styles.composeCard}>
           <TextInput
             style={styles.composeInput}
@@ -184,6 +198,8 @@ const styles = StyleSheet.create({
   termsLink:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum,textDecorationLine:'underline'},
   termsBtn:{backgroundColor:Colors.plum,borderRadius:28,paddingVertical:16,paddingHorizontal:40},
   termsBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment},
+  promptChip:{backgroundColor:Colors.cream,borderWidth:1,borderColor:Colors.plumLight,borderRadius:20,paddingVertical:8,paddingHorizontal:14},
+  promptChipText:{fontFamily:Fonts.sans,fontSize:12,color:Colors.plum},
   modalBackdrop:{position:'absolute',top:0,left:0,right:0,bottom:0,backgroundColor:'rgba(0,0,0,0.5)'},
   reportSheet:{position:'absolute',bottom:0,left:0,right:0,backgroundColor:Colors.parchment,borderTopLeftRadius:20,borderTopRightRadius:20,padding:24,paddingBottom:40},
   reportTitle:{fontFamily:Fonts.serif,fontSize:18,color:Colors.plum,marginBottom:4},

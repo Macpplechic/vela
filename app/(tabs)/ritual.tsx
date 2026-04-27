@@ -186,6 +186,23 @@ export default function RitualScreen() {
         </View>
 
         <View style={styles.card}>
+          <Text style={styles.cardTitle}>How did you sleep? 🌙</Text>
+          <Text style={styles.cardSub}>Sleep quality directly affects hot flash frequency</Text>
+          <View style={{ flexDirection:'row', gap:8, marginBottom:8 }}>
+            {[1,2,3,4,5].map(n => (
+              <TouchableOpacity
+                key={n}
+                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+                style={{ flex:1, alignItems:'center', paddingVertical:12, borderRadius:12,
+                  backgroundColor: Colors.parchment, borderWidth:1, borderColor:Colors.parchmentDark }}>
+                <Text style={{ fontSize:20 }}>{['😴','😐','🙂','😊','✨'][n-1]}</Text>
+                <Text style={{ fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, marginTop:4 }}>{['poor','okay','good','great','amazing'][n-1]}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.card}>
           <Text style={styles.cardTitle}>Evening reflection</Text>
           <Text style={[styles.cardSub, { fontStyle:'italic' }]}>What did your body do well today?</Text>
           <TextInput

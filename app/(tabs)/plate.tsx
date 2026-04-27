@@ -12,10 +12,36 @@ export default function PlateScreen() {
   const [showFood, setShowFood] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scannedImage, setScannedImage] = useState<string | null>(null);
+  const [aiAdvice, setAiAdvice] = useState<string | null>(null);
+  const [loadingAdvice, setLoadingAdvice] = useState(false);
   const pd = PHASES[phase ?? 'late'];
 
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
+  const getAiAdvice = async () => {
+    setLoadingAdvice(true);
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          messages: [{
+            role: 'user',
+            content: `I am a woman in ${pd.label} phase of perimenopause. Today I have eaten: ${foods.length > 0 ? foods.map(f => f.name).join(', ') : 'nothing yet'}. My protein is ${Math.round(totals.protein)}g of ${pd.targets.protein}g target. Give me ONE specific food recommendation for my next meal that will most improve my hormone balance today. Be specific, practical, and under 2 sentences. No preamble.`
+          }]
+        })
+      });
+      const data = await response.json();
+      setAiAdvice(data.content[0].text);
+    } catch (e) {
+      setAiAdvice('Add wild salmon, flaxseed, or broccoli to support estrogen balance today.');
+    } finally {
+      setLoadingAdvice(false);
+    }
+  };
+
   const scanMeal = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -142,6 +168,23 @@ export default function PlateScreen() {
         </View>
 
         {/* Food search */}
+        <TouchableOpacity style={styles.aiAdviceBtn} onPress={getAiAdvice} disabled={loadingAdvice} activeOpacity={0.85}>
+          {loadingAdvice
+            ? <ActivityIndicator color={Colors.parchment} size="small" />
+            : <Text style={styles.aiAdviceBtnText}>✦ What should I eat today?</Text>
+          }
+        </TouchableOpacity>
+
+        {aiAdvice && (
+          <View style={styles.aiAdviceCard}>
+            <Text style={styles.aiAdviceLabel}>✦ VELA RECOMMENDS</Text>
+            <Text style={styles.aiAdviceText}>{aiAdvice}</Text>
+            <TouchableOpacity onPress={() => setAiAdvice(null)}>
+              <Text style={styles.aiAdviceDismiss}>dismiss</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {!showFood && foods.length === 0 && (
           <View style={styles.suggestCard}>
             <Text style={styles.suggestTitle}>✦ Best foods for {pd.label}</Text>
@@ -276,6 +319,12 @@ const styles = StyleSheet.create({
   loggedMeta: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist },
   removeBtn: { padding:4 },
   removeBtnText: { fontSize:18, color: Colors.mist },
+  aiAdviceBtn:{backgroundColor:Colors.plum,borderRadius:18,paddingVertical:14,alignItems:'center',marginBottom:12},
+  aiAdviceBtnText:{fontFamily:Fonts.sansMedium,fontSize:14,color:Colors.goldLight,letterSpacing:0.5},
+  aiAdviceCard:{backgroundColor:'#F0EBF5',borderWidth:1,borderColor:Colors.plum,borderRadius:16,padding:16,marginBottom:12},
+  aiAdviceLabel:{fontFamily:Fonts.sansMedium,fontSize:10,color:Colors.plum,letterSpacing:2,marginBottom:8},
+  aiAdviceText:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum,lineHeight:22,marginBottom:8},
+  aiAdviceDismiss:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,textAlign:'right'},
   suggestCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:12},
   suggestTitle:{fontFamily:Fonts.serif,fontSize:16,color:Colors.plum,marginBottom:2},
   suggestSub:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,marginBottom:12},

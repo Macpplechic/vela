@@ -32,6 +32,8 @@ export default function FluxScreen() {
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
   const [selectedFlow, setSelectedFlow] = useState<string | null>(null);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
+  const [cycleInsight, setCycleInsight] = useState<string | null>(null);
+  const [loadingInsight, setLoadingInsight] = useState(false);
 
   useEffect(() => {
     loadOffering();
@@ -41,6 +43,31 @@ export default function FluxScreen() {
     const t = setInterval(() => setTestimonialIdx(i => (i + 1) % TESTIMONIALS.length), 4000);
     return () => clearInterval(t);
   }, []);
+
+  const getCycleInsight = async () => {
+    if (!selectedFlow) { Alert.alert('Log your flow first', 'Tap a flow option above to log today before getting your insight.'); return; }
+    setLoadingInsight(true);
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 200,
+          messages: [{
+            role: 'user',
+            content: `I am in perimenopause and logged "${selectedFlow}" flow today. Give me ONE practical tip for managing this specific type of flow during perimenopause. Be warm, specific, and under 2 sentences. No preamble or diagnosis.`
+          }]
+        })
+      });
+      const data = await response.json();
+      setCycleInsight(data.content[0].text);
+    } catch(e) {
+      setCycleInsight('Track for 2-3 cycles to start seeing patterns. Every log counts.');
+    } finally {
+      setLoadingInsight(false);
+    }
+  };
 
   const loadOffering = async () => {
     try {
@@ -133,6 +160,21 @@ export default function FluxScreen() {
               })}
             </View>
 
+            {selectedFlow && (
+              <TouchableOpacity style={{backgroundColor:Colors.plum,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:8,alignItems:'center'}} onPress={getCycleInsight} disabled={loadingInsight}>
+                {loadingInsight
+                  ? <ActivityIndicator color={Colors.parchment} size="small" />
+                  : <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.parchment}}>✦ Get insight for today's flow</Text>
+                }
+              </TouchableOpacity>
+            )}
+            {cycleInsight && (
+              <View style={{backgroundColor:'#F0EBF5',borderRadius:14,padding:14,marginBottom:8,borderWidth:1,borderColor:Colors.plum}}>
+                <Text style={{fontFamily:Fonts.sansMedium,fontSize:10,color:Colors.plum,letterSpacing:2,marginBottom:6}}>✦ VELA INSIGHT</Text>
+                <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.plum,lineHeight:20}}>{cycleInsight}</Text>
+                <TouchableOpacity onPress={() => setCycleInsight(null)}><Text style={{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,marginTop:8,textAlign:'right'}}>dismiss</Text></TouchableOpacity>
+              </View>
+            )}
             {selectedFlow && (
               <View style={{ backgroundColor: Colors.sagePale ?? '#EEF5EE', borderRadius: 14, padding: 12, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text style={{ color: Colors.sage, fontFamily: Fonts.sans, fontSize: 13 }}>✓ Logged today: {selectedFlow} — great consistency!</Text>
