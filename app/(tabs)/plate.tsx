@@ -15,12 +15,54 @@ export default function PlateScreen() {
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [apiResults, setApiResults] = useState<any[]>([]);
   const [apiLoading, setApiLoading] = useState(false);
+  const USDA_KEY = 'DEMO_KEY'; // Replace with your free key from fdc.nal.usda.gov
+  const [apiResults, setApiResults] = useState<any[]>([]);
+  const [apiLoading, setApiLoading] = useState(false);
   const USDA_KEY = 'WVDorwLRz7lTRdTvDE3IJy22xCZr0ptzhXwdNFQn'; // Replace with your free key from fdc.nal.usda.gov
 
   const pd = PHASES[phase ?? 'late'];
 
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
+  const searchUSDA = async (query: string) => {
+    if (query.length < 2) { setApiResults([]); return; }
+    setApiLoading(true);
+    try {
+      const res = await fetch(
+        `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&pageSize=20&api_key=${USDA_KEY}&dataType=Foundation,SR%20Legacy`
+      );
+      const data = await res.json();
+      const mapped = (data.foods ?? []).map((f: any) => {
+        const get = (name: string) => {
+          const n = f.foodNutrients?.find((x: any) =>
+            x.nutrientName?.toLowerCase().includes(name.toLowerCase())
+          );
+          return Math.round((n?.value ?? 0) * 10) / 10;
+        };
+        return {
+          id: `usda_${f.fdcId}`,
+          name: f.description?.split(',')[0]?.replace(/raw$/i,'').trim() ?? f.description,
+          category: 'usda',
+          protein: get('protein'),
+          fiber: get('fiber'),
+          calcium: get('calcium'),
+          magnesium: get('magnesium'),
+          omega3: get('18:3') || get('omega'),
+          phyto: 0,
+          cal: get('energy') || get('calor'),
+          ai: Math.min(10, Math.round((get('18:3') * 2 + (get('fiber') > 3 ? 2 : 0) + (get('protein') > 15 ? 1 : 0)))),
+          phase: ['early','late','post'] as any,
+        };
+      }).filter((f: any) => f.cal > 0 || f.protein > 0);
+      setApiResults(mapped);
+    } catch(e) {
+      // fallback to local search
+      setApiResults([]);
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
   const searchUSDA = async (query: string) => {
     if (query.length < 2) { setApiResults([]); return; }
     setApiLoading(true);
