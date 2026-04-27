@@ -293,8 +293,6 @@ export const BREATHWORK: BreathExercise[] = [
   { id:"ginger_fresh", name:"Fresh Ginger (1 tsp grated)", category:"spices", protein:0, fiber:0.1, calcium:2, magnesium:3, omega3:0, phyto:0, cal:2, ai:9, phase:["early","late","post"] },
   { id:"cinnamon", name:"Cinnamon (1 tsp)", category:"spices", protein:0, fiber:1.4, calcium:26, magnesium:2, omega3:0, phyto:0, cal:6, ai:8, phase:["early","late","post"] },
 ];
-];
-];
 
 // ─── Somatic Techniques ────────────────────────────────────────────────────────
 
@@ -304,6 +302,7 @@ export const SOMATIC: SomaticTechnique[] = [
   { id:'scan',    name:'Body Scan Release',           duration:'10 min', desc:'Lie down and bring attention slowly through your body from feet to head. At each area, notice tension and intentionally soften. Activates the rest-and-digest system.' },
   { id:'cold',    name:'Cold Water Face Plunge',      duration:'1 min',  desc:'Fill a bowl with cold water and ice. Submerge your face for 30 seconds. Activates the diving reflex and lowers heart rate within 30–60 seconds.' },
   { id:'pelvic',  name:'Pelvic Floor Release',        duration:'8 min',  desc:'Lie on your back, knees bent. Slowly tilt your pelvis and release 10 times. Then hold a gentle inward breath and release fully. Releases deep pelvic tension linked to anxiety.' },
+];
 
 // ─── Doctor Questions ──────────────────────────────────────────────────────────
 
@@ -317,5 +316,7 @@ export const DOCTOR_QUESTIONS: string[] = [
   'What lifestyle changes will have the highest impact for my specific symptoms?',
   'Can you refer me to a menopause specialist if needed?',
 
+
+];
 
 export const SUPP_LIBRARY = SUPP_DB_FULL;

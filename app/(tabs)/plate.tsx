@@ -60,20 +60,6 @@ export default function PlateScreen() {
     }
   };
 
-    if (query.length < 2) { setApiResults([]); return; }
-    setApiLoading(true);
-    try {
-      const res = await fetch(
-        `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&pageSize=20&api_key=${USDA_KEY}&dataType=Foundation,SR%20Legacy`
-      );
-      const data = await res.json();
-      const mapped = (data.foods ?? []).map((f: any) => {
-        const get = (name: string) => {
-          const n = f.foodNutrients?.find((x: any) =>
-            x.nutrientName?.toLowerCase().includes(name.toLowerCase())
-          );
-          return Math.round((n?.value ?? 0) * 10) / 10;
-        };
         return {
           id: `usda_${f.fdcId}`,
           name: f.description?.split(',')[0]?.replace(/raw$/i,'').trim() ?? f.description,
