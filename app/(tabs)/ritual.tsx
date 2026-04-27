@@ -28,6 +28,7 @@ export default function RitualScreen() {
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const greetingEmoji = hour < 12 ? "🌿" : hour < 17 ? "☀️" : "🌙";
   const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
   const toggleSymptom = async (s: string) => {
@@ -64,7 +65,7 @@ export default function RitualScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.dateText}>{today}</Text>
-        <Text style={styles.greeting}>{greeting}, beautiful.</Text>
+        <Text style={styles.greeting}>{greeting}, beautiful. {greetingEmoji}</Text>
         <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>
 
         {velaHistory.length === 0 && (
@@ -92,7 +93,7 @@ export default function RitualScreen() {
           <View style={styles.scoreRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardTitle}>Your hormone score</Text>
-              {foods.length > 0 && <Text style={styles.aiScore}>✦ Anti-inflammatory: {aiScore}/100</Text>}
+              {foods.length > 0 && <Text style={styles.aiScore}>{aiScore >= 70 ? '✦ Strong anti-inflammatory day' : aiScore >= 40 ? '✦ Building your score — add more plants' : '✦ Start logging food to build your score'}</Text>}
             </View>
             <View style={styles.scoreBox}>
               <Text style={[styles.scoreNum, { color: score > 60 ? Colors.sage : Colors.rose }]}>{score}</Text>
@@ -155,7 +156,7 @@ export default function RitualScreen() {
               );
             })}
           </View>
-          {symptoms.length > 0 && <Text style={styles.symptomNote}>{symptoms.length} logged</Text>}
+          {symptoms.length > 0 && <Text style={styles.symptomNote}>{symptoms.length} symptom{symptoms.length !== 1 ? 's' : ''} logged today ✓</Text>}
         </View>
 
         <View style={styles.card}>

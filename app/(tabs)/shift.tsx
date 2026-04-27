@@ -84,7 +84,7 @@ export default function ShiftScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={{ gap:8, paddingRight:20 }}>
           {['all','wins','tips','questions','health'].map(f => (
             <TouchableOpacity key={f} style={[styles.filterChip, { borderColor:filter===f?Colors.plum:Colors.parchmentDark, backgroundColor:filter===f?Colors.plum:Colors.cream }]} onPress={() => setFilter(f)}>
-              <Text style={[styles.filterText, { color:filter===f?Colors.parchment:Colors.mist }]}>{f === 'all' ? 'All posts' : f}</Text>
+              <Text style={[styles.filterText, { color:filter===f?Colors.parchment:Colors.mist }]}>{f === 'all' ? '✦ All' : f === 'wins' ? '🎉 Wins' : f === 'tips' ? '💡 Tips' : f === 'questions' ? '❓ Questions' : f === 'health' ? '💚 Health' : f}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>

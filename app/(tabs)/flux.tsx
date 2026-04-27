@@ -135,7 +135,7 @@ export default function FluxScreen() {
 
             {selectedFlow && (
               <View style={{ backgroundColor: Colors.sagePale ?? '#EEF5EE', borderRadius: 14, padding: 12, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Text style={{ color: Colors.sage, fontFamily: Fonts.sans, fontSize: 13 }}>✓ Logged: {selectedFlow}</Text>
+                <Text style={{ color: Colors.sage, fontFamily: Fonts.sans, fontSize: 13 }}>✓ Logged today: {selectedFlow} — great consistency!</Text>
               </View>
             )}
 
@@ -143,10 +143,10 @@ export default function FluxScreen() {
               <Text style={styles.cardTitle}>Cycle insights</Text>
               <Text style={styles.cardSub}>Patterns emerge after a few weeks of logging.</Text>
               {[
-                { label: 'Average cycle length', val: '—' },
+                { label: 'Average cycle length', val: '—', sub: 'log 2+ cycles to unlock' },
                 { label: 'Last period', val: '—' },
                 { label: 'Irregularity score', val: '—' },
-                { label: 'Days tracked', val: '0' },
+                { label: 'Days tracked', val: '0', sub: 'start today' },
               ].map(item => (
                 <View key={item.label} style={styles.insightRow}>
                   <Text style={styles.insightLabel}>{item.label}</Text>
@@ -156,9 +156,9 @@ export default function FluxScreen() {
             </View>
 
             <View style={[styles.card, { backgroundColor: Colors.tealPale ?? '#E8F4F2', borderColor: Colors.teal }]}>
-              <Text style={[styles.cardTitle, { color: Colors.teal }]}>Why this matters</Text>
+              <Text style={[styles.cardTitle, { color: Colors.teal }]}>Why tracking now matters</Text>
               <Text style={[styles.cardSub, { color: Colors.plum, marginBottom: 0 }]}>
-                Perimenopausal cycles are unpredictable by design. Logging them over time helps you and your doctor understand your unique hormonal pattern — and catch anything worth investigating.
+                Perimenopause cycles are unpredictable by design — but your patterns tell a story. 90 days of data gives you and your doctor something real to work with. Most women wish they'd started logging sooner.
               </Text>
             </View>
           </>

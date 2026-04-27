@@ -146,8 +146,8 @@ export default function ProfileScreen() {
         {/* ── 30-Day Snapshot ── */}
         <Text allowFontScaling={false} style={styles.sectionTitle}>Last 30 days</Text>
         <View style={styles.statsRow}>
-          <StatCard label="Supp adherence" value={`${adherence}%`} color={adherence >= 70 ? Colors.sage : Colors.gold} />
-          <StatCard label="Days logged" value={`${history.filter(e => { const d = new Date(); d.setDate(d.getDate()-30); return new Date(e.date) >= d; }).length}`} sub="of 30" />
+          <StatCard label="Supp adherence" value={`${adherence}%`} sub={adherence >= 70 ? 'on track' : adherence > 0 ? 'keep going' : 'start today'} color={adherence >= 70 ? Colors.sage : Colors.gold} />
+          <StatCard label="Days logged" value={`${history.filter(e => { const d = new Date(); d.setDate(d.getDate()-30); return new Date(e.date) >= d; }).length}`} sub={history.filter(e => { const d = new Date(); d.setDate(d.getDate()-30); return new Date(e.date) >= d; }).length >= 20 ? "excellent" : "of 30"} />
           <StatCard label="Avg protein" value={`${Math.round(avgNut.protein)}g`} sub="daily" />
         </View>
 
@@ -395,7 +395,7 @@ export default function ProfileScreen() {
                   <Text allowFontScaling={false} style={styles.doctorQ}>{q}</Text>
                 </View>
               ))}
-              <Text allowFontScaling={false} style={styles.doctorNote}>Many women see multiple providers before getting answers. Come prepared — you deserve a thorough conversation.</Text>
+              <Text allowFontScaling={false} style={styles.doctorNote}>Studies show women who arrive with symptom data get better treatment outcomes. These questions are your starting point.</Text>
             </View>
           )}
         </View>

@@ -24,7 +24,7 @@ export default function PlateScreen() {
   };
 
   const nutrients = [
-    { key:'protein' as keyof typeof totals, label:'Protein', u:'g', color:Colors.rose },
+    { key:'protein' as keyof typeof totals, label:'Protein', u:'g', color:Colors.rose, tip:'Key for muscle & mood' },
     { key:'fiber' as keyof typeof totals, label:'Fiber', u:'g', color:Colors.sage },
     { key:'calcium' as keyof typeof totals, label:'Calcium', u:'mg', color:Colors.gold },
     { key:'magnesium' as keyof typeof totals, label:'Magnesium', u:'mg', color:Colors.plumLight },
