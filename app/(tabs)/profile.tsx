@@ -92,6 +92,8 @@ export default function ProfileScreen() {
 
   const toggleMySupp = async (id: string) => {
     const next = mySupps.includes(id) ? mySupps.filter(x => x !== id) : [...mySupps, id];
+    const { impactAsync, ImpactFeedbackStyle } = require('expo-haptics');
+    impactAsync(ImpactFeedbackStyle.Medium);
     await setMySupps(next);
     if (!next.includes(id)) await setCheckedSupps(checkedSupps.filter(x => x !== id));
   };
@@ -340,7 +342,7 @@ export default function ProfileScreen() {
               <Text allowFontScaling={false} style={styles.manageBadgeText}>+ manage</Text>
             </TouchableOpacity>
           </View>
-          <Text allowFontScaling={false} style={styles.cardSub}>{_mySuppsDataTyped.length} supplements · {adherence}% adherence last 30 days</Text>
+          <Text allowFontScaling={false} style={styles.cardSub}>{_mySuppsDataTyped.length === 0 ? 'Tap manage to build your stack' : `${_mySuppsDataTyped.length} supplements · {adherence}% adherence last 30 days</Text>`}</Text>
           <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
             {_mySuppsDataTyped.map((s:any) => (
               <View key={s.id} style={styles.suppChip}>
@@ -650,7 +652,7 @@ const styles = StyleSheet.create({
   suppLibName:{ fontFamily:Fonts.sansMedium, fontSize:14, color:Colors.plum, marginBottom:2 },
   suppLibDose:{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold, marginBottom:6 },
   suppLibWhy:{ fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, lineHeight:18 },
-  suppToggleBtn:{ borderWidth:1, borderRadius:20, paddingVertical:7, paddingHorizontal:14, marginTop:2 },
+  suppToggleBtn:{ borderWidth:1.5, borderRadius:20, paddingVertical:10, paddingHorizontal:18, marginTop:2 },
   suppToggleTxt:{ fontFamily:Fonts.sans, fontSize:12 },
   routineSummary:{ backgroundColor:Colors.goldPale, borderRadius:14, padding:14, marginTop:20, borderWidth:0.5, borderColor:Colors.gold },
   routineLabel:{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold, letterSpacing:1, textTransform:'uppercase' },

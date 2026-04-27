@@ -71,7 +71,7 @@ export default function OnboardingScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Skip */}
       <TouchableOpacity style={styles.skip} onPress={handleDone}>
-        <Text style={styles.skipText}>Skip</Text>
+        <Text style={styles.skipText}>skip intro</Text>
       </TouchableOpacity>
 
       <ScrollView

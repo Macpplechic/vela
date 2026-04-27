@@ -150,16 +150,25 @@ export default function RitualScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Hydration today 💧</Text>
           <Text style={styles.cardSub}>Dehydration amplifies hot flashes & brain fog</Text>
-          <View style={{flexDirection:'row', alignItems:'center', gap:8, marginBottom:8, flexWrap:'wrap'}}>
-            {[1,2,3,4,5,6,7,8].map(n => (
+          <View style={{flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:8}}>
+            {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n => (
               <TouchableOpacity key={n}
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setWaterCount(waterCount === n ? n - 1 : n); }}
-                style={{width:34,height:34,borderRadius:17,backgroundColor: n <= waterCount ? Colors.teal : Colors.parchmentDark, alignItems:'center', justifyContent:'center'}}>
-                <Text style={{fontSize:15}}>💧</Text>
+                style={{width:36,height:36,borderRadius:18,
+                  backgroundColor: n <= waterCount ? (n > 10 ? '#00b4d8' : Colors.teal) : Colors.parchmentDark,
+                  alignItems:'center', justifyContent:'center',
+                  transform:[{scale: n <= waterCount ? 1.05 : 1}]}}>
+                <Text style={{fontSize:16}}>💧</Text>
               </TouchableOpacity>
             ))}
           </View>
-          <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>{waterCount === 0 ? 'Tap each glass as you drink it — aim for 8 daily' : waterCount >= 8 ? '✦ Fully hydrated today!' : `${waterCount} of 8 glasses — keep going`}</Text>
+          <Text style={{fontFamily:Fonts.sans, fontSize:11, color: waterCount >= 12 ? '#00b4d8' : waterCount >= 8 ? Colors.teal : Colors.mist}}>
+            {waterCount === 0 ? 'Tap each glass as you drink — aim for 8, go wild with 15 💧' :
+             waterCount >= 15 ? '🌊 LEGEND. 15 glasses. Your cells are thriving.' :
+             waterCount >= 12 ? `🔥 ${waterCount} glasses — absolutely crushing it` :
+             waterCount >= 8 ? `✦ ${waterCount} glasses — fully hydrated!` :
+             `${waterCount} of 8 glasses — ${8 - waterCount} more to go`}
+          </Text>
         </View>
 
         <View style={styles.card}>

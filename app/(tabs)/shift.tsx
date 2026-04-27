@@ -111,7 +111,7 @@ export default function ShiftScreen() {
               </View>
               <View style={styles.postMeta}>
                 <Text style={styles.postUser}>{p.user}</Text>
-                <Text style={styles.postPhase}>{PHASES[p.phase].label} · {p.time} ago · anonymous</Text>
+                <Text style={styles.postPhase}>{PHASES[p.phase]?.label ?? 'Peri'} · {p.time} ago</Text>
               </View>
               <View style={[styles.tagBadge, { backgroundColor:`${tagColors[p.tag] ?? Colors.gold}20` }]}>
                 <Text style={[styles.tagText, { color: tagColors[p.tag] ?? Colors.gold }]}>{p.tag}</Text>
