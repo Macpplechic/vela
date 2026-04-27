@@ -94,7 +94,7 @@ export default function PlateScreen() {
   const scanMeal = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Camera access needed', 'Please allow camera access to photograph your meal.');
+      Alert.alert('Camera access needed', 'Please allow camera access in Settings to use photo logging.');
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -103,12 +103,20 @@ export default function PlateScreen() {
     });
     if (result.canceled) return;
     setScannedImage(result.assets[0].uri);
-    // Show search after photo so user can find and log the foods they photographed
     setShowFood(true);
-    Alert.alert(
-      '📷 Meal captured!',
-      'Search for the foods in your photo below and tap to add them to your plate.',
-      [{ text: 'Got it', style: 'default' }]
+    Alert.prompt(
+      '📷 What did you eat?',
+      'Type the main food in your photo to search and add it',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Search', onPress: (text) => {
+          if (text) {
+            setSearch(text);
+            searchUSDA(text);
+          }
+        }},
+      ],
+      'plain-text'
     );
   };
 
@@ -140,12 +148,14 @@ export default function PlateScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle}>The Peri Plate</Text>
+          <View style={{flexDirection:'row', gap:6}}>
           <TouchableOpacity style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
-            <Text style={styles.scanButtonText}>📷 photo log</Text>
+            <Text style={styles.scanButtonText}>📷 scan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.addButton} onPress={() => setShowFood(!showFood)}>
-            <Text style={styles.addButtonText}>+ log food</Text>
+            <Text style={styles.addButtonText}>+ add food</Text>
           </TouchableOpacity>
+          </View>
         </View>
 
         {/* Score row */}
@@ -298,16 +308,16 @@ const styles = StyleSheet.create({
   subText: { fontFamily: Fonts.sans, fontSize:10, color: Colors.mist, letterSpacing:3, textTransform:'uppercase', marginTop:1 },
   scroll: { flex:1 },
   content: { padding:20, paddingBottom:100 },
-  titleRow: { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:20 },
-  pageTitle: { fontFamily: Fonts.serif, fontSize:24, color: Colors.plum },
-  scanButton:{backgroundColor:Colors.teal,borderRadius:20,paddingVertical:9,paddingHorizontal:14,marginRight:8},
-  scanButtonText:{fontFamily:Fonts.sans,fontSize:12,color:Colors.parchment,letterSpacing:0.5},
+  titleRow: { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:20, flexWrap:'wrap', gap:8 },
+  pageTitle: { fontFamily: Fonts.serif, fontSize:22, color: Colors.plum, flexShrink:1 },
+  scanButton:{backgroundColor:Colors.teal,borderRadius:20,paddingVertical:8,paddingHorizontal:12,marginRight:6},
+  scanButtonText:{fontFamily:Fonts.sans,fontSize:11,color:Colors.parchment},
   scanPreview:{borderRadius:18,overflow:'hidden',marginBottom:12,height:200},
   scanImage:{width:'100%',height:200,borderRadius:18},
   scanOverlay:{position:'absolute',top:0,left:0,right:0,bottom:0,backgroundColor:'rgba(61,31,58,0.7)',alignItems:'center',justifyContent:'center',gap:12},
   scanOverlayText:{fontFamily:Fonts.sansMedium,fontSize:14,color:Colors.parchment},
-  addButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:9, paddingHorizontal:18 },
-  addButtonText: { fontFamily: Fonts.sans, fontSize:12, color: Colors.parchment, letterSpacing:1 },
+  addButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:8, paddingHorizontal:14 },
+  addButtonText: { fontFamily: Fonts.sans, fontSize:11, color: Colors.parchment },
   scoreRow: { flexDirection:'row', gap:10, marginBottom:16 },
   scoreCard: { flex:1, backgroundColor: Colors.cream, borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:18, padding:16, alignItems:'center' },
   scoreLabel: { fontFamily: Fonts.sans, fontSize:10, color: Colors.mist, letterSpacing:2, textTransform:'uppercase', marginBottom:4 },
