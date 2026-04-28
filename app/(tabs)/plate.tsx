@@ -257,7 +257,7 @@ export default function PlateScreen() {
               </View>
             ))}
           </View>
-
+        )}
 
         {/* Score row */}
         <View style={styles.scoreRow}>
