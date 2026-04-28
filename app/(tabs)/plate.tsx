@@ -206,7 +206,58 @@ export default function PlateScreen() {
             <Text style={styles.addButtonText}>+ add food</Text>
           </TouchableOpacity>
           </View>
-        </View>
+        {showFood && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Add food</Text>
+            <TextInput
+              style={styles.searchInput}
+              value={search}
+              onChangeText={(t) => { setSearch(t); searchUSDA(t); }}
+              placeholder="Type to search 2,400+ foods..."
+              placeholderTextColor={Colors.mist}
+            />
+            <ScrollView style={{ maxHeight: 240 }} nestedScrollEnabled>
+              {apiLoading && (
+                <View style={{alignItems:'center', padding:20}}>
+                  <ActivityIndicator color={Colors.plum} />
+                  <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginTop:8}}>Searching 600,000+ foods...</Text>
+                </View>
+              )}
+              {(apiResults.length > 0 ? apiResults : filteredFoods).map((f: any, i: number) => (
+                <TouchableOpacity delayPressIn={0} key={i} style={styles.foodRow} onPress={() => addFood(f)} activeOpacity={0.7}>
+                  <View style={{ flex:1 }}>
+                    <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start' }}>
+                      <Text style={[styles.foodName, {flex:1, marginRight:8}]}>{f.name}</Text>
+                      <Text style={styles.foodAi}>✦ {f.ai}/10</Text>
+                    </View>
+                    <Text style={styles.foodMeta}>{f.protein}g protein · {f.fiber}g fiber · {f.cal} cal</Text>
+                    {f.omega3 > 0.5 && <Text style={{fontFamily:Fonts.sans,fontSize:10,color:Colors.teal,marginTop:2}}>Ω omega-3 rich</Text>}
+                    {f.phyto > 5 && <Text style={{fontFamily:Fonts.sans,fontSize:10,color:Colors.sage,marginTop:2}}>✦ phytoestrogen</Text>}
+                    {f.calcium > 100 && <Text style={{fontFamily:Fonts.sans,fontSize:10,color:Colors.gold,marginTop:2}}>◈ calcium rich</Text>}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Logged foods */}
+        {foods.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Logged today</Text>
+            {foods.map((f: any, i) => (
+              <View key={i} style={[styles.loggedRow, i < foods.length-1 && styles.loggedBorder]}>
+                <View style={{ flex:1 }}>
+                  <Text style={styles.loggedName}>{f.name}</Text>
+                  <Text style={styles.loggedMeta}>{f.protein}g protein · ✦ {f.ai}/10</Text>
+                </View>
+                <TouchableOpacity delayPressIn={0} onPress={() => removeFood(i)} style={styles.removeBtn}>
+                  <Text style={styles.removeBtnText}>×</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+
 
         {/* Score row */}
         <View style={styles.scoreRow}>
@@ -287,57 +338,6 @@ export default function PlateScreen() {
           </View>
         )}
 
-        {showFood && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Add food</Text>
-            <TextInput
-              style={styles.searchInput}
-              value={search}
-              onChangeText={(t) => { setSearch(t); searchUSDA(t); }}
-              placeholder="Type to search 2,400+ foods..."
-              placeholderTextColor={Colors.mist}
-            />
-            <ScrollView style={{ maxHeight: 240 }} nestedScrollEnabled>
-              {apiLoading && (
-                <View style={{alignItems:'center', padding:20}}>
-                  <ActivityIndicator color={Colors.plum} />
-                  <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginTop:8}}>Searching 600,000+ foods...</Text>
-                </View>
-              )}
-              {(apiResults.length > 0 ? apiResults : filteredFoods).map((f: any, i: number) => (
-                <TouchableOpacity delayPressIn={0} key={i} style={styles.foodRow} onPress={() => addFood(f)} activeOpacity={0.7}>
-                  <View style={{ flex:1 }}>
-                    <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start' }}>
-                      <Text style={[styles.foodName, {flex:1, marginRight:8}]}>{f.name}</Text>
-                      <Text style={styles.foodAi}>✦ {f.ai}/10</Text>
-                    </View>
-                    <Text style={styles.foodMeta}>{f.protein}g protein · {f.fiber}g fiber · {f.cal} cal</Text>
-                    {f.omega3 > 0.5 && <Text style={{fontFamily:Fonts.sans,fontSize:10,color:Colors.teal,marginTop:2}}>Ω omega-3 rich</Text>}
-                    {f.phyto > 5 && <Text style={{fontFamily:Fonts.sans,fontSize:10,color:Colors.sage,marginTop:2}}>✦ phytoestrogen</Text>}
-                    {f.calcium > 100 && <Text style={{fontFamily:Fonts.sans,fontSize:10,color:Colors.gold,marginTop:2}}>◈ calcium rich</Text>}
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-
-        {/* Logged foods */}
-        {foods.length > 0 && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Logged today</Text>
-            {foods.map((f: any, i) => (
-              <View key={i} style={[styles.loggedRow, i < foods.length-1 && styles.loggedBorder]}>
-                <View style={{ flex:1 }}>
-                  <Text style={styles.loggedName}>{f.name}</Text>
-                  <Text style={styles.loggedMeta}>{f.protein}g protein · ✦ {f.ai}/10</Text>
-                </View>
-                <TouchableOpacity delayPressIn={0} onPress={() => removeFood(i)} style={styles.removeBtn}>
-                  <Text style={styles.removeBtnText}>×</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
         )}
 
         {foods.length === 0 && !showFood && (

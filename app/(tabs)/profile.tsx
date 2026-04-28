@@ -414,7 +414,7 @@ export default function ProfileScreen() {
         <View style={styles.card}>
           <View style={styles.cardTitleRow}>
             <Text allowFontScaling={false} style={styles.cardTitle}>My supplements</Text>
-            <TouchableOpacity delayPressIn={0} onPress={() => setShowSuppLib(true)} style={styles.manageBadge}>
+            <TouchableOpacity delayPressIn={0} onPress={() => { setShowSuppLib(true); }} style={styles.manageBadge} activeOpacity={0.6}>
               <Text allowFontScaling={false} style={styles.manageBadgeText}>+ manage</Text>
             </TouchableOpacity>
           </View>
@@ -564,7 +564,7 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* ── Supplement Library Modal ── */}
-      <Modal visible={showSuppLib} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowSuppLib(false)}>
+      <Modal visible={showSuppLib} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowSuppLib(false)} hardwareAccelerated>
         <SafeAreaView style={{ flex:1, backgroundColor: Colors.cream }} edges={["top"]}>
           <View style={styles.modalHeader}>
             <Text allowFontScaling={false} style={styles.modalTitle}>Supplement library</Text>
