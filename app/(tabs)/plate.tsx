@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '../../constants/Colors';
 import * as ImagePicker from 'expo-image-picker';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
 import { PHASES, FOOD_DB, Food } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
@@ -16,6 +17,8 @@ export default function PlateScreen() {
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [apiResults, setApiResults] = useState<any[]>([]);
   const [apiLoading, setApiLoading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const USDA_KEY = 'WVDorwLRz7lTRdTvDE3IJy22xCZr0ptzhXwdNFQn'; // Free key from fdc.nal.usda.gov — get yours for higher limits
 
   const pd = PHASES[phase ?? 'late'];
@@ -301,12 +304,50 @@ export default function PlateScreen() {
         )}
         <View style={{ height: 20 }} />
       </ScrollView>
+      {/* ── Barcode Scanner Modal ── */}
+      {showScanner && (
+        <View style={styles.scannerOverlay}>
+          <CameraView
+            style={styles.scannerCamera}
+            barcodeScannerSettings={{ barcodeTypes: ['ean13','ean8','upc_a','upc_e','qr'] }}
+            onBarcodeScanned={(result) => {
+              if (!apiLoading) lookupBarcode(result.data);
+            }}
+          />
+          <View style={styles.scannerFrame}>
+            <View style={styles.scannerCornerTL} />
+            <View style={styles.scannerCornerTR} />
+            <View style={styles.scannerCornerBL} />
+            <View style={styles.scannerCornerBR} />
+          </View>
+          <View style={styles.scannerBottom}>
+            {apiLoading
+              ? <ActivityIndicator color={Colors.parchment} size="large" />
+              : <Text style={styles.scannerHint}>Point at any barcode to scan</Text>
+            }
+            <TouchableOpacity style={styles.scannerClose} onPress={() => setShowScanner(false)}>
+              <Text style={styles.scannerCloseText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex:1, backgroundColor: Colors.parchment },
+  scannerOverlay: { position:'absolute', top:0, left:0, right:0, bottom:0, zIndex:999, backgroundColor:'#000' },
+  scannerCamera: { flex:1 },
+  scannerFrame: { position:'absolute', top:'30%', left:'10%', right:'10%', height:200, borderWidth:0 },
+  scannerCornerTL: { position:'absolute', top:0, left:0, width:30, height:30, borderTopWidth:3, borderLeftWidth:3, borderColor:Colors.gold },
+  scannerCornerTR: { position:'absolute', top:0, right:0, width:30, height:30, borderTopWidth:3, borderRightWidth:3, borderColor:Colors.gold },
+  scannerCornerBL: { position:'absolute', bottom:0, left:0, width:30, height:30, borderBottomWidth:3, borderLeftWidth:3, borderColor:Colors.gold },
+  scannerCornerBR: { position:'absolute', bottom:0, right:0, width:30, height:30, borderBottomWidth:3, borderRightWidth:3, borderColor:Colors.gold },
+  scannerBottom: { position:'absolute', bottom:60, left:0, right:0, alignItems:'center', gap:16 },
+  scannerHint: { fontFamily:'System', fontSize:16, color:Colors.parchment, textAlign:'center' },
+  scannerClose: { backgroundColor:'rgba(255,255,255,0.15)', borderRadius:30, paddingVertical:12, paddingHorizontal:32 },
+  scannerCloseText: { fontFamily:'System', fontSize:16, color:Colors.parchment },
   header: { backgroundColor: Colors.plum, paddingHorizontal:20, paddingTop:8, paddingBottom:14 },
   logoText: { fontFamily: Fonts.serif, fontSize:24, color: Colors.goldLight, letterSpacing:4 },
   subText: { fontFamily: Fonts.sans, fontSize:10, color: Colors.mist, letterSpacing:3, textTransform:'uppercase', marginTop:1 },

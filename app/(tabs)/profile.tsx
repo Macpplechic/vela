@@ -5,6 +5,9 @@ import { router } from 'expo-router';
 import { Colors, Fonts } from '../../constants/Colors';
 import { scheduleVelaNotifications, cancelAllNotifications } from '../../hooks/useNotifications';
 import { generateDoctorReport } from '../../hooks/generateReport';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 import { PHASES, SUPP_LIBRARY, DOCTOR_QUESTIONS } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
@@ -88,6 +91,53 @@ export default function ProfileScreen() {
       setNotifsEnabled(granted);
     }
     setNotifsLoading(false);
+  };
+
+  const handleBackup = async () => {
+    try {
+      const backup = {
+        version: 1,
+        exportDate: new Date().toISOString(),
+        phase, history, sleepHistory, mySupps, symptoms,
+        fluxLogs, streak, lastStreakDate,
+      };
+      const json = JSON.stringify(backup, null, 2);
+      const path = FileSystem.documentDirectory + 'vela_backup.json';
+      await FileSystem.writeAsStringAsync(path, json);
+      await Sharing.shareAsync(path, {
+        mimeType: 'application/json',
+        dialogTitle: 'Save your Vela backup',
+      });
+    } catch (e) {
+      Alert.alert('Backup failed', 'Could not create backup file.');
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: 'application/json' });
+      if (result.canceled || !result.assets?.[0]) return;
+      const json = await FileSystem.readAsStringAsync(result.assets[0].uri);
+      const backup = JSON.parse(json);
+      if (backup.version !== 1) {
+        Alert.alert('Invalid backup', 'This file does not appear to be a valid Vela backup.');
+        return;
+      }
+      Alert.alert(
+        'Restore backup?',
+        `This will replace all your current data with the backup from ${new Date(backup.exportDate).toLocaleDateString()}. This cannot be undone.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Restore', style: 'destructive', onPress: async () => {
+            if (backup.phase) await setPhase(backup.phase);
+            if (backup.mySupps) await setMySupps(backup.mySupps);
+            Alert.alert('Restored ✦', 'Your Vela data has been restored. Restart the app to see all changes.');
+          }},
+        ]
+      );
+    } catch (e) {
+      Alert.alert('Restore failed', 'Could not read the backup file. Make sure it is a valid Vela backup.');
+    }
   };
 
   const toggleMySupp = async (id: string) => {
