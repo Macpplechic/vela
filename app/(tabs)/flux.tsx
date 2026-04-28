@@ -59,7 +59,7 @@ function predictNextPeriod(logs: any[]): string | null {
 }
 
 export default function FluxScreen() {
-  const { fluxActive, unlockFlux, startFluxTrial } = useVelaStore();
+  const { fluxActive, fluxLogs, setFluxLogs, unlockFlux, startFluxTrial } = useVelaStore();
   const [showPaywall, setShowPaywall] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
@@ -331,6 +331,10 @@ const styles = StyleSheet.create({
   content:{padding:20},
   pageTitle:{fontFamily:Fonts.serif,fontSize:26,color:Colors.plum,marginBottom:4},
   pageSub:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist,marginBottom:20},
+  calGrid:{flexDirection:'row',flexWrap:'wrap',gap:4,marginBottom:10},
+  calDot:{width:30,height:30,borderRadius:6,alignItems:'center',justifyContent:'center'},
+  calDotText:{fontFamily:Fonts.sans,fontSize:9,color:Colors.plum},
+  calLegend:{flexDirection:'row',flexWrap:'wrap',gap:10},
   card:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:12},
   cardTitle:{fontFamily:Fonts.serif,fontSize:18,color:Colors.plum,marginBottom:4},
   cardSub:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,marginBottom:14},
