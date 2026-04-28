@@ -281,7 +281,7 @@ export default function ProfileScreen() {
 
         {/* ── Monthly History ── */}
         <View style={styles.card}>
-          <TouchableOpacity onPress={() => setShowHistory(!showHistory)} style={styles.cardTitleRow} activeOpacity={0.7}>
+          <TouchableOpacity delayPressIn={0} onPress={() => setShowHistory(!showHistory)} style={styles.cardTitleRow} activeOpacity={0.7}>
             <View>
               <Text allowFontScaling={false} style={styles.cardTitle}>Monthly history</Text>
               <Text allowFontScaling={false} style={styles.cardSub}>{history.length} days tracked</Text>
@@ -294,7 +294,7 @@ export default function ProfileScreen() {
               {/* Month selector */}
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop:12, marginBottom:16 }} contentContainerStyle={{ gap:8 }}>
                 {availableMonths.map(ym => (
-                  <TouchableOpacity key={ym} onPress={() => setSelectedMonth(ym)}
+                  <TouchableOpacity delayPressIn={0} key={ym} onPress={() => setSelectedMonth(ym)}
                     style={[styles.monthPill, { borderColor: selectedMonth===ym ? Colors.plum : Colors.parchmentDark, backgroundColor: selectedMonth===ym ? Colors.plum : Colors.cream }]}>
                     <Text allowFontScaling={false} style={[styles.monthPillText, { color: selectedMonth===ym ? Colors.parchment : Colors.mist }]}>{monthLabel(ym)}</Text>
                   </TouchableOpacity>
@@ -402,7 +402,7 @@ export default function ProfileScreen() {
               <Text allowFontScaling={false} style={styles.moduleName}>{m.name}</Text>
               {m.active
                 ? <Text allowFontScaling={false} style={[styles.moduleStatus, { color:m.color }]}>{m.daysLeft !== null ? `${m.daysLeft}d trial` : '✦ Active'}</Text>
-                : <TouchableOpacity onPress={m.onStart} style={[styles.trialBtn, { borderColor:m.color }]}>
+                : <TouchableOpacity delayPressIn={0} onPress={m.onStart} style={[styles.trialBtn, { borderColor:m.color }]}>
                     <Text allowFontScaling={false} style={[styles.trialBtnText, { color:m.color }]}>Start trial</Text>
                   </TouchableOpacity>
               }
@@ -414,7 +414,7 @@ export default function ProfileScreen() {
         <View style={styles.card}>
           <View style={styles.cardTitleRow}>
             <Text allowFontScaling={false} style={styles.cardTitle}>My supplements</Text>
-            <TouchableOpacity onPress={() => setShowSuppLib(true)} style={styles.manageBadge}>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowSuppLib(true)} style={styles.manageBadge}>
               <Text allowFontScaling={false} style={styles.manageBadgeText}>+ manage</Text>
             </TouchableOpacity>
           </View>
@@ -433,14 +433,14 @@ export default function ProfileScreen() {
           <Text allowFontScaling={false} style={styles.plumLabel}>✦ Vela Creator Program</Text>
           <Text allowFontScaling={false} style={styles.plumTitle}>Share Vela. Earn with us.</Text>
           <Text allowFontScaling={false} style={styles.plumText}>Share your referral link and earn 30% of every subscription — forever.</Text>
-          <TouchableOpacity onPress={() => setShowAffiliate(true)} style={styles.goldOutlineBtn}>
+          <TouchableOpacity delayPressIn={0} onPress={() => setShowAffiliate(true)} style={styles.goldOutlineBtn}>
             <Text allowFontScaling={false} style={styles.goldOutlineBtnText}>✦ Join the Creator Program</Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Doctor prep ── */}
         <View style={styles.card}>
-          <TouchableOpacity onPress={() => setShowDoctor(!showDoctor)} style={styles.cardTitleRow} activeOpacity={0.7}>
+          <TouchableOpacity delayPressIn={0} onPress={() => setShowDoctor(!showDoctor)} style={styles.cardTitleRow} activeOpacity={0.7}>
             <View style={{ flex:1 }}>
               <Text allowFontScaling={false} style={styles.cardTitle}>Doctor visit prep</Text>
               <Text allowFontScaling={false} style={styles.cardSub}>Know your rights. Ask the right questions.</Text>
@@ -519,7 +519,7 @@ export default function ProfileScreen() {
           <Text allowFontScaling={false} style={[styles.phaseLabel, { color:pd.color }]}>Your phase</Text>
           <Text allowFontScaling={false} style={styles.phaseTitle}>{pd.label}</Text>
           <Text allowFontScaling={false} style={styles.phaseDesc}>{pd.desc}</Text>
-          <TouchableOpacity onPress={() => { resetOnboarding(); router.replace('/onboarding'); }} style={styles.retakeBtn}>
+          <TouchableOpacity delayPressIn={0} onPress={() => { resetOnboarding(); router.replace('/onboarding'); }} style={styles.retakeBtn}>
             <Text allowFontScaling={false} style={styles.retakeBtnText}>✎ Retake phase quiz</Text>
           </TouchableOpacity>
         </View>
@@ -527,7 +527,7 @@ export default function ProfileScreen() {
         <View style={styles.card}>
           <Text allowFontScaling={false} style={styles.cardTitle}>Doctor report</Text>
           <Text allowFontScaling={false} style={styles.cardSub}>Symptoms · nutrition · supplements · sleep · patterns — 90 days of data your doctor actually needs. Takes 3 seconds to generation, supplements</Text>
-          <TouchableOpacity
+          <TouchableOpacity delayPressIn={0}
             onPress={handleExportPDF}
             disabled={pdfLoading}
             style={[styles.retakeBtn, { backgroundColor: pdfLoading ? Colors.parchmentDark : Colors.plum }]}>
@@ -549,7 +549,7 @@ export default function ProfileScreen() {
                 {notifsEnabled ? '7:30am · 8am · 1pm · 5pm · 9pm' : 'Tap to enable reminders'}
               </Text>
             </View>
-            <TouchableOpacity
+            <TouchableOpacity delayPressIn={0}
               onPress={handleNotifToggle}
               disabled={notifsLoading}
               style={[styles.notifToggle, { backgroundColor: notifsEnabled ? Colors.sage : Colors.parchmentDark }]}>
@@ -569,13 +569,13 @@ export default function ProfileScreen() {
           <View style={styles.modalHeader}>
             <Text allowFontScaling={false} style={styles.modalTitle}>Supplement library</Text>
             <Text allowFontScaling={false} style={{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,marginTop:2}}>Showing recommendations for {phase ? PHASES[phase]?.label : 'your phase'}</Text>
-            <TouchableOpacity onPress={() => setShowSuppLib(false)}>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowSuppLib(false)}>
               <Text allowFontScaling={false} style={styles.modalClose}>×</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catRow} contentContainerStyle={{ paddingHorizontal:20, gap:8, paddingVertical:4 }}>
             {Object.entries(CAT_LABELS).map(([cat, lbl]) => (
-              <TouchableOpacity key={cat} onPress={() => setSuppCat(cat)} style={[styles.catPill, { borderColor: suppCat===cat?Colors.plum:Colors.parchmentDark, backgroundColor: suppCat===cat?Colors.plum:Colors.cream }]}>
+              <TouchableOpacity delayPressIn={0} key={cat} onPress={() => setSuppCat(cat)} style={[styles.catPill, { borderColor: suppCat===cat?Colors.plum:Colors.parchmentDark, backgroundColor: suppCat===cat?Colors.plum:Colors.cream }]}>
                 <Text allowFontScaling={false} style={[styles.catPillText, { color: suppCat===cat?Colors.parchment:Colors.mist }]}>{lbl}</Text>
               </TouchableOpacity>
             ))}
@@ -590,7 +590,7 @@ export default function ProfileScreen() {
                     <Text allowFontScaling={false} style={styles.suppLibDose} numberOfLines={1}>{s.dose}</Text>
                     <Text allowFontScaling={false} style={styles.suppLibWhy} numberOfLines={3}>{s.why}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => toggleMySupp(s.id)} style={[styles.suppToggleBtn, { borderColor:inR?Colors.rose:Colors.gold, backgroundColor:inR?Colors.rosePale:Colors.goldPale }]}>
+                  <TouchableOpacity delayPressIn={0} onPress={() => toggleMySupp(s.id)} style={[styles.suppToggleBtn, { borderColor:inR?Colors.rose:Colors.gold, backgroundColor:inR?Colors.rosePale:Colors.goldPale }]}>
                     <Text allowFontScaling={false} style={[styles.suppToggleTxt, { color:inR?Colors.rose:Colors.plum }]}>{inR?'× remove':'✦ add'}</Text>
                   </TouchableOpacity>
                 </View>
@@ -613,7 +613,7 @@ export default function ProfileScreen() {
         <SafeAreaView style={{ flex:1, backgroundColor: Colors.cream }}>
           <View style={styles.modalHeader}>
             <Text allowFontScaling={false} style={styles.modalTitle}>Vela Creator Program</Text>
-            <TouchableOpacity onPress={() => setShowAffiliate(false)}><Text allowFontScaling={false} style={styles.modalClose}>×</Text></TouchableOpacity>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowAffiliate(false)}><Text allowFontScaling={false} style={styles.modalClose}>×</Text></TouchableOpacity>
           </View>
           <ScrollView contentContainerStyle={{ padding:20 }}>
             {[
@@ -631,7 +631,7 @@ export default function ProfileScreen() {
               <Text allowFontScaling={false} style={styles.linkBoxLabel}>Your referral link</Text>
               <Text allowFontScaling={false} style={styles.linkBoxVal}>macpplechic.github.io/vela/support</Text>
             </View>
-            <TouchableOpacity style={styles.plumBtn} onPress={() => require('react-native').Linking.openURL('mailto:hello@velaforwomen.com?subject=Creator%20Program%20Application')}>
+            <TouchableOpacity delayPressIn={0} style={styles.plumBtn} onPress={() => require('react-native').Linking.openURL('mailto:hello@velaforwomen.com?subject=Creator%20Program%20Application')}>
               <Text allowFontScaling={false} style={styles.plumBtnText}>Apply to join ✦</Text>
             </TouchableOpacity>
           </ScrollView>

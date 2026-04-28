@@ -122,7 +122,7 @@ function ProtocolTimer({ protocol, onClose }: { protocol: Protocol; onClose: () 
 
   return (
     <View style={ts.container}>
-      <TouchableOpacity style={ts.closeBtn} onPress={onClose}><Text style={ts.closeTxt}>✕ Close</Text></TouchableOpacity>
+      <TouchableOpacity delayPressIn={0} style={ts.closeBtn} onPress={onClose}><Text style={ts.closeTxt}>✕ Close</Text></TouchableOpacity>
       <Text style={ts.protocolName}>{protocol.title}</Text>
       <Text style={ts.stepCount}>{done ? 'Complete' : `Step ${stepIndex + 1} of ${protocol.steps.length}`}</Text>
       <View style={[ts.circle, { backgroundColor: currentStep.color + '22', borderColor: currentStep.color }]}>
@@ -147,11 +147,11 @@ function ProtocolTimer({ protocol, onClose }: { protocol: Protocol; onClose: () 
         ))}
       </View>
       {done ? (
-        <TouchableOpacity style={[ts.actionBtn, { backgroundColor: Colors.sage }]} onPress={handleReset}><Text style={ts.actionBtnTxt}>Do it again</Text></TouchableOpacity>
+        <TouchableOpacity delayPressIn={0} style={[ts.actionBtn, { backgroundColor: Colors.sage }]} onPress={handleReset}><Text style={ts.actionBtnTxt}>Do it again</Text></TouchableOpacity>
       ) : running ? (
-        <TouchableOpacity style={[ts.actionBtn, { backgroundColor: Colors.parchmentDark }]} onPress={() => { setRunning(false); progress.stopAnimation(); }}><Text style={[ts.actionBtnTxt, { color: Colors.mist }]}>Pause</Text></TouchableOpacity>
+        <TouchableOpacity delayPressIn={0} style={[ts.actionBtn, { backgroundColor: Colors.parchmentDark }]} onPress={() => { setRunning(false); progress.stopAnimation(); }}><Text style={[ts.actionBtnTxt, { color: Colors.mist }]}>Pause</Text></TouchableOpacity>
       ) : (
-        <TouchableOpacity style={[ts.actionBtn, { backgroundColor: currentStep.color }]} onPress={handleStart} activeOpacity={0.85}><Text style={ts.actionBtnTxt}>{stepIndex === 0 && secondsLeft === protocol.steps[0].duration ? 'Begin' : 'Resume'}</Text></TouchableOpacity>
+        <TouchableOpacity delayPressIn={0} style={[ts.actionBtn, { backgroundColor: currentStep.color }]} onPress={handleStart} activeOpacity={0.85}><Text style={ts.actionBtnTxt}>{stepIndex === 0 && secondsLeft === protocol.steps[0].duration ? 'Begin' : 'Resume'}</Text></TouchableOpacity>
       )}
     </View>
   );
@@ -257,7 +257,7 @@ export default function CoolScreen() {
               <Text style={styles.cardSub}>Each technique is clinically validated for symptom relief.</Text>
             </View>
             {PROTOCOLS.map((p, i) => (
-              <TouchableOpacity key={p.title} style={[styles.protocolCard, activeProtocol===i && styles.protocolCardActive]} onPress={() => setActiveProtocol(activeProtocol===i ? null : i)} activeOpacity={0.8}>
+              <TouchableOpacity delayPressIn={0} key={p.title} style={[styles.protocolCard, activeProtocol===i && styles.protocolCardActive]} onPress={() => setActiveProtocol(activeProtocol===i ? null : i)} activeOpacity={0.8}>
                 <View style={styles.protocolHeader}>
                   <View style={{ flex:1 }}>
                     <Text style={styles.protocolTitle}>{p.title}</Text>
@@ -267,7 +267,7 @@ export default function CoolScreen() {
                 </View>
                 {activeProtocol===i && <Text style={styles.protocolDesc}>{p.desc}</Text>}
                 {activeProtocol===i && (
-                  <TouchableOpacity style={styles.startBtn} activeOpacity={0.85} onPress={(e) => { e.stopPropagation(); setRunningProtocol(p); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); }}>
+                  <TouchableOpacity delayPressIn={0} style={styles.startBtn} activeOpacity={0.85} onPress={(e) => { e.stopPropagation(); setRunningProtocol(p); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); }}>
                     <Text style={styles.startBtnText}>▶  Start guided session</Text>
                   </TouchableOpacity>
                 )}
@@ -312,12 +312,12 @@ export default function CoolScreen() {
               ))}
             </View>
 
-            <TouchableOpacity style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
               <Text style={styles.trialBtnTitle}>Start free — 7 days, no card needed</Text>
               <Text style={styles.trialBtnSub}>Join 4,200+ women who found relief</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
               <Text style={styles.subscribeBtnText}>Get full access · {price}/month</Text>
             </TouchableOpacity>
             <Text style={styles.legalSmall}>Cancel anytime · Less than 17¢ a day · Billed by Apple</Text>
@@ -328,14 +328,14 @@ export default function CoolScreen() {
 
       <Modal visible={showPaywall} animationType="slide" onRequestClose={() => setShowPaywall(false)}>
         <SafeAreaView style={styles.modalSafe} edges={['top']}>
-          <TouchableOpacity style={styles.modalClose} onPress={() => setShowPaywall(false)}>
+          <TouchableOpacity delayPressIn={0} style={styles.modalClose} onPress={() => setShowPaywall(false)}>
             <Text style={styles.modalCloseText}>✕</Text>
           </TouchableOpacity>
           <ScrollView contentContainerStyle={[styles.modalContent, { paddingBottom: 60 }]}>
             <Text style={styles.modalGlyph}>◇</Text>
             <Text style={styles.modalTitle}>CoolDown</Text>
             <Text style={styles.modalHook}>You deserve to feel in control of your own body again.{'\n'}CoolDown gives you that back.</Text>
-            <TouchableOpacity style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
               <View>
                 <Text style={styles.trialBoxTitle}>✦  Start free — full access, 7 days</Text>
                 <Text style={styles.trialBoxSub}>No card required · Cancel anytime · Instant access</Text>
@@ -353,10 +353,10 @@ export default function CoolScreen() {
                 <Text style={styles.modalFeatureText}>{f}</Text>
               </View>
             ))}
-            <TouchableOpacity style={[styles.purchaseBtn, loading && { opacity:0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={[styles.purchaseBtn, loading && { opacity:0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
               {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Unlock CoolDown · {price}/month</Text>}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
+            <TouchableOpacity delayPressIn={0} style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
               <Text style={styles.restoreBtnText}>Already subscribed? Restore access</Text>
             </TouchableOpacity>
             <View style={styles.legalRow}>

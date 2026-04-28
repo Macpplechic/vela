@@ -103,7 +103,7 @@ export default function RitualScreen() {
               <Text allowFontScaling={false} style={styles.streakText}>🔥 {streak} day streak</Text>
             </View>
           )}
-          <TouchableOpacity onPress={() => router.push('/quiz')} style={styles.phaseBadge}>
+          <TouchableOpacity delayPressIn={0} onPress={() => router.push('/quiz')} style={styles.phaseBadge}>
             <Text allowFontScaling={false} style={styles.phaseBadgeText}>{pd.glyph} {pd.label}</Text>
           </TouchableOpacity>
         </View>
@@ -207,7 +207,7 @@ export default function RitualScreen() {
           <Text style={styles.cardSub}>Dehydration amplifies hot flashes & brain fog</Text>
           <View style={{flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:8}}>
             {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n => (
-              <TouchableOpacity key={n}
+              <TouchableOpacity delayPressIn={0} key={n}
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setWaterCount(waterCount === n ? n - 1 : n); }}
                 style={{width:36,height:36,borderRadius:18,
                   backgroundColor: n <= waterCount ? (n > 10 ? '#00b4d8' : Colors.teal) : Colors.parchmentDark,
@@ -229,7 +229,7 @@ export default function RitualScreen() {
         <View style={styles.card}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <Text style={[styles.cardTitle, { flex:1, marginBottom:0, fontSize:16 }]}>Morning supplement ritual</Text>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
+            <TouchableOpacity delayPressIn={0} onPress={() => router.push('/(tabs)/profile')} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
               <Text style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold }}>+ manage</Text>
             </TouchableOpacity>
           </View>
@@ -237,7 +237,7 @@ export default function RitualScreen() {
           {(mySuppsData as any[]).map((s: any) => {
             const on = checkedSupps.includes(s.id);
             return (
-              <TouchableOpacity key={s.id} style={styles.suppRow} onPress={() => toggleSupp(s.id)} activeOpacity={0.7}>
+              <TouchableOpacity delayPressIn={0} key={s.id} style={styles.suppRow} onPress={() => toggleSupp(s.id)} activeOpacity={0.7}>
                 <View style={[styles.checkbox, { borderColor: on ? Colors.sage : Colors.mist, backgroundColor: on ? Colors.sage : 'transparent' }]}>
                   {on && <Text style={styles.checkmark}>✓</Text>}
                 </View>
@@ -257,7 +257,7 @@ export default function RitualScreen() {
             {SYMPTOMS.map(s => {
               const on = symptoms.includes(s);
               return (
-                <TouchableOpacity key={s} style={[styles.symptomChip, { borderColor: on?Colors.rose:Colors.parchmentDark, backgroundColor: on?Colors.rosePale:Colors.cream }]} onPress={() => toggleSymptom(s)} activeOpacity={0.7}>
+                <TouchableOpacity delayPressIn={0} key={s} style={[styles.symptomChip, { borderColor: on?Colors.rose:Colors.parchmentDark, backgroundColor: on?Colors.rosePale:Colors.cream }]} onPress={() => toggleSymptom(s)} activeOpacity={0.7}>
                   <Text style={[styles.symptomText, { color: on?Colors.rose:Colors.mist }]}>{s}</Text>
                 </TouchableOpacity>
               );
@@ -271,7 +271,7 @@ export default function RitualScreen() {
           <Text style={styles.cardSub}>Sleep quality directly affects hot flash frequency</Text>
           <View style={{flexDirection:'row', gap:8, marginTop:12}}>
             {[1,2,3,4,5].map(n => (
-              <TouchableOpacity
+              <TouchableOpacity delayPressIn={0}
                 key={n}
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSleepQuality(n); }}
                 style={{flex:1, alignItems:'center', paddingVertical:12, borderRadius:12,
@@ -289,7 +289,7 @@ export default function RitualScreen() {
               <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.sage}}>
                 ✓ {['poor','okay','good','great','amazing'][sleepQuality-1]} sleep selected
               </Text>
-              <TouchableOpacity
+              <TouchableOpacity delayPressIn={0}
                 onPress={async () => {
                   await saveSleepEntry(
                     { date: new Date().toISOString().split('T')[0], quality: sleepQuality, nightSweats: false, wakeCount: 0, notes: '' },
@@ -318,7 +318,7 @@ export default function RitualScreen() {
             multiline
             numberOfLines={4}
           />
-          <TouchableOpacity style={styles.saveButton} onPress={async () => { await setJournal(journal); setJournalSaved(true); }} activeOpacity={0.8}>
+          <TouchableOpacity delayPressIn={0} style={styles.saveButton} onPress={async () => { await setJournal(journal); setJournalSaved(true); }} activeOpacity={0.8}>
             <Text style={styles.saveButtonText}>{journalSaved ? '✓ Saved' : 'Save'}</Text>
           </TouchableOpacity>
         </View>

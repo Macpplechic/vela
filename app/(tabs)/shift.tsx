@@ -45,7 +45,7 @@ export default function ShiftScreen() {
             <Text style={styles.termsLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
             {'. Zero tolerance for harassment or abusive content.'}
           </Text>
-          <TouchableOpacity style={styles.termsBtn} onPress={() => setHasAcceptedTerms(true)} activeOpacity={0.85}>
+          <TouchableOpacity delayPressIn={0} style={styles.termsBtn} onPress={() => setHasAcceptedTerms(true)} activeOpacity={0.85}>
             <Text style={styles.termsBtnText}>I Agree — Enter The Shift</Text>
           </TouchableOpacity>
         </View>
@@ -71,7 +71,7 @@ export default function ShiftScreen() {
             "Hot flash trigger I discovered:",
             "Win I want to share ✦",
           ].map(prompt => (
-            <TouchableOpacity key={prompt} style={styles.promptChip} onPress={() => setNewPost(prompt + ' ')}>
+            <TouchableOpacity delayPressIn={0} key={prompt} style={styles.promptChip} onPress={() => setNewPost(prompt + ' ')}>
               <Text style={styles.promptChipText}>{prompt}</Text>
             </TouchableOpacity>
           ))}
@@ -89,7 +89,7 @@ export default function ShiftScreen() {
           />
           <View style={styles.composeFooter}>
             <Text style={styles.composeAs}>Sharing as {pd.label}</Text>
-            <TouchableOpacity onPress={() => { if (newPost.trim()) { Alert.alert('Posted!', 'Your post has been shared.'); setNewPost(''); } }} style={styles.postButton}>
+            <TouchableOpacity delayPressIn={0} onPress={() => { if (newPost.trim()) { Alert.alert('Posted!', 'Your post has been shared.'); setNewPost(''); } }} style={styles.postButton}>
               <Text style={styles.postButtonText}>Post</Text>
             </TouchableOpacity>
           </View>
@@ -97,7 +97,7 @@ export default function ShiftScreen() {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={{ gap:8, paddingRight:20 }}>
           {['all','wins','tips','questions','health'].map(f => (
-            <TouchableOpacity key={f} style={[styles.filterChip, { borderColor:filter===f?Colors.plum:Colors.parchmentDark, backgroundColor:filter===f?Colors.plum:Colors.cream }]} onPress={() => setFilter(f)}>
+            <TouchableOpacity delayPressIn={0} key={f} style={[styles.filterChip, { borderColor:filter===f?Colors.plum:Colors.parchmentDark, backgroundColor:filter===f?Colors.plum:Colors.cream }]} onPress={() => setFilter(f)}>
               <Text style={[styles.filterText, { color:filter===f?Colors.parchment:Colors.mist }]}>{f === 'all' ? '✦ All' : f === 'wins' ? '🎉 Wins' : f === 'tips' ? '💡 Tips' : f === 'questions' ? '❓ Questions' : f === 'health' ? '💚 Health' : f}</Text>
             </TouchableOpacity>
           ))}
@@ -116,18 +116,18 @@ export default function ShiftScreen() {
               <View style={[styles.tagBadge, { backgroundColor:`${tagColors[p.tag] ?? Colors.gold}20` }]}>
                 <Text style={[styles.tagText, { color: tagColors[p.tag] ?? Colors.gold }]}>{p.tag}</Text>
               </View>
-              <TouchableOpacity onPress={() => setReportTarget({ id: p.id, user: p.user })} hitSlop={{ top:8,bottom:8,left:8,right:8 }}>
+              <TouchableOpacity delayPressIn={0} onPress={() => setReportTarget({ id: p.id, user: p.user })} hitSlop={{ top:8,bottom:8,left:8,right:8 }}>
                 <Text style={styles.moreBtn}>···</Text>
               </TouchableOpacity>
             </View>
             <Text style={styles.postText}>{p.text}</Text>
             <View style={styles.postActions}>
-              <TouchableOpacity onPress={() => toggleLike(p.id)} style={styles.actionBtn}>
+              <TouchableOpacity delayPressIn={0} onPress={() => toggleLike(p.id)} style={styles.actionBtn}>
                 <Text style={[styles.actionText, { color: likedPosts.includes(p.id) ? Colors.rose : Colors.mist }]}>
                   {likedPosts.includes(p.id) ? '♥' : '♡'} {p.likes + (likedPosts.includes(p.id) ? 1 : 0)}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Replies coming soon', 'This feature is in progress.')  }>
+              <TouchableOpacity delayPressIn={0} style={styles.actionBtn} onPress={() => Alert.alert('Replies coming soon', 'This feature is in progress.')  }>
                 <Text style={styles.actionText}>◎ reply</Text>
               </TouchableOpacity>
             </View>
@@ -136,23 +136,23 @@ export default function ShiftScreen() {
         <View style={{ height:20 }} />
       </ScrollView>
       <Modal visible={!!reportTarget} transparent animationType="fade" onRequestClose={() => setReportTarget(null)}>
-        <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setReportTarget(null)} />
+        <TouchableOpacity delayPressIn={0} style={styles.modalBackdrop} activeOpacity={1} onPress={() => setReportTarget(null)} />
         <View style={styles.reportSheet}>
           <Text style={styles.reportTitle}>Report {reportTarget?.user}</Text>
           <Text style={styles.reportSub}>Anonymous. Reviewed within 24 hours.</Text>
           {['Spam','Harassment or bullying','Misinformation','Inappropriate content','Other'].map(r => (
-            <TouchableOpacity key={r} style={[styles.reasonRow, reportReason===r && styles.reasonRowActive]} onPress={() => setReportReason(r)}>
+            <TouchableOpacity delayPressIn={0} key={r} style={[styles.reasonRow, reportReason===r && styles.reasonRowActive]} onPress={() => setReportReason(r)}>
               <Text style={[styles.reasonText, reportReason===r && styles.reasonTextActive]}>{r}</Text>
               {reportReason===r && <Text style={styles.reasonCheck}>✓</Text>}
             </TouchableOpacity>
           ))}
-          <TouchableOpacity style={[styles.reportBtn, !reportReason && styles.reportBtnDisabled]} onPress={submitReport} disabled={!reportReason} activeOpacity={0.85}>
+          <TouchableOpacity delayPressIn={0} style={[styles.reportBtn, !reportReason && styles.reportBtnDisabled]} onPress={submitReport} disabled={!reportReason} activeOpacity={0.85}>
             <Text style={styles.reportBtnText}>Submit Report</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.blockBtn} onPress={() => { setBlockedUsers([...blockedUsers, reportTarget?.user ?? '']); setReportTarget(null); setReportReason(''); Alert.alert('User blocked', `${reportTarget?.user} has been blocked and removed from your feed.`); }} activeOpacity={0.85}>
+          <TouchableOpacity delayPressIn={0} style={styles.blockBtn} onPress={() => { setBlockedUsers([...blockedUsers, reportTarget?.user ?? '']); setReportTarget(null); setReportReason(''); Alert.alert('User blocked', `${reportTarget?.user} has been blocked and removed from your feed.`); }} activeOpacity={0.85}>
             <Text style={styles.blockBtnText}>🚫 Block this user</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelBtn} onPress={() => { setReportTarget(null); setReportReason(''); }}>
+          <TouchableOpacity delayPressIn={0} style={styles.cancelBtn} onPress={() => { setReportTarget(null); setReportReason(''); }}>
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
         </View>

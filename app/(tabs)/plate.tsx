@@ -198,10 +198,10 @@ export default function PlateScreen() {
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle}>The Peri Plate</Text>
           <View style={{flexDirection:'row', gap:6}}>
-          <TouchableOpacity style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
+          <TouchableOpacity delayPressIn={0} style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
             <Text style={styles.scanButtonText}>📷 scan</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.addButton} onPress={() => setShowFood(!showFood)}>
+          <TouchableOpacity delayPressIn={0} style={styles.addButton} onPress={() => setShowFood(!showFood)}>
             <Text style={styles.addButtonText}>+ add food</Text>
           </TouchableOpacity>
           </View>
@@ -239,7 +239,7 @@ export default function PlateScreen() {
         </View>
 
         {/* Food search */}
-        <TouchableOpacity style={styles.aiAdviceBtn} onPress={getAiAdvice} activeOpacity={0.85}>
+        <TouchableOpacity delayPressIn={0} style={styles.aiAdviceBtn} onPress={getAiAdvice} activeOpacity={0.85}>
           <Text style={styles.aiAdviceBtnText}>✦ What should I eat today?</Text>
         </TouchableOpacity>
 
@@ -247,7 +247,7 @@ export default function PlateScreen() {
           <View style={styles.aiAdviceCard}>
             <Text style={styles.aiAdviceLabel}>✦ VELA RECOMMENDS</Text>
             <Text style={styles.aiAdviceText}>{aiAdvice}</Text>
-            <TouchableOpacity onPress={() => setAiAdvice(null)}>
+            <TouchableOpacity delayPressIn={0} onPress={() => setAiAdvice(null)}>
               <Text style={styles.aiAdviceDismiss}>dismiss</Text>
             </TouchableOpacity>
           </View>
@@ -265,7 +265,7 @@ export default function PlateScreen() {
                 {name:'Edamame', emoji:'🫘'},
                 {name:'Walnuts', emoji:'🥜'},
               ].map(s => (
-                <TouchableOpacity key={s.name} style={styles.suggestChip}
+                <TouchableOpacity delayPressIn={0} key={s.name} style={styles.suggestChip}
                   onPress={() => {
                     searchUSDA(s.name);
                   }}>
@@ -301,7 +301,7 @@ export default function PlateScreen() {
                 </View>
               )}
               {(apiResults.length > 0 ? apiResults : filteredFoods).map((f: any, i: number) => (
-                <TouchableOpacity key={i} style={styles.foodRow} onPress={() => addFood(f)} activeOpacity={0.7}>
+                <TouchableOpacity delayPressIn={0} key={i} style={styles.foodRow} onPress={() => addFood(f)} activeOpacity={0.7}>
                   <View style={{ flex:1 }}>
                     <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start' }}>
                       <Text style={[styles.foodName, {flex:1, marginRight:8}]}>{f.name}</Text>
@@ -328,7 +328,7 @@ export default function PlateScreen() {
                   <Text style={styles.loggedName}>{f.name}</Text>
                   <Text style={styles.loggedMeta}>{f.protein}g protein · ✦ {f.ai}/10</Text>
                 </View>
-                <TouchableOpacity onPress={() => removeFood(i)} style={styles.removeBtn}>
+                <TouchableOpacity delayPressIn={0} onPress={() => removeFood(i)} style={styles.removeBtn}>
                   <Text style={styles.removeBtnText}>×</Text>
                 </TouchableOpacity>
               </View>
@@ -366,7 +366,7 @@ export default function PlateScreen() {
               ? <ActivityIndicator color={Colors.parchment} size="large" />
               : <Text style={styles.scannerHint}>Point at any barcode to scan</Text>
             }
-            <TouchableOpacity style={styles.scannerClose} onPress={() => setShowScanner(false)}>
+            <TouchableOpacity delayPressIn={0} style={styles.scannerClose} onPress={() => setShowScanner(false)}>
               <Text style={styles.scannerCloseText}>Cancel</Text>
             </TouchableOpacity>
           </View>

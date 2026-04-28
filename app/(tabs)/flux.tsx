@@ -161,7 +161,7 @@ export default function FluxScreen() {
               {FLOW_OPTIONS.map(opt => {
                 const on = selectedFlow === opt.label;
                 return (
-                  <TouchableOpacity
+                  <TouchableOpacity delayPressIn={0}
                     key={opt.label}
                     style={[styles.optRow, on && { backgroundColor: opt.color + '22', borderColor: opt.color }]}
                     onPress={async () => {
@@ -183,7 +183,7 @@ export default function FluxScreen() {
             </View>
 
             {selectedFlow && (
-              <TouchableOpacity style={{backgroundColor:Colors.plum,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:8,alignItems:'center'}} onPress={getCycleInsight} activeOpacity={0.85}>
+              <TouchableOpacity delayPressIn={0} style={{backgroundColor:Colors.plum,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:8,alignItems:'center'}} onPress={getCycleInsight} activeOpacity={0.85}>
                 <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.parchment}}>✦ What does this mean?</Text>
               </TouchableOpacity>
             )}
@@ -191,7 +191,7 @@ export default function FluxScreen() {
               <View style={{backgroundColor:'#F0EBF5',borderRadius:14,padding:14,marginBottom:8,borderWidth:1,borderColor:Colors.plum}}>
                 <Text style={{fontFamily:Fonts.sansMedium,fontSize:10,color:Colors.plum,letterSpacing:2,marginBottom:6}}>✦ VELA INSIGHT</Text>
                 <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.plum,lineHeight:20}}>{cycleInsight}</Text>
-                <TouchableOpacity onPress={() => setCycleInsight(null)}><Text style={{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,marginTop:8,textAlign:'right'}}>dismiss</Text></TouchableOpacity>
+                <TouchableOpacity delayPressIn={0} onPress={() => setCycleInsight(null)}><Text style={{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,marginTop:8,textAlign:'right'}}>dismiss</Text></TouchableOpacity>
               </View>
             )}
             {selectedFlow && (
@@ -254,12 +254,12 @@ export default function FluxScreen() {
             </View>
 
             {/* Trial CTA */}
-            <TouchableOpacity style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
               <Text style={styles.trialBtnTitle}>Start free — 7 days, no card needed</Text>
               <Text style={styles.trialBtnSub}>3,800+ women tracking their peri cycles</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
               <Text style={styles.subscribeBtnText}>Unlock FluxLog · {price}/month</Text>
             </TouchableOpacity>
 
@@ -270,7 +270,7 @@ export default function FluxScreen() {
 
       <Modal visible={showPaywall} animationType="slide" onRequestClose={() => setShowPaywall(false)}>
         <SafeAreaView style={styles.modalSafe} edges={['top']}>
-          <TouchableOpacity style={styles.modalClose} onPress={() => setShowPaywall(false)}>
+          <TouchableOpacity delayPressIn={0} style={styles.modalClose} onPress={() => setShowPaywall(false)}>
             <Text style={styles.modalCloseText}>✕</Text>
           </TouchableOpacity>
           <ScrollView contentContainerStyle={[styles.modalContent, { paddingBottom: 60 }]}>
@@ -280,7 +280,7 @@ export default function FluxScreen() {
 understand it — and take back control.</Text>
 
             {/* Trial box */}
-            <TouchableOpacity style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
               <View>
                 <Text style={styles.trialBoxTitle}>✦  Start free — full access, 7 days</Text>
                 <Text style={styles.trialBoxSub}>No card required · Cancel anytime · Instant access</Text>
@@ -302,11 +302,11 @@ understand it — and take back control.</Text>
               </View>
             ))}
 
-            <TouchableOpacity style={[styles.purchaseBtn, loading && { opacity: 0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
+            <TouchableOpacity delayPressIn={0} style={[styles.purchaseBtn, loading && { opacity: 0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
               {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Unlock FluxLog · {price}/month</Text>}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
+            <TouchableOpacity delayPressIn={0} style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
               <Text style={styles.restoreBtnText}>Already subscribed? Restore access</Text>
             </TouchableOpacity>
             <View style={styles.legalRow}>
