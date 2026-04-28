@@ -166,7 +166,6 @@ export default function PlateScreen() {
   };
 
   const filteredFoods: Food[] = [];
-const filteredFoods: Food[] = [];
 
   const addFood = async (f: Food) => {
     const updated = [...foods, f];
