@@ -55,7 +55,7 @@ export default function RitualScreen() {
   const {
     phase, mySuppsData, checkedSupps, setCheckedSupps,
     symptoms, setSymptoms, journal, setJournal,
-    totals, foods, streak, lastStreakDate, incrementStreak, history: velaHistory, history,
+    totals, foods, streak, lastStreakDate, incrementStreak, history: velaHistory, history, sleepHistory, saveSleepEntry,
   } = useVelaStore();
   const [journalSaved, setJournalSaved] = useState(false);
   const [waterCount, setWaterCount] = useState(0);
