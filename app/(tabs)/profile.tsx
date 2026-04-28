@@ -1,10 +1,9 @@
-import { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { useState, useEffect, useMemo } from 'react';
+import { View, Text, ScrollView, Alert, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors, Fonts } from '../../constants/Colors';
 import { scheduleVelaNotifications, cancelAllNotifications } from '../../hooks/useNotifications';
-import * as StoreReview from 'expo-store-review';
 import { generateDoctorReport } from '../../hooks/generateReport';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -42,7 +41,7 @@ export default function ProfileScreen() {
     checkedSupps, setCheckedSupps,
     fluxActive, coolActive, fluxDaysLeft, coolDaysLeft,
     startFluxTrial, startCoolTrial, resetOnboarding,
-    history, sleepHistory, streak, lastStreakDate, topSymptoms, avgNutrients, suppAdherence,
+    history, sleepHistory, fluxLogs, streak, lastStreakDate, topSymptoms, avgNutrients, suppAdherence,
   } = useVelaStore();
   const _mySuppsDataTyped = mySuppsData as any[];
 
@@ -130,7 +129,7 @@ export default function ProfileScreen() {
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Restore', style: 'destructive', onPress: async () => {
-            if (backup.phase) await setPhase(backup.phase);
+            if (backup.phase) { const { AsyncStorage } = require('@react-native-async-storage/async-storage'); await AsyncStorage.setItem('@vela_phase', JSON.stringify(backup.phase)); }
             if (backup.mySupps) await setMySupps(backup.mySupps);
             Alert.alert('Restored ✦', 'Your Vela data has been restored. Restart the app to see all changes.');
           }},
@@ -142,17 +141,20 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
-    // Ask for review after 3-day streak, once
     const askReview = async () => {
       if (streak >= 3) {
-        const asked = await require('@react-native-async-storage/async-storage').default.getItem('@vela_review_asked');
-        if (!asked) {
-          const available = await StoreReview.isAvailableAsync();
-          if (available) {
-            await StoreReview.requestReview();
-            await require('@react-native-async-storage/async-storage').default.setItem('@vela_review_asked', '1');
+        try {
+          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+          const asked = await AsyncStorage.getItem('@vela_review_asked');
+          if (!asked) {
+            const StoreReview = require('expo-store-review');
+            const available = await StoreReview.isAvailableAsync();
+            if (available) {
+              await StoreReview.requestReview();
+              await AsyncStorage.setItem('@vela_review_asked', '1');
+            }
           }
-        }
+        } catch (e) { /* store review unavailable */ }
       }
     };
     askReview();

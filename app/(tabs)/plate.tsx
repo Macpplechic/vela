@@ -95,6 +95,47 @@ export default function PlateScreen() {
     setAiAdvice(tip);
   };
 
+  const lookupBarcode = async (barcode: string) => {
+    setShowScanner(false);
+    setApiLoading(true);
+    try {
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const data = await res.json();
+      if (data.status === 1 && data.product) {
+        const p = data.product;
+        const n = p.nutriments ?? {};
+        const srv = parseFloat(p.serving_size) || 100;
+        const per = srv / 100;
+        const food: Food = {
+          id: `off_${barcode}`,
+          name: (p.product_name || p.generic_name || 'Scanned product').slice(0, 60),
+          category: 'scanned',
+          protein:   Math.round((n.proteins_100g   ?? 0) * per * 10) / 10,
+          fiber:     Math.round((n.fiber_100g       ?? 0) * per * 10) / 10,
+          calcium:   Math.round((n.calcium_100g     ?? 0) * per * 10) / 10,
+          magnesium: Math.round((n.magnesium_100g   ?? 0) * per * 10) / 10,
+          omega3:    Math.round((n['omega-3-fat_100g'] ?? 0) * per * 10) / 10,
+          phyto: 0,
+          cal: Math.round((n['energy-kcal_100g'] ?? n.energy_100g ?? 0) * per),
+          ai: Math.min(10, Math.round((n.fiber_100g ?? 0) > 3 ? 4 : 2)),
+          phase: ['early', 'late', 'post'] as any,
+        };
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        await addFood(food);
+        Alert.alert('✦ Added!', `${food.name}\n${food.cal} cal · ${food.protein}g protein`);
+      } else {
+        Alert.alert('Product not found', 'Try searching by name.', [
+          { text: 'Search', onPress: () => setShowFood(true) },
+          { text: 'OK', style: 'cancel' },
+        ]);
+      }
+    } catch (e) {
+      Alert.alert('Error', 'Could not look up product.');
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
   const scanMeal = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -124,7 +165,7 @@ export default function PlateScreen() {
     );
   };
 
-  const filteredFoods = search.length > 1 ? FOOD_DB.filter(f => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
+  const filteredFoods = search.length > 1 ? FOOD_DB.filter((f: any) => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
 
   const addFood = async (f: Food) => {
     const updated = [...foods, f];
@@ -134,7 +175,7 @@ export default function PlateScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
   const removeFood = async (i: number) => {
-    await setFoods(foods.filter((_, j) => j !== i));
+    await setFoods(foods.filter((_: any, j: number) => j !== i));
   };
 
   const nutrients = [
@@ -259,7 +300,7 @@ export default function PlateScreen() {
                   <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginTop:8}}>Searching 600,000+ foods...</Text>
                 </View>
               )}
-              {(apiResults.length > 0 ? apiResults : filteredFoods).map((f, i) => (
+              {(apiResults.length > 0 ? apiResults : filteredFoods).map((f: any, i: number) => (
                 <TouchableOpacity key={i} style={styles.foodRow} onPress={() => addFood(f)} activeOpacity={0.7}>
                   <View style={{ flex:1 }}>
                     <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start' }}>
