@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '../../constants/Colors';
@@ -12,6 +12,7 @@ export default function PlateScreen() {
   const { phase, foods, setFoods, totals } = useVelaStore();
   const [search, setSearch] = useState('');
   const [showFood, setShowFood] = useState(false);
+  const scrollRef = useRef<any>(null);
 
   const [scannedImage, setScannedImage] = useState<string | null>(null);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
@@ -194,14 +195,14 @@ export default function PlateScreen() {
         <Text style={styles.logoText}>vela</Text>
         <Text style={styles.subText}>your shift. your terms.</Text>
       </View>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle}>The Peri Plate</Text>
           <View style={{flexDirection:'row', gap:6}}>
           <TouchableOpacity delayPressIn={0} style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
             <Text style={styles.scanButtonText}>📷 scan</Text>
           </TouchableOpacity>
-          <TouchableOpacity delayPressIn={0} style={styles.addButton} onPress={() => { setShowFood(prev => !prev); setSearch(''); setApiResults([]); }}>
+          <TouchableOpacity delayPressIn={0} style={styles.addButton} onPress={() => { setShowFood(prev => !prev); setSearch(''); setApiResults([]); setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 100); }}>
             <Text style={styles.addButtonText}>+ add food</Text>
           </TouchableOpacity>
           </View>
@@ -267,7 +268,10 @@ export default function PlateScreen() {
               ].map(s => (
                 <TouchableOpacity delayPressIn={0} key={s.name} style={styles.suggestChip}
                   onPress={() => {
+                    setSearch(s.name);
+                    setShowFood(true);
                     searchUSDA(s.name);
+                    setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 100);
                   }}>
                   <Text style={styles.suggestEmoji}>{s.emoji}</Text>
                   <Text style={styles.suggestName}>{s.name}</Text>
