@@ -115,7 +115,7 @@ export const PHASES: Record<PhaseKey, Phase> = {
 
 // ─── Food Database ─────────────────────────────────────────────────────────────
 
-export const FOOD_DB = FOOD_DB_FULL;
+
 
 // ─── Supplement Library ────────────────────────────────────────────────────────
 
