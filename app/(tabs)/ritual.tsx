@@ -9,6 +9,48 @@ import { useVelaStore } from '../../hooks/useVelaStore';
 
 const { width } = Dimensions.get('window');
 
+function detectTriggers(history: any[]): string | null {
+  if (history.length < 7) return null;
+  const recent = history.slice(-30);
+
+  // Check if coffee correlates with hot flashes
+  const coffeedays = recent.filter(e => e.foods.some((f: any) => f.name?.toLowerCase().includes('coffee')));
+  const hotFlashDays = recent.filter(e => e.symptoms.includes('Hot flash'));
+
+  if (coffeedays.length >= 3 && hotFlashDays.length >= 3) {
+    const overlap = coffeedays.filter(cd =>
+      hotFlashDays.some(hd => hd.date === cd.date)
+    ).length;
+    const pct = Math.round((overlap / coffeedays.length) * 100);
+    if (pct >= 60) return `☕ Hot flashes on ${pct}% of days you had coffee — consider reducing or switching to matcha`;
+  }
+
+  // Check alcohol + night sweats
+  const alcoholDays = recent.filter(e => e.foods.some((f: any) => f.name?.toLowerCase().includes('alcohol') || f.name?.toLowerCase().includes('wine') || f.name?.toLowerCase().includes('beer')));
+  const nightSweatDays = recent.filter(e => e.symptoms.includes('Night sweats'));
+  if (alcoholDays.length >= 2 && nightSweatDays.length >= 2) {
+    const overlap = alcoholDays.filter(ad => nightSweatDays.some(nd => nd.date === ad.date)).length;
+    if (overlap >= 2) return `🍷 Night sweats on ${overlap} of ${alcoholDays.length} days with alcohol — this is a common trigger`;
+  }
+
+  // Low protein + brain fog
+  const lowProteinDays = recent.filter(e => e.totals.protein < 60 && e.foods.length > 0);
+  const brainFogDays = recent.filter(e => e.symptoms.includes('Brain fog'));
+  if (lowProteinDays.length >= 3 && brainFogDays.length >= 3) {
+    const overlap = lowProteinDays.filter(ld => brainFogDays.some(bd => bd.date === ld.date)).length;
+    if (overlap >= 2) return `🧠 Brain fog appears on low-protein days — try to hit 100g+ protein daily`;
+  }
+
+  // Good streak — positive insight
+  if (history.length >= 7) {
+    const last7 = history.slice(-7);
+    const avgProtein = last7.reduce((a: number, e: any) => a + (e.totals.protein || 0), 0) / 7;
+    if (avgProtein > 90) return `✦ Great week — your protein averaged ${Math.round(avgProtein)}g/day. This supports muscle, mood and hormones.`;
+  }
+
+  return null;
+}
+
 export default function RitualScreen() {
   const {
     phase, mySuppsData, checkedSupps, setCheckedSupps,

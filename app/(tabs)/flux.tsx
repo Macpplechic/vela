@@ -25,6 +25,39 @@ const FLOW_OPTIONS = [
   { label: 'Irregular', color: Colors.plumLight ?? '#7B5EA7' },
 ];
 
+function predictNextPeriod(logs: any[]): string | null {
+  // Get logs that have period symptoms
+  const periodLogs = logs.filter(l =>
+    l.symptoms.some((s: string) => ['Heavy flow','Moderate flow','Light flow','Light spotting'].includes(s))
+  ).sort((a: any, b: any) => a.date.localeCompare(b.date));
+
+  if (periodLogs.length < 2) return null;
+
+  // Calculate average cycle length from last 3 cycles
+  const cycleLengths: number[] = [];
+  for (let i = 1; i < Math.min(periodLogs.length, 4); i++) {
+    const prev = new Date(periodLogs[i-1].date);
+    const curr = new Date(periodLogs[i].date);
+    const diff = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24));
+    if (diff > 15 && diff < 90) cycleLengths.push(diff);
+  }
+
+  if (cycleLengths.length === 0) return null;
+
+  const avgCycle = Math.round(cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length);
+  const lastPeriod = new Date(periodLogs[periodLogs.length - 1].date);
+  const predicted = new Date(lastPeriod);
+  predicted.setDate(predicted.getDate() + avgCycle);
+
+  const today = new Date();
+  const daysUntil = Math.round((predicted.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (daysUntil < 0) return `${Math.abs(daysUntil)} days late (avg cycle: ${avgCycle} days)`;
+  if (daysUntil === 0) return 'Expected today';
+  if (daysUntil <= 3) return `In ${daysUntil} day${daysUntil !== 1 ? 's' : ''} — coming soon`;
+  return `In ~${daysUntil} days (avg cycle: ${avgCycle} days)`;
+}
+
 export default function FluxScreen() {
   const { fluxActive, unlockFlux, startFluxTrial } = useVelaStore();
   const [showPaywall, setShowPaywall] = useState(false);
