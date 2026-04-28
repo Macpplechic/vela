@@ -1,6 +1,5 @@
 import { SUPP_DB_FULL } from './SUPP_DB_generated';
 
-import { FOOD_DB_FULL } from './FOOD_DB_generated';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

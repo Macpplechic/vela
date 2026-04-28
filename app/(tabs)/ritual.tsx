@@ -292,7 +292,7 @@ export default function RitualScreen() {
               <TouchableOpacity
                 onPress={async () => {
                   await saveSleepEntry(
-                    { quality: sleepQuality, nightSweats: false, wakeCount: 0, notes: '' },
+                    { date: new Date().toISOString().split('T')[0], quality: sleepQuality, nightSweats: false, wakeCount: 0, notes: '' },
                     sleepHistory
                   );
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

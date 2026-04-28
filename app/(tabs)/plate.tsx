@@ -5,7 +5,7 @@ import { Colors, Fonts } from '../../constants/Colors';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
-import { PHASES, FOOD_DB, Food } from '../../constants/Data';
+import { PHASES, Food } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 export default function PlateScreen() {
@@ -165,9 +165,8 @@ export default function PlateScreen() {
     );
   };
 
-  const filteredFoods = search.length > 1
-    ? FOOD_DB.filter((f: any) => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 20)
-    : FOOD_DB.filter((f: any) => !f.phase || f.phase.includes(phase ?? 'late')).slice(0, 15);
+  const filteredFoods: Food[] = [];
+const filteredFoods: Food[] = [];
 
   const addFood = async (f: Food) => {
     const updated = [...foods, f];
@@ -269,8 +268,7 @@ export default function PlateScreen() {
               ].map(s => (
                 <TouchableOpacity key={s.name} style={styles.suggestChip}
                   onPress={() => {
-                    const food = FOOD_DB.find(f => f.name.toLowerCase().includes(s.name.toLowerCase().split(' ')[0]));
-                    if (food) addFood(food);
+                    searchUSDA(s.name);
                   }}>
                   <Text style={styles.suggestEmoji}>{s.emoji}</Text>
                   <Text style={styles.suggestName}>{s.name}</Text>
