@@ -201,7 +201,7 @@ export default function PlateScreen() {
           <TouchableOpacity delayPressIn={0} style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
             <Text style={styles.scanButtonText}>📷 scan</Text>
           </TouchableOpacity>
-          <TouchableOpacity delayPressIn={0} style={styles.addButton} onPress={() => setShowFood(!showFood)}>
+          <TouchableOpacity delayPressIn={0} style={styles.addButton} onPress={() => { setShowFood(prev => !prev); setSearch(''); setApiResults([]); }}>
             <Text style={styles.addButtonText}>+ add food</Text>
           </TouchableOpacity>
           </View>
