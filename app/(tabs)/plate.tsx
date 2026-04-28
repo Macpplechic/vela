@@ -322,7 +322,7 @@ export default function PlateScreen() {
         {foods.length > 0 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Logged today</Text>
-            {foods.map((f, i) => (
+            {foods.map((f: any, i) => (
               <View key={i} style={[styles.loggedRow, i < foods.length-1 && styles.loggedBorder]}>
                 <View style={{ flex:1 }}>
                   <Text style={styles.loggedName}>{f.name}</Text>
