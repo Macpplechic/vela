@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors, Fonts } from '../../constants/Colors';
 import { scheduleVelaNotifications, cancelAllNotifications } from '../../hooks/useNotifications';
+import * as StoreReview from 'expo-store-review';
 import { generateDoctorReport } from '../../hooks/generateReport';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -139,6 +140,23 @@ export default function ProfileScreen() {
       Alert.alert('Restore failed', 'Could not read the backup file. Make sure it is a valid Vela backup.');
     }
   };
+
+  useEffect(() => {
+    // Ask for review after 3-day streak, once
+    const askReview = async () => {
+      if (streak >= 3) {
+        const asked = await require('@react-native-async-storage/async-storage').default.getItem('@vela_review_asked');
+        if (!asked) {
+          const available = await StoreReview.isAvailableAsync();
+          if (available) {
+            await StoreReview.requestReview();
+            await require('@react-native-async-storage/async-storage').default.setItem('@vela_review_asked', '1');
+          }
+        }
+      }
+    };
+    askReview();
+  }, [streak]);
 
   const toggleMySupp = async (id: string) => {
     const next = mySupps.includes(id) ? mySupps.filter(x => x !== id) : [...mySupps, id];

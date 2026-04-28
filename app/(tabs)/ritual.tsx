@@ -59,6 +59,8 @@ export default function RitualScreen() {
   } = useVelaStore();
   const [journalSaved, setJournalSaved] = useState(false);
   const [waterCount, setWaterCount] = useState(0);
+  const [mood, setMood] = useState(0);
+  const [energy, setEnergy] = useState(0);
   const [sleepQuality, setSleepQuality] = useState(0);
 
   const pd = PHASES[phase ?? 'late'];

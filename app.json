@@ -21,7 +21,9 @@
           "fetch",
           "remote-notification"
         ],
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Vela uses your camera to scan food barcodes for instant nutrition logging.",
+        "NSPhotoLibraryUsageDescription": "Vela uses your photo library for meal photo logging."
       }
     },
     "android": {
@@ -54,6 +56,12 @@
           "color": "#3D1F3A",
           "sounds": [],
           "mode": "production"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Vela uses your camera to scan food barcodes."
         }
       ]
     ],
