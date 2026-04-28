@@ -11,7 +11,7 @@ function TabIcon({ glyph, label, focused, showDot }: { glyph: string; label: str
       )}
       <Text allowFontScaling={false} style={{ fontSize: 18, color: focused ? Colors.plum : Colors.mist }}>{glyph}</Text>
       <Text allowFontScaling={false} numberOfLines={1} style={{
-        fontSize: 9,
+        fontSize: 10,
         textTransform: 'uppercase',
         fontFamily: focused ? Fonts.sansMedium : Fonts.sansLight,
         color: focused ? Colors.plum : Colors.mist,
@@ -32,7 +32,7 @@ export default function TabLayout() {
         backgroundColor: Colors.cream,
         borderTopWidth: 3,
         borderTopColor: Colors.plum,
-        height: 82,
+        height: 86,
         paddingBottom: 24,
         paddingTop: 8,
       },
@@ -41,10 +41,10 @@ export default function TabLayout() {
     }}>
       <Tabs.Screen name="ritual" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◌" label="Ritual" focused={focused} /> }} />
       <Tabs.Screen name="plate" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◈" label="Plate" focused={focused} /> }} />
-      <Tabs.Screen name="flux" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◎" label="Flux" focused={focused} showDot={!fluxActive} /> }} />
-      <Tabs.Screen name="cool" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◇" label="Cool" focused={focused} showDot={!coolActive} /> }} />
-      <Tabs.Screen name="shift" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="⬡" label="Shift" focused={focused} /> }} />
-      <Tabs.Screen name="profile" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◉" label="Me" focused={focused} /> }} />
+      <Tabs.Screen name="flux" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◎" label="FluxLog" focused={focused} showDot={!fluxActive} /> }} />
+      <Tabs.Screen name="cool" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◇" label="CoolDown" focused={focused} showDot={!coolActive} /> }} />
+      <Tabs.Screen name="shift" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="⬡" label="The Shift" focused={focused} /> }} />
+      <Tabs.Screen name="profile" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◉" label="Profile" focused={focused} /> }} />
     </Tabs>
   );
 }

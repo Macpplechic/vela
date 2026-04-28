@@ -498,6 +498,7 @@ export default function ProfileScreen() {
         <SafeAreaView style={{ flex:1, backgroundColor: Colors.cream }} edges={["top"]}>
           <View style={styles.modalHeader}>
             <Text allowFontScaling={false} style={styles.modalTitle}>Supplement library</Text>
+            <Text allowFontScaling={false} style={{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,marginTop:2}}>Showing recommendations for {phase ? PHASES[phase]?.label : 'your phase'}</Text>
             <TouchableOpacity onPress={() => setShowSuppLib(false)}>
               <Text allowFontScaling={false} style={styles.modalClose}>×</Text>
             </TouchableOpacity>
@@ -510,7 +511,7 @@ export default function ProfileScreen() {
             ))}
           </ScrollView>
           <ScrollView contentContainerStyle={{ padding:20, paddingBottom: 60 }}>
-            {(SUPP_LIBRARY as any[]).filter((s:any) => s.category === suppCat).map((s:any) => {
+            {(SUPP_LIBRARY as any[]).filter((s:any) => s.category === suppCat && (!s.phase || s.phase.includes(phase ?? 'early'))).map((s:any) => {
               const inR = mySupps.includes(s.id);
               return (
                 <View key={s.id} style={styles.suppLibRow}>
