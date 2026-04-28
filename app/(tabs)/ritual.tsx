@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, StyleSheet, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -269,18 +269,41 @@ export default function RitualScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>How did you sleep? 🌙</Text>
           <Text style={styles.cardSub}>Sleep quality directly affects hot flash frequency</Text>
-          <View style={{ flexDirection:'row', gap:8, marginBottom:8 }}>
+          <View style={{flexDirection:'row', gap:8, marginTop:12}}>
             {[1,2,3,4,5].map(n => (
               <TouchableOpacity
                 key={n}
-                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-                style={{ flex:1, alignItems:'center', paddingVertical:12, borderRadius:12,
-                  backgroundColor: Colors.parchment, borderWidth:1, borderColor:Colors.parchmentDark }}>
-                <Text style={{ fontSize:20 }}>{['😴','😐','🙂','😊','✨'][n-1]}</Text>
-                <Text style={{ fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, marginTop:4 }}>{['poor','okay','good','great','amazing'][n-1]}</Text>
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSleepQuality(n); }}
+                style={{flex:1, alignItems:'center', paddingVertical:12, borderRadius:12,
+                  backgroundColor: sleepQuality===n ? Colors.plum : Colors.parchment,
+                  borderWidth:1, borderColor: sleepQuality===n ? Colors.plum : Colors.parchmentDark}}>
+                <Text style={{fontSize:22}}>{['😴','😐','🙂','😊','✨'][n-1]}</Text>
+                <Text style={{fontFamily:Fonts.sans, fontSize:10, color: sleepQuality===n ? Colors.parchment : Colors.mist, marginTop:3}}>
+                  {['poor','okay','good','great','amazing'][n-1]}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
+          {sleepQuality > 0 && (
+            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginTop:12}}>
+              <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.sage}}>
+                ✓ {['poor','okay','good','great','amazing'][sleepQuality-1]} sleep selected
+              </Text>
+              <TouchableOpacity
+                onPress={async () => {
+                  await saveSleepEntry(
+                    { quality: sleepQuality, nightSweats: false, wakeCount: 0, notes: '' },
+                    sleepHistory
+                  );
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  Alert.alert('Sleep logged ✦', 'Your sleep quality has been saved to your history.');
+                  setSleepQuality(0);
+                }}
+                style={{backgroundColor:Colors.plum, borderRadius:20, paddingVertical:8, paddingHorizontal:18}}>
+                <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.parchment}}>Save sleep</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         <View style={styles.card}>

@@ -165,13 +165,16 @@ export default function PlateScreen() {
     );
   };
 
-  const filteredFoods = search.length > 1 ? FOOD_DB.filter((f: any) => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30) : [];
+  const filteredFoods = search.length > 1
+    ? FOOD_DB.filter((f: any) => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 20)
+    : FOOD_DB.filter((f: any) => !f.phase || f.phase.includes(phase ?? 'late')).slice(0, 15);
 
   const addFood = async (f: Food) => {
     const updated = [...foods, f];
     await setFoods(updated);
     setSearch('');
     setApiResults([]);
+    setShowFood(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
   const removeFood = async (i: number) => {

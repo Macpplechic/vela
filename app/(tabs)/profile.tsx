@@ -585,10 +585,10 @@ export default function ProfileScreen() {
               const inR = mySupps.includes(s.id);
               return (
                 <View key={s.id} style={styles.suppLibRow}>
-                  <View style={{ flex:1 }}>
-                    <Text allowFontScaling={false} style={styles.suppLibName}>{s.icon} {s.name}</Text>
-                    <Text allowFontScaling={false} style={styles.suppLibDose}>{s.dose}</Text>
-                    <Text allowFontScaling={false} style={styles.suppLibWhy}>{s.why}</Text>
+                  <View style={{flex:1, minWidth:0}}>
+                    <Text allowFontScaling={false} style={styles.suppLibName} numberOfLines={2}>{s.icon} {s.name}</Text>
+                    <Text allowFontScaling={false} style={styles.suppLibDose} numberOfLines={1}>{s.dose}</Text>
+                    <Text allowFontScaling={false} style={styles.suppLibWhy} numberOfLines={3}>{s.why}</Text>
                   </View>
                   <TouchableOpacity onPress={() => toggleMySupp(s.id)} style={[styles.suppToggleBtn, { borderColor:inR?Colors.rose:Colors.gold, backgroundColor:inR?Colors.rosePale:Colors.goldPale }]}>
                     <Text allowFontScaling={false} style={[styles.suppToggleTxt, { color:inR?Colors.rose:Colors.plum }]}>{inR?'× remove':'✦ add'}</Text>
@@ -732,11 +732,11 @@ const styles = StyleSheet.create({
   catRow:{ maxHeight:52 },
   catPill:{ paddingVertical:6, paddingHorizontal:14, borderRadius:20, borderWidth:1 },
   catPillText:{ fontFamily:Fonts.sans, fontSize:11 },
-  suppLibRow:{ flexDirection:'row', alignItems:'flex-start', gap:12, paddingVertical:14, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark },
-  suppLibName:{ fontFamily:Fonts.sansMedium, fontSize:14, color:Colors.plum, marginBottom:2 },
-  suppLibDose:{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold, marginBottom:6 },
-  suppLibWhy:{ fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, lineHeight:18 },
-  suppToggleBtn:{ borderWidth:1.5, borderRadius:20, paddingVertical:10, paddingHorizontal:18, marginTop:2 },
+  suppLibRow:{ flexDirection:'row', alignItems:'flex-start', gap:12, paddingVertical:14, flexWrap:'wrap', borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark },
+  suppLibName:{ fontFamily:Fonts.sansMedium, fontSize:14, color:Colors.plum, marginBottom:2, flexWrap:'wrap', flex:1 },
+  suppLibDose:{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold, marginBottom:6, flexWrap:'wrap' },
+  suppLibWhy:{ fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, lineHeight:18, flexWrap:'wrap' },
+  suppToggleBtn:{ borderWidth:1.5, borderRadius:20, paddingVertical:10, paddingHorizontal:18, width:90, alignItems:'center', marginTop:2 },
   suppToggleTxt:{ fontFamily:Fonts.sans, fontSize:12 },
   routineSummary:{ backgroundColor:Colors.goldPale, borderRadius:14, padding:14, marginTop:20, borderWidth:0.5, borderColor:Colors.gold },
   routineLabel:{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold, letterSpacing:1, textTransform:'uppercase' },
