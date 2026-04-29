@@ -216,6 +216,36 @@ export default function PlateScreen() {
           </View>
         </View>
 
+        {/* ── Macros ── */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Macros</Text>
+          <View style={{gap:10, marginTop:8}}>
+            {[
+              {label:'Protein', val:totals.protein, goal:80, color:Colors.rose, unit:'g'},
+              {label:'Fiber',   val:totals.fiber,   goal:25, color:Colors.sage, unit:'g'},
+              {label:'Calcium', val:totals.calcium,  goal:1200, color:Colors.gold, unit:'mg'},
+              {label:'Omega-3', val:totals.omega3,   goal:2, color:Colors.teal, unit:'g'},
+              {label:'Magnesium', val:totals.magnesium, goal:320, color:Colors.plum, unit:'mg'},
+            ].map(m => {
+              const pct = Math.min(100, Math.round(((m.val||0) / m.goal) * 100));
+              return (
+                <View key={m.label}>
+                  <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom:4}}>
+                    <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum}}>{m.label}</Text>
+                    <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist}}>
+                      {Math.round(m.val||0)}{m.unit} <Text style={{color:pct>=100?m.color:Colors.mist}}>/ {m.goal}{m.unit}</Text>
+                    </Text>
+                  </View>
+                  <View style={{height:8, backgroundColor:Colors.parchmentDark, borderRadius:4, overflow:'hidden'}}>
+                    <View style={{height:8, borderRadius:4, backgroundColor:m.color, width:`${pct}%` as any}} />
+                  </View>
+                  {pct >= 100 && <Text style={{fontFamily:Fonts.sans, fontSize:10, color:m.color, marginTop:2}}>✓ goal met</Text>}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
         {/* Nutrient rings (simplified as bars for native) */}
         <View style={styles.ringGrid}>
           {nutrients.map(n => {
