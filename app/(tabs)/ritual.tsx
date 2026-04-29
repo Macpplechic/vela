@@ -220,10 +220,10 @@ export default function RitualScreen() {
           </View>
           <Text style={{fontFamily:Fonts.sans, fontSize:11, color: waterCount >= 12 ? '#00b4d8' : waterCount >= 8 ? Colors.teal : Colors.mist}}>
             {waterCount === 0 ? 'Tap each glass as you drink — aim for 8, go wild with 15 💧' :
-             waterCount >= 15 ? '🌊 LEGEND. 15 × 8oz × 8oz glasses. Your cells are thriving.' :
-             waterCount >= 12 ? `🔥 ${waterCount} × 8oz glasses — absolutely crushing it` :
-             waterCount >= 8 ? `✦ ${waterCount} × 8oz glasses — fully hydrated!` :
-             `${waterCount} of 8 × 8oz glasses — ${8 - waterCount} more to go`}
+             waterCount >= 15 ? '🌊 LEGEND. 15 × 8oz glasses. Your cells are thriving.' :
+             waterCount >= 12 ? `🔥 ${waterCount} glasses — absolutely crushing it` :
+             waterCount >= 8 ? `✦ ${waterCount} glasses — fully hydrated!` :
+             `${waterCount} of 8 glasses — ${8 - waterCount} more to go`}
           </Text>
         </View>
 
@@ -325,7 +325,99 @@ export default function RitualScreen() {
         </View>
 
         <View style={{ height: 20 }} />
-        </>)}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex:1, backgroundColor: Colors.parchment },
+  header: { backgroundColor: Colors.plum, paddingHorizontal:20, paddingTop:12, paddingBottom:14, flexDirection:'row', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8 },
+  logoText: { fontFamily: Fonts.serif, fontSize:24, color: Colors.goldLight, letterSpacing:4 },
+  subText: { fontFamily: Fonts.sans, fontSize:10, color: Colors.mist, letterSpacing:3, textTransform:'uppercase', marginTop:1 },
+  phaseBadge: { borderWidth:1, borderColor: Colors.plumLight, borderRadius:20, paddingVertical:5, paddingHorizontal:14, maxWidth:180 },
+  streakBadge: { backgroundColor: Colors.gold, borderRadius:12, paddingVertical:3, paddingHorizontal:10 },
+  streakText: { fontFamily: Fonts.sans, fontSize:11, color: Colors.plum },
+  phaseBadgeText: { fontFamily: Fonts.sans, fontSize:11, color: Colors.goldLight, letterSpacing:1, flexShrink:1 },
+  scroll: { flex:1 },
+  content: { padding:20 },
+  dateText: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist, letterSpacing:2, textTransform:'uppercase', marginBottom:4 },
+  greeting: { fontFamily: Fonts.serif, fontSize:26, color: Colors.plum, marginBottom:4 },
+  subtitle: { fontFamily: Fonts.sans, fontSize:13, color: Colors.mist, marginBottom:24 },
+  ritualCard: { borderRadius:20, padding:20, marginBottom:14, borderLeftWidth:3 },
+  ritualLabel: { fontFamily: Fonts.sansMedium, fontSize:10, letterSpacing:3, textTransform:'uppercase', marginBottom:8 },
+  ritualText: { fontFamily: Fonts.sans, fontSize:14, color: Colors.plum, lineHeight:22 },
+  card: { backgroundColor: Colors.cream, borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:18, padding:18, marginBottom:12 },
+  cardTitle: { fontFamily: Fonts.serif, fontSize:18, color: Colors.plum, marginBottom:4 },
+  cardSub: { fontFamily: Fonts.sans, fontSize:12, color: Colors.mist, marginBottom:14 },
+  scoreRow: { flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16 },
+  scoreBox: { alignItems:'flex-end' },
+  scoreNum: { fontFamily: Fonts.sansMedium, fontSize:36, lineHeight:40 },
+  scoreDenom: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist },
+  aiScore: { fontFamily: Fonts.sans, fontSize:11, color: Colors.sage, marginTop:3 },
+  nutrientRow: { marginBottom:10 },
+  nutrientLabels: { flexDirection:'row', justifyContent:'space-between', marginBottom:4 },
+  nutrientName: { fontFamily: Fonts.sans, fontSize:12, color: Colors.mist },
+  nutrientVal: { fontFamily: Fonts.sans, fontSize:12, color: Colors.plum },
+  barTrack: { backgroundColor: Colors.parchmentDark, borderRadius:3, height:5, overflow:'hidden' },
+  barFill: { height:'100%' as any, borderRadius:3 },
+  suppRow: { flexDirection:'row', alignItems:'center', gap:12, paddingVertical:10, borderBottomWidth:0.5, borderBottomColor: Colors.parchmentDark },
+  checkbox: { width:22, height:22, borderRadius:6, borderWidth:1.5, alignItems:'center', justifyContent:'center' },
+  checkmark: { color: Colors.cream, fontSize:11, fontFamily: Fonts.sansMedium },
+  suppInfo: { flex:1 },
+  suppName: { fontFamily: Fonts.sans, fontSize:13, color: Colors.plum },
+  suppDose: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist },
+  symptomGrid: { flexDirection:'row', flexWrap:'wrap', gap:7 },
+  symptomChip: { paddingVertical:6, paddingHorizontal:13, borderRadius:20, borderWidth:1 },
+  symptomText: { fontFamily: Fonts.sans, fontSize:12 },
+  symptomNote: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist, marginTop:10 },
+  journalInput: { borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:12, padding:12, fontSize:13, fontFamily: Fonts.sans, color: Colors.plum, backgroundColor: Colors.parchment, minHeight:80, textAlignVertical:'top', marginBottom:10 },
+  saveButton: { backgroundColor: Colors.plum, borderRadius:20, paddingVertical:8, paddingHorizontal:20, alignSelf:'flex-start' },
+  saveButtonText: { fontFamily: Fonts.sans, fontSize:12, color: Colors.parchment },
+  weeklyCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:12},
+  weeklyTitle:{fontFamily:Fonts.sansMedium,fontSize:11,color:Colors.mist,letterSpacing:2,textTransform:'uppercase',marginBottom:12},
+  weeklyRow:{flexDirection:'row',justifyContent:'space-between',marginBottom:12},
+  weekDay:{width:36,height:48,borderRadius:10,alignItems:'center',justifyContent:'center',backgroundColor:Colors.parchment,borderWidth:0.5,borderColor:Colors.parchmentDark,gap:2},
+  weekDayDone:{backgroundColor:Colors.plum,borderColor:Colors.plum},
+  weekDayToday:{borderColor:Colors.gold,borderWidth:1.5},
+  weekDayLetter:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist},
+  weekDayLetterDone:{color:Colors.parchment},
+  weekDayDot:{fontSize:8,color:Colors.gold},
+  weeklyMotivation:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,textAlign:'center'},
+  streakCelebration:{backgroundColor:Colors.gold,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:16,alignItems:'center'},
+  streakCelebrationText:{fontFamily:Fonts.sansMedium,fontSize:13,color:Colors.plum,textAlign:'center'},
+  welcomeCard: { backgroundColor: Colors.plum, borderRadius: 20, padding: 20, marginBottom: 20 },
+  welcomeTitle: { fontFamily: Fonts.serif, fontSize: 20, color: Colors.goldLight, marginBottom: 4 },
+  welcomeSub: { fontFamily: Fonts.sans, fontSize: 10, color: 'rgba(245,239,230,0.6)', marginBottom: 14, letterSpacing: 2 },
+  welcomeRow: { flexDirection: 'row', gap: 12, marginBottom: 10, alignItems: 'flex-start' },
+  welcomeGlyph: { fontFamily: Fonts.sans, fontSize: 14, color: Colors.gold, marginTop: 2 },
+  welcomeTab: { fontFamily: Fonts.sansMedium, fontSize: 13, color: Colors.goldLight, marginBottom: 1 },
+  welcomeDesc: { fontFamily: Fonts.sans, fontSize: 11, color: 'rgba(245,239,230,0.65)', lineHeight: 17 },
+});
+        {/* ── Session toggle ── */}
+        <View style={{flexDirection:'row', backgroundColor:Colors.parchmentDark, borderRadius:30, padding:3, marginBottom:4}}>
+          {(['morning','evening'] as const).map(s => (
+            <TouchableOpacity delayPressIn={0} key={s} onPress={() => setSession(s)}
+              style={{flex:1, paddingVertical:10, borderRadius:28, alignItems:'center',
+                backgroundColor: session===s ? Colors.plum : 'transparent'}}>
+              <Text style={{fontFamily:Fonts.sansMedium, fontSize:13,
+                color: session===s ? Colors.parchment : Colors.mist}}>
+                {s === 'morning' ? '🌅  Morning' : '🌙  Evening'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {session === 'morning' && (
+          <>
+          </>
+        )}
+
+        {session === 'evening' && (
+          <>
+          </>
+        )}
+
+        <View style={{ height: 20 }} />
       </ScrollView>
     </SafeAreaView>
   );
