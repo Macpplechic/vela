@@ -62,6 +62,7 @@ export default function RitualScreen() {
   const [mood, setMood] = useState(0);
   const [energy, setEnergy] = useState(0);
   const [sleepQuality, setSleepQuality] = useState(0);
+  const [session, setSession] = useState<'morning'|'evening'>('morning');
 
   const pd = PHASES[phase ?? 'late'];
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
@@ -219,10 +220,10 @@ export default function RitualScreen() {
           </View>
           <Text style={{fontFamily:Fonts.sans, fontSize:11, color: waterCount >= 12 ? '#00b4d8' : waterCount >= 8 ? Colors.teal : Colors.mist}}>
             {waterCount === 0 ? 'Tap each glass as you drink — aim for 8, go wild with 15 💧' :
-             waterCount >= 15 ? '🌊 LEGEND. 15 × 8oz glasses. Your cells are thriving.' :
-             waterCount >= 12 ? `🔥 ${waterCount} glasses — absolutely crushing it` :
-             waterCount >= 8 ? `✦ ${waterCount} glasses — fully hydrated!` :
-             `${waterCount} of 8 glasses — ${8 - waterCount} more to go`}
+             waterCount >= 15 ? '🌊 LEGEND. 15 × 8oz × 8oz glasses. Your cells are thriving.' :
+             waterCount >= 12 ? `🔥 ${waterCount} × 8oz glasses — absolutely crushing it` :
+             waterCount >= 8 ? `✦ ${waterCount} × 8oz glasses — fully hydrated!` :
+             `${waterCount} of 8 × 8oz glasses — ${8 - waterCount} more to go`}
           </Text>
         </View>
 
@@ -324,6 +325,7 @@ export default function RitualScreen() {
         </View>
 
         <View style={{ height: 20 }} />
+        </>)}
       </ScrollView>
     </SafeAreaView>
   );
