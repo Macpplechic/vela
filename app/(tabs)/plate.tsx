@@ -11,7 +11,6 @@ import { useVelaStore } from '../../hooks/useVelaStore';
 export default function PlateScreen() {
   const { phase, foods, setFoods, totals } = useVelaStore();
   const [search, setSearch] = useState('');
-  const [showFood, setShowFood] = useState(false);
 
   const [scannedImage, setScannedImage] = useState<string | null>(null);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
@@ -125,7 +124,7 @@ export default function PlateScreen() {
         Alert.alert('✦ Added!', `${food.name}\n${food.cal} cal · ${food.protein}g protein`);
       } else {
         Alert.alert('Product not found', 'Try searching by name.', [
-          { text: 'Search', onPress: () => setShowFood(true) },
+          
           { text: 'OK', style: 'cancel' },
         ]);
       }
@@ -148,7 +147,7 @@ export default function PlateScreen() {
     });
     if (result.canceled) return;
     setScannedImage(result.assets[0].uri);
-    setShowFood(true);
+    
     Alert.prompt(
       '📷 What did you eat?',
       'Type the main food in your photo to search and add it',
@@ -172,7 +171,7 @@ export default function PlateScreen() {
     await setFoods(updated);
     setSearch('');
     setApiResults([]);
-    setShowFood(false);
+    
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
   const removeFood = async (i: number) => {
@@ -201,9 +200,7 @@ export default function PlateScreen() {
           <TouchableOpacity delayPressIn={0} style={styles.scanButton} onPress={scanMeal} activeOpacity={0.85}>
             <Text style={styles.scanButtonText}>📷 scan</Text>
           </TouchableOpacity>
-          <TouchableOpacity delayPressIn={0} style={styles.addButton} onPress={() => { setShowFood(prev => !prev); setSearch(''); setApiResults([]); }}>
-            <Text style={styles.addButtonText}>+ add food</Text>
-          </TouchableOpacity>
+
           </View>
         </View>
 
@@ -253,7 +250,7 @@ export default function PlateScreen() {
           </View>
         )}
 
-        {!showFood && foods.length === 0 && (
+        {foods.length === 0 && (
           <View style={styles.suggestCard}>
             <Text style={styles.suggestTitle}>✦ Best foods for {pd.label}</Text>
             <Text style={styles.suggestSub}>Tap any to add instantly</Text>
@@ -277,13 +274,13 @@ export default function PlateScreen() {
           </View>
         )}
 
-        {scannedImage && !showFood && (
+        {scannedImage && (
           <View style={styles.scanPreview}>
             <Image source={{ uri: scannedImage }} style={styles.scanImage} />
           </View>
         )}
 
-        {showFood && (
+        {(
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Add food</Text>
             <TextInput
@@ -336,7 +333,7 @@ export default function PlateScreen() {
           </View>
         )}
 
-        {foods.length === 0 && !showFood && (
+        {foods.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>◈</Text>
             <Text style={styles.emptyTitle}>Nothing logged yet</Text>
