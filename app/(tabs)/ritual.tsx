@@ -219,7 +219,7 @@ export default function RitualScreen() {
           </View>
           <Text style={{fontFamily:Fonts.sans, fontSize:11, color: waterCount >= 12 ? '#00b4d8' : waterCount >= 8 ? Colors.teal : Colors.mist}}>
             {waterCount === 0 ? 'Tap each glass as you drink — aim for 8, go wild with 15 💧' :
-             waterCount >= 15 ? '🌊 LEGEND. 15 glasses. Your cells are thriving.' :
+             waterCount >= 15 ? '🌊 LEGEND. 15 × 8oz glasses. Your cells are thriving.' :
              waterCount >= 12 ? `🔥 ${waterCount} glasses — absolutely crushing it` :
              waterCount >= 8 ? `✦ ${waterCount} glasses — fully hydrated!` :
              `${waterCount} of 8 glasses — ${8 - waterCount} more to go`}
@@ -277,9 +277,9 @@ export default function RitualScreen() {
                 style={{flex:1, alignItems:'center', paddingVertical:12, borderRadius:12,
                   backgroundColor: sleepQuality===n ? Colors.plum : Colors.parchment,
                   borderWidth:1, borderColor: sleepQuality===n ? Colors.plum : Colors.parchmentDark}}>
-                <Text style={{fontSize:22}}>{['😴','😐','🙂','😊','✨'][n-1]}</Text>
+                <Text style={{fontSize:22}}>{['🌑','🌒','🌓','🌔','🌕'][n-1]}</Text>
                 <Text style={{fontFamily:Fonts.sans, fontSize:10, color: sleepQuality===n ? Colors.parchment : Colors.mist, marginTop:3}}>
-                  {['poor','okay','good','great','amazing'][n-1]}
+                  {['restless','light','decent','deep','blissful'][n-1]}
                 </Text>
               </TouchableOpacity>
             ))}
