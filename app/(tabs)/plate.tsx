@@ -280,7 +280,7 @@ export default function PlateScreen() {
           </View>
         )}
 
-        {(
+        
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Add food</Text>
             <TextInput
@@ -313,7 +313,6 @@ export default function PlateScreen() {
               ))}
             </ScrollView>
           </View>
-        )}
 
         {/* Logged foods */}
         {foods.length > 0 && (
