@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, StyleSheet, Dimensions, Modal } from 'react-native';
+import { View, Text, ScrollView, FlatList, TouchableOpacity, Alert, TextInput, StyleSheet, Dimensions, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -335,12 +335,15 @@ export default function RitualScreen() {
               <Text style={{fontSize:28, color:Colors.mist}}>×</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView contentContainerStyle={{padding:20, paddingBottom:60}}>
-            <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginBottom:16}}>Tap to add to your daily ritual. Selected supplements appear on your Ritual screen.</Text>
-            {(SUPP_LIBRARY as any[]).map((s: any) => {
+          <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginHorizontal:20, marginTop:12, marginBottom:8}}>Tap to add to your daily ritual.</Text>
+          <FlatList
+            data={SUPP_LIBRARY as any[]}
+            keyExtractor={(s: any) => s.id}
+            contentContainerStyle={{paddingHorizontal:20, paddingBottom:60}}
+            renderItem={({item: s}: any) => {
               const inRoutine = mySupps.includes(s.id);
               return (
-                <TouchableOpacity delayPressIn={0} key={s.id}
+                <TouchableOpacity delayPressIn={0}
                   onPress={async () => {
                     const updated = inRoutine
                       ? mySupps.filter((id: string) => id !== s.id)
@@ -365,8 +368,8 @@ export default function RitualScreen() {
                   </Text>
                 </TouchableOpacity>
               );
-            })}
-          </ScrollView>
+            }}
+          />
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
