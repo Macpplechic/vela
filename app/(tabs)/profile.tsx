@@ -213,8 +213,53 @@ export default function ProfileScreen() {
         <Text allowFontScaling={false} style={styles.subText}>your shift. your terms.</Text>
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text allowFontScaling={false} style={styles.pageTitle}>Your profile</Text>
+        {/* ── Phase ── */}
+        <View style={[styles.phaseCard, { backgroundColor:pd.bg, borderColor:pd.color }]}>
+          <Text allowFontScaling={false} style={[styles.phaseLabel, { color:pd.color }]}>Your phase</Text>
+          <Text allowFontScaling={false} style={styles.phaseTitle}>{pd.label}</Text>
+          <Text allowFontScaling={false} style={styles.phaseDesc}>{pd.desc}</Text>
+          <TouchableOpacity delayPressIn={0} onPress={() => { resetOnboarding(); router.replace('/onboarding'); }} style={styles.retakeBtn}>
+            <Text allowFontScaling={false} style={styles.retakeBtnText}>✎ Retake phase quiz</Text>
+          </TouchableOpacity>
+        </View>
 
+        <View style={styles.card}>
+          <Text allowFontScaling={false} style={styles.cardTitle}>Doctor report</Text>
+          <Text allowFontScaling={false} style={styles.cardSub}>Symptoms · nutrition · supplements · sleep · patterns — 90 days of data your doctor actually needs. Takes 3 seconds to generation, supplements</Text>
+          <TouchableOpacity delayPressIn={0}
+            onPress={handleExportPDF}
+            disabled={pdfLoading}
+            style={[styles.retakeBtn, { backgroundColor: pdfLoading ? Colors.parchmentDark : Colors.plum }]}>
+            <Text allowFontScaling={false} style={styles.retakeBtnText}>
+              {pdfLoading ? 'Generating...' : '✦ Export PDF for my doctor'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.card}>
+          <Text allowFontScaling={false} style={styles.cardTitle}>Daily reminders</Text>
+          <Text allowFontScaling={false} style={styles.cardSub}>Supplement check-ins, sleep logs, and weekly insights</Text>
+          <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
+            <View>
+              <Text allowFontScaling={false} style={{ fontFamily:Fonts.sans, fontSize:13, color:Colors.plum }}>
+                {notifsEnabled ? '🔔 Notifications on' : '🔕 Notifications off'}
+              </Text>
+              <Text allowFontScaling={false} style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.mist, marginTop:2 }}>
+                {notifsEnabled ? '7:30am · 8am · 1pm · 5pm · 9pm' : 'Tap to enable reminders'}
+              </Text>
+            </View>
+            <TouchableOpacity delayPressIn={0}
+              onPress={handleNotifToggle}
+              disabled={notifsLoading}
+              style={[styles.notifToggle, { backgroundColor: notifsEnabled ? Colors.sage : Colors.parchmentDark }]}>
+              <Text allowFontScaling={false} style={{ fontFamily:Fonts.sansMedium, fontSize:12, color: notifsEnabled ? Colors.cream : Colors.mist }}>
+                {notifsLoading ? '...' : notifsEnabled ? 'On' : 'Off'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Text allowFontScaling={false} style={styles.footer}>Always consult your healthcare provider</Text>
+        <View style={{ height: 20 }} />
         {/* ── 30-Day Snapshot ── */}
         <Text allowFontScaling={false} style={styles.sectionTitle}>Last 30 days</Text>
         <View style={styles.statsRow}>
@@ -278,6 +323,130 @@ export default function ProfileScreen() {
             </View>
           </View>
         )}
+
+        {/* ── Supplements ── */}
+        <View style={styles.card}>
+          <View style={styles.cardTitleRow}>
+            <Text allowFontScaling={false} style={styles.cardTitle}>My supplements</Text>
+            <TouchableOpacity delayPressIn={0} onPress={() => { setShowSuppLib(true); }} style={styles.manageBadge} activeOpacity={0.6}>
+              <Text allowFontScaling={false} style={styles.manageBadgeText}>+ manage</Text>
+            </TouchableOpacity>
+          </View>
+          <Text allowFontScaling={false} style={styles.cardSub}>{_mySuppsDataTyped.length === 0 ? 'Tap manage to build your stack' : `${_mySuppsDataTyped.length} supplements · {adherence}% adherence last 30 days</Text>`}</Text>
+          <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
+            {_mySuppsDataTyped.map((s:any) => (
+              <View key={s.id} style={styles.suppChip}>
+                <Text allowFontScaling={false} style={styles.suppChipText}>{s.name}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* ── Doctor prep ── */}
+        <View style={styles.card}>
+          <TouchableOpacity delayPressIn={0} onPress={() => setShowDoctor(!showDoctor)} style={styles.cardTitleRow} activeOpacity={0.7}>
+            <View style={{ flex:1 }}>
+              <Text allowFontScaling={false} style={styles.cardTitle}>Doctor visit prep</Text>
+              <Text allowFontScaling={false} style={styles.cardSub}>Know your rights. Ask the right questions.</Text>
+            </View>
+            <Text allowFontScaling={false} style={styles.chevron}>{showDoctor ? '−' : '+'}</Text>
+          </TouchableOpacity>
+          {showDoctor && (
+            <View style={{ marginTop:14 }}>
+              {symptoms.length > 0 && (
+                <View style={styles.symptomsBox}>
+                  <Text allowFontScaling={false} style={styles.symptomsBoxLabel}>Your logged symptoms today</Text>
+                  <Text allowFontScaling={false} style={styles.symptomsBoxText}>{symptoms.join(' · ')}</Text>
+                </View>
+              )}
+              {/* Streak card */}
+        {streak > 0 && (
+          <View style={styles.streakCard}>
+            <View style={{ flex: 1 }}>
+              <Text allowFontScaling={false} style={styles.streakCardLabel}>Current streak</Text>
+              <Text allowFontScaling={false} style={styles.streakCardNum}>🔥 {streak} day{streak !== 1 ? 's' : ''}</Text>
+              <Text allowFontScaling={false} style={styles.streakCardSub}>
+                {streak >= 30 ? 'Incredible — 30+ days of consistency.' :
+                 streak >= 14 ? 'Two weeks strong. Keep going.' :
+                 streak >= 7  ? 'One full week. You are building something real.' :
+                 streak >= 3  ? 'Three days in. Momentum is building.' :
+                 'Great start. Come back tomorrow to keep it going.'}
+              </Text>
+            </View>
+            <View style={styles.streakRing}>
+              <Text allowFontScaling={false} style={styles.streakRingNum}>{streak}</Text>
+              <Text allowFontScaling={false} style={styles.streakRingLabel}>{streak === 1 ? 'day' : 'days'}</Text>
+            </View>
+          </View>
+        )}
+
+        <Text style={styles.sectionTitle}>Your milestones</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:16}} contentContainerStyle={{gap:10,paddingRight:16}}>
+          {[
+            { icon: '🌱', label: 'First log',    sub:'Day 1',     earned: history.length >= 1 },
+            { icon: '💧', label: 'Hydrated',      sub:'8 glasses', earned: false },
+            { icon: '🔥', label: '7-day streak',  sub:'1 week',    earned: streak >= 7 },
+            { icon: '⚡', label: '2 weeks',        sub:'14 days',   earned: streak >= 14 },
+            { icon: '🧘', label: 'Supplement pro', sub:'30 days',   earned: history.length >= 30 },
+            { icon: '🌙', label: '30-day logger',  sub:'Consistent',earned: history.length >= 30 },
+            { icon: '📊', label: 'Pattern finder', sub:'60 days',   earned: history.length >= 60 },
+            { icon: '✦',  label: '90-day report',  sub:'3 months',  earned: history.length >= 90 },
+            { icon: '👑', label: 'Vela Legend',    sub:'1 year',    earned: history.length >= 365 },
+          ].map((b, i) => (
+            <View key={i} style={[styles.badge, !b.earned && styles.badgeLocked]}>
+              <Text style={styles.badgeIcon}>{b.earned ? b.icon : '○'}</Text>
+              <Text style={[styles.badgeLabel, !b.earned && styles.badgeLabelLocked]}>{b.label}</Text>
+              <Text style={[styles.badgeSub, !b.earned && styles.badgeLabelLocked]}>{b.sub}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
+        {topSyms.length > 0 && (
+                <View style={[styles.symptomsBox, { borderColor:Colors.gold, backgroundColor:Colors.goldPale }]}>
+                  <Text allowFontScaling={false} style={[styles.symptomsBoxLabel, { color:Colors.gold }]}>Most frequent last 30 days</Text>
+                  <Text allowFontScaling={false} style={styles.symptomsBoxText}>{topSyms.map(s => `${s.symptom} (${s.count}×)`).join(' · ')}</Text>
+                </View>
+              )}
+              {DOCTOR_QUESTIONS.map((q, i) => (
+                <View key={i} style={styles.doctorQRow}>
+                  <Text allowFontScaling={false} style={styles.doctorArrow}>→</Text>
+                  <Text allowFontScaling={false} style={styles.doctorQ}>{q}</Text>
+                </View>
+              ))}
+              <Text allowFontScaling={false} style={styles.doctorNote}>Studies show women who arrive with symptom data get better treatment outcomes. These questions are your starting point.</Text>
+            </View>
+          )}
+        </View>
+
+        {/* ── Modules ── */}
+        <Text allowFontScaling={false} style={styles.sectionTitle}>Your modules</Text>
+        <View style={styles.moduleGrid}>
+          {[
+            { id:'flux', name:'FluxLog', glyph:'◎', color:Colors.teal, pale:Colors.tealPale, active:fluxActive, daysLeft:fluxDaysLeft, onStart:startFluxTrial },
+            { id:'cool', name:'CoolDown', glyph:'◌', color:Colors.indigo, pale:Colors.indigoPale, active:coolActive, daysLeft:coolDaysLeft, onStart:startCoolTrial },
+          ].map(m => (
+            <View key={m.id} style={[styles.moduleCard, { backgroundColor:m.active?m.pale:Colors.cream, borderColor:m.active?m.color:Colors.parchmentDark }]}>
+              <Text allowFontScaling={false} style={[styles.moduleGlyph, { color:m.active?m.color:Colors.parchmentDark }]}>{m.glyph}</Text>
+              <Text allowFontScaling={false} style={styles.moduleName}>{m.name}</Text>
+              {m.active
+                ? <Text allowFontScaling={false} style={[styles.moduleStatus, { color:m.color }]}>{m.daysLeft !== null ? `${m.daysLeft}d trial` : '✦ Active'}</Text>
+                : <TouchableOpacity delayPressIn={0} onPress={m.onStart} style={[styles.trialBtn, { borderColor:m.color }]}>
+                    <Text allowFontScaling={false} style={[styles.trialBtnText, { color:m.color }]}>Start trial</Text>
+                  </TouchableOpacity>
+              }
+            </View>
+          ))}
+        </View>
+
+        {/* ── Creator program ── */}
+        <View style={styles.plumCard}>
+          <Text allowFontScaling={false} style={styles.plumLabel}>✦ Vela Creator Program</Text>
+          <Text allowFontScaling={false} style={styles.plumTitle}>Share Vela. Earn with us.</Text>
+          <Text allowFontScaling={false} style={styles.plumText}>Share your referral link and earn 30% of every subscription — forever.</Text>
+          <TouchableOpacity delayPressIn={0} onPress={() => setShowAffiliate(true)} style={styles.goldOutlineBtn}>
+            <Text allowFontScaling={false} style={styles.goldOutlineBtnText}>✦ Join the Creator Program</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* ── Monthly History ── */}
         <View style={styles.card}>
@@ -390,177 +559,6 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* ── Modules ── */}
-        <Text allowFontScaling={false} style={styles.sectionTitle}>Your modules</Text>
-        <View style={styles.moduleGrid}>
-          {[
-            { id:'flux', name:'FluxLog', glyph:'◎', color:Colors.teal, pale:Colors.tealPale, active:fluxActive, daysLeft:fluxDaysLeft, onStart:startFluxTrial },
-            { id:'cool', name:'CoolDown', glyph:'◌', color:Colors.indigo, pale:Colors.indigoPale, active:coolActive, daysLeft:coolDaysLeft, onStart:startCoolTrial },
-          ].map(m => (
-            <View key={m.id} style={[styles.moduleCard, { backgroundColor:m.active?m.pale:Colors.cream, borderColor:m.active?m.color:Colors.parchmentDark }]}>
-              <Text allowFontScaling={false} style={[styles.moduleGlyph, { color:m.active?m.color:Colors.parchmentDark }]}>{m.glyph}</Text>
-              <Text allowFontScaling={false} style={styles.moduleName}>{m.name}</Text>
-              {m.active
-                ? <Text allowFontScaling={false} style={[styles.moduleStatus, { color:m.color }]}>{m.daysLeft !== null ? `${m.daysLeft}d trial` : '✦ Active'}</Text>
-                : <TouchableOpacity delayPressIn={0} onPress={m.onStart} style={[styles.trialBtn, { borderColor:m.color }]}>
-                    <Text allowFontScaling={false} style={[styles.trialBtnText, { color:m.color }]}>Start trial</Text>
-                  </TouchableOpacity>
-              }
-            </View>
-          ))}
-        </View>
-
-        {/* ── Supplements ── */}
-        <View style={styles.card}>
-          <View style={styles.cardTitleRow}>
-            <Text allowFontScaling={false} style={styles.cardTitle}>My supplements</Text>
-            <TouchableOpacity delayPressIn={0} onPress={() => { setShowSuppLib(true); }} style={styles.manageBadge} activeOpacity={0.6}>
-              <Text allowFontScaling={false} style={styles.manageBadgeText}>+ manage</Text>
-            </TouchableOpacity>
-          </View>
-          <Text allowFontScaling={false} style={styles.cardSub}>{_mySuppsDataTyped.length === 0 ? 'Tap manage to build your stack' : `${_mySuppsDataTyped.length} supplements · {adherence}% adherence last 30 days</Text>`}</Text>
-          <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
-            {_mySuppsDataTyped.map((s:any) => (
-              <View key={s.id} style={styles.suppChip}>
-                <Text allowFontScaling={false} style={styles.suppChipText}>{s.name}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* ── Creator program ── */}
-        <View style={styles.plumCard}>
-          <Text allowFontScaling={false} style={styles.plumLabel}>✦ Vela Creator Program</Text>
-          <Text allowFontScaling={false} style={styles.plumTitle}>Share Vela. Earn with us.</Text>
-          <Text allowFontScaling={false} style={styles.plumText}>Share your referral link and earn 30% of every subscription — forever.</Text>
-          <TouchableOpacity delayPressIn={0} onPress={() => setShowAffiliate(true)} style={styles.goldOutlineBtn}>
-            <Text allowFontScaling={false} style={styles.goldOutlineBtnText}>✦ Join the Creator Program</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* ── Doctor prep ── */}
-        <View style={styles.card}>
-          <TouchableOpacity delayPressIn={0} onPress={() => setShowDoctor(!showDoctor)} style={styles.cardTitleRow} activeOpacity={0.7}>
-            <View style={{ flex:1 }}>
-              <Text allowFontScaling={false} style={styles.cardTitle}>Doctor visit prep</Text>
-              <Text allowFontScaling={false} style={styles.cardSub}>Know your rights. Ask the right questions.</Text>
-            </View>
-            <Text allowFontScaling={false} style={styles.chevron}>{showDoctor ? '−' : '+'}</Text>
-          </TouchableOpacity>
-          {showDoctor && (
-            <View style={{ marginTop:14 }}>
-              {symptoms.length > 0 && (
-                <View style={styles.symptomsBox}>
-                  <Text allowFontScaling={false} style={styles.symptomsBoxLabel}>Your logged symptoms today</Text>
-                  <Text allowFontScaling={false} style={styles.symptomsBoxText}>{symptoms.join(' · ')}</Text>
-                </View>
-              )}
-              {/* Streak card */}
-        {streak > 0 && (
-          <View style={styles.streakCard}>
-            <View style={{ flex: 1 }}>
-              <Text allowFontScaling={false} style={styles.streakCardLabel}>Current streak</Text>
-              <Text allowFontScaling={false} style={styles.streakCardNum}>🔥 {streak} day{streak !== 1 ? 's' : ''}</Text>
-              <Text allowFontScaling={false} style={styles.streakCardSub}>
-                {streak >= 30 ? 'Incredible — 30+ days of consistency.' :
-                 streak >= 14 ? 'Two weeks strong. Keep going.' :
-                 streak >= 7  ? 'One full week. You are building something real.' :
-                 streak >= 3  ? 'Three days in. Momentum is building.' :
-                 'Great start. Come back tomorrow to keep it going.'}
-              </Text>
-            </View>
-            <View style={styles.streakRing}>
-              <Text allowFontScaling={false} style={styles.streakRingNum}>{streak}</Text>
-              <Text allowFontScaling={false} style={styles.streakRingLabel}>{streak === 1 ? 'day' : 'days'}</Text>
-            </View>
-          </View>
-        )}
-
-        <Text style={styles.sectionTitle}>Your milestones</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:16}} contentContainerStyle={{gap:10,paddingRight:16}}>
-          {[
-            { icon: '🌱', label: 'First log',    sub:'Day 1',     earned: history.length >= 1 },
-            { icon: '💧', label: 'Hydrated',      sub:'8 glasses', earned: false },
-            { icon: '🔥', label: '7-day streak',  sub:'1 week',    earned: streak >= 7 },
-            { icon: '⚡', label: '2 weeks',        sub:'14 days',   earned: streak >= 14 },
-            { icon: '🧘', label: 'Supplement pro', sub:'30 days',   earned: history.length >= 30 },
-            { icon: '🌙', label: '30-day logger',  sub:'Consistent',earned: history.length >= 30 },
-            { icon: '📊', label: 'Pattern finder', sub:'60 days',   earned: history.length >= 60 },
-            { icon: '✦',  label: '90-day report',  sub:'3 months',  earned: history.length >= 90 },
-            { icon: '👑', label: 'Vela Legend',    sub:'1 year',    earned: history.length >= 365 },
-          ].map((b, i) => (
-            <View key={i} style={[styles.badge, !b.earned && styles.badgeLocked]}>
-              <Text style={styles.badgeIcon}>{b.earned ? b.icon : '○'}</Text>
-              <Text style={[styles.badgeLabel, !b.earned && styles.badgeLabelLocked]}>{b.label}</Text>
-              <Text style={[styles.badgeSub, !b.earned && styles.badgeLabelLocked]}>{b.sub}</Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        {topSyms.length > 0 && (
-                <View style={[styles.symptomsBox, { borderColor:Colors.gold, backgroundColor:Colors.goldPale }]}>
-                  <Text allowFontScaling={false} style={[styles.symptomsBoxLabel, { color:Colors.gold }]}>Most frequent last 30 days</Text>
-                  <Text allowFontScaling={false} style={styles.symptomsBoxText}>{topSyms.map(s => `${s.symptom} (${s.count}×)`).join(' · ')}</Text>
-                </View>
-              )}
-              {DOCTOR_QUESTIONS.map((q, i) => (
-                <View key={i} style={styles.doctorQRow}>
-                  <Text allowFontScaling={false} style={styles.doctorArrow}>→</Text>
-                  <Text allowFontScaling={false} style={styles.doctorQ}>{q}</Text>
-                </View>
-              ))}
-              <Text allowFontScaling={false} style={styles.doctorNote}>Studies show women who arrive with symptom data get better treatment outcomes. These questions are your starting point.</Text>
-            </View>
-          )}
-        </View>
-
-        {/* ── Phase ── */}
-        <View style={[styles.phaseCard, { backgroundColor:pd.bg, borderColor:pd.color }]}>
-          <Text allowFontScaling={false} style={[styles.phaseLabel, { color:pd.color }]}>Your phase</Text>
-          <Text allowFontScaling={false} style={styles.phaseTitle}>{pd.label}</Text>
-          <Text allowFontScaling={false} style={styles.phaseDesc}>{pd.desc}</Text>
-          <TouchableOpacity delayPressIn={0} onPress={() => { resetOnboarding(); router.replace('/onboarding'); }} style={styles.retakeBtn}>
-            <Text allowFontScaling={false} style={styles.retakeBtnText}>✎ Retake phase quiz</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.card}>
-          <Text allowFontScaling={false} style={styles.cardTitle}>Doctor report</Text>
-          <Text allowFontScaling={false} style={styles.cardSub}>Symptoms · nutrition · supplements · sleep · patterns — 90 days of data your doctor actually needs. Takes 3 seconds to generation, supplements</Text>
-          <TouchableOpacity delayPressIn={0}
-            onPress={handleExportPDF}
-            disabled={pdfLoading}
-            style={[styles.retakeBtn, { backgroundColor: pdfLoading ? Colors.parchmentDark : Colors.plum }]}>
-            <Text allowFontScaling={false} style={styles.retakeBtnText}>
-              {pdfLoading ? 'Generating...' : '✦ Export PDF for my doctor'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.card}>
-          <Text allowFontScaling={false} style={styles.cardTitle}>Daily reminders</Text>
-          <Text allowFontScaling={false} style={styles.cardSub}>Supplement check-ins, sleep logs, and weekly insights</Text>
-          <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
-            <View>
-              <Text allowFontScaling={false} style={{ fontFamily:Fonts.sans, fontSize:13, color:Colors.plum }}>
-                {notifsEnabled ? '🔔 Notifications on' : '🔕 Notifications off'}
-              </Text>
-              <Text allowFontScaling={false} style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.mist, marginTop:2 }}>
-                {notifsEnabled ? '7:30am · 8am · 1pm · 5pm · 9pm' : 'Tap to enable reminders'}
-              </Text>
-            </View>
-            <TouchableOpacity delayPressIn={0}
-              onPress={handleNotifToggle}
-              disabled={notifsLoading}
-              style={[styles.notifToggle, { backgroundColor: notifsEnabled ? Colors.sage : Colors.parchmentDark }]}>
-              <Text allowFontScaling={false} style={{ fontFamily:Fonts.sansMedium, fontSize:12, color: notifsEnabled ? Colors.cream : Colors.mist }}>
-                {notifsLoading ? '...' : notifsEnabled ? 'On' : 'Off'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <Text allowFontScaling={false} style={styles.footer}>Always consult your healthcare provider</Text>
-        <View style={{ height: 20 }} />
       </ScrollView>
 
       {/* ── Supplement Library Modal ── */}

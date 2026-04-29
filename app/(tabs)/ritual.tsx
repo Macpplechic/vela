@@ -174,36 +174,6 @@ export default function RitualScreen() {
         </View>
 
         <View style={styles.card}>
-          <View style={styles.scoreRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.cardTitle}>Your hormone score</Text>
-              {foods.length > 0 && <Text style={styles.aiScore}>{aiScore >= 70 ? '✦ Strong anti-inflammatory day' : aiScore >= 40 ? '✦ Building your score — add more plants' : '✦ Start logging food to build your score'}</Text>}
-            </View>
-            <View style={styles.scoreBox}>
-              <Text style={[styles.scoreNum, { color: score > 60 ? Colors.sage : Colors.rose }]}>{score}</Text>
-              <Text style={styles.scoreDenom}>/100</Text>
-            </View>
-          </View>
-          {[
-            { label:'Protein', v:totals.protein, t:pd.targets.protein, u:'g' },
-            { label:'Fiber', v:totals.fiber, t:pd.targets.fiber, u:'g' },
-            { label:'Calcium', v:totals.calcium, t:pd.targets.calcium, u:'mg' },
-            { label:'Omega-3', v:totals.omega3, t:pd.targets.omega3, u:'g' },
-            { label:'Phytoestrogens', v:totals.phyto, t:pd.targets.phyto, u:'mg' },
-          ].map(n => (
-            <View key={n.label} style={styles.nutrientRow}>
-              <View style={styles.nutrientLabels}>
-                <Text style={styles.nutrientName}>{n.label}</Text>
-                <Text style={styles.nutrientVal}>{n.label==='Omega-3'?n.v.toFixed(1):Math.round(n.v)}{n.u} / {n.t}{n.u}</Text>
-              </View>
-              <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width:`${pct(n.v,n.t)}%` as any, backgroundColor: pct(n.v,n.t)>=80?Colors.sage:Colors.gold }]} />
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.card}>
           <Text style={styles.cardTitle}>Hydration today 💧</Text>
           <Text style={styles.cardSub}>Dehydration amplifies hot flashes & brain fog</Text>
           <View style={{flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:8}}>
