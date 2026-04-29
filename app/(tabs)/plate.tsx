@@ -287,7 +287,7 @@ export default function PlateScreen() {
               style={styles.searchInput}
               value={search}
               onChangeText={(t) => { setSearch(t); searchUSDA(t); }}
-              placeholder="Type to search 2,400+ foods..."
+              placeholder="Search 600,000+ foods by name..."
               placeholderTextColor={Colors.mist}
             />
             <ScrollView style={{ maxHeight: 240 }} nestedScrollEnabled>
