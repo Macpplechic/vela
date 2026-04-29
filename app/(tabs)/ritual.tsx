@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, StyleSheet, Dimensions, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Fonts } from '../../constants/Colors';
-import { PHASES, SYMPTOMS } from '../../constants/Data';
+import { PHASES, SYMPTOMS, SUPP_LIBRARY } from '../../constants/Data';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 const { width } = Dimensions.get('window');
@@ -53,7 +53,7 @@ function detectTriggers(history: any[]): string | null {
 
 export default function RitualScreen() {
   const {
-    phase, mySuppsData, checkedSupps, setCheckedSupps,
+    phase, mySupps, setMySupps, mySuppsData, checkedSupps, setCheckedSupps,
     symptoms, setSymptoms, journal, setJournal,
     totals, foods, streak, lastStreakDate, incrementStreak, history: velaHistory, history, sleepHistory, saveSleepEntry,
   } = useVelaStore();
@@ -62,6 +62,7 @@ export default function RitualScreen() {
   const [mood, setMood] = useState(0);
   const [energy, setEnergy] = useState(0);
   const [sleepQuality, setSleepQuality] = useState(0);
+  const [showSuppModal, setShowSuppModal] = useState(false);
 
   const pd = PHASES[phase ?? 'late'];
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
@@ -229,8 +230,8 @@ export default function RitualScreen() {
         <View style={styles.card}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <Text style={[styles.cardTitle, { flex:1, marginBottom:0, fontSize:16 }]}>Morning supplement ritual</Text>
-            <TouchableOpacity delayPressIn={0} onPress={() => router.push('/(tabs)/profile')} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
-              <Text style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold }}>+ manage</Text>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowSuppModal(true)} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
+              <Text style={{ fontFamily:Fonts.sans, fontSize:11, color:Colors.gold }}>+ add</Text>
             </TouchableOpacity>
           </View>
           <Text style={styles.cardSub}>{mySuppsData.length===0?'Add supplements to track your morning ritual':`${checkedSupps.length} of ${mySuppsData.length} taken today`}</Text>
@@ -325,6 +326,49 @@ export default function RitualScreen() {
 
         <View style={{ height: 20 }} />
       </ScrollView>
+      {/* ── Supplement Library Modal ── */}
+      <Modal visible={showSuppModal} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowSuppModal(false)}>
+        <SafeAreaView style={{flex:1, backgroundColor:Colors.cream}}>
+          <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center', padding:20, paddingTop:16, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
+            <Text style={{fontFamily:Fonts.serif, fontSize:20, color:Colors.plum}}>Add supplements</Text>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowSuppModal(false)}>
+              <Text style={{fontSize:28, color:Colors.mist}}>×</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView contentContainerStyle={{padding:20, paddingBottom:60}}>
+            <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, marginBottom:16}}>Tap to add to your daily ritual. Selected supplements appear on your Ritual screen.</Text>
+            {(SUPP_LIBRARY as any[]).map((s: any) => {
+              const inRoutine = mySupps.includes(s.id);
+              return (
+                <TouchableOpacity delayPressIn={0} key={s.id}
+                  onPress={async () => {
+                    const updated = inRoutine
+                      ? mySupps.filter((id: string) => id !== s.id)
+                      : [...mySupps, s.id];
+                    await setMySupps(updated);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  style={{flexDirection:'row', alignItems:'center', paddingVertical:14,
+                    borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
+                  <View style={{width:36, height:36, borderRadius:18, alignItems:'center', justifyContent:'center',
+                    backgroundColor: inRoutine ? Colors.sage : Colors.parchmentDark, marginRight:14}}>
+                    <Text style={{fontSize:18}}>{s.icon ?? '✦'}</Text>
+                  </View>
+                  <View style={{flex:1}}>
+                    <Text style={{fontFamily:Fonts.sansMedium, fontSize:14, color:Colors.plum}}>{s.name}</Text>
+                    <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>{s.dose}</Text>
+                    <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist, marginTop:2}} numberOfLines={2}>{s.why}</Text>
+                  </View>
+                  <Text style={{fontFamily:Fonts.sansMedium, fontSize:13,
+                    color: inRoutine ? Colors.sage : Colors.gold, marginLeft:10}}>
+                    {inRoutine ? '✓ added' : '+ add'}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
