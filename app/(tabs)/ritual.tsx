@@ -253,7 +253,7 @@ export default function RitualScreen() {
 
         }
 
-        {session === 'evening' && <View style={styles.card}>
+        {session === 'morning' && <View style={styles.card}>
           <Text style={styles.cardTitle}>How did you sleep? 🌙</Text>
           <Text style={styles.cardSub}>Sleep quality directly affects hot flash frequency</Text>
           <View style={{flexDirection:'row', gap:8, marginTop:12}}>
