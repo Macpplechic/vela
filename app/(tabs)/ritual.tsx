@@ -63,6 +63,7 @@ export default function RitualScreen() {
   const [energy, setEnergy] = useState(0);
   const [sleepQuality, setSleepQuality] = useState(0);
   const [showSuppModal, setShowSuppModal] = useState(false);
+  const [session, setSession] = useState<'morning'|'evening'>('morning');
 
   const pd = PHASES[phase ?? 'late'];
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
@@ -173,7 +174,16 @@ export default function RitualScreen() {
           </Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={{flexDirection:'row',backgroundColor:Colors.parchmentDark,borderRadius:30,padding:3,marginBottom:12}}>
+          <TouchableOpacity delayPressIn={0} onPress={() => setSession('morning')} style={{flex:1,paddingVertical:10,borderRadius:28,alignItems:'center',backgroundColor:session==='morning'?Colors.plum:'transparent'}}>
+            <Text style={{fontFamily:Fonts.sansMedium,fontSize:13,color:session==='morning'?Colors.parchment:Colors.mist}}>🌅  Morning</Text>
+          </TouchableOpacity>
+          <TouchableOpacity delayPressIn={0} onPress={() => setSession('evening')} style={{flex:1,paddingVertical:10,borderRadius:28,alignItems:'center',backgroundColor:session==='evening'?Colors.plum:'transparent'}}>
+            <Text style={{fontFamily:Fonts.sansMedium,fontSize:13,color:session==='evening'?Colors.parchment:Colors.mist}}>🌙  Evening</Text>
+          </TouchableOpacity>
+        </View>
+
+        {session === 'morning' && <View style={styles.card}>
           <Text style={styles.cardTitle}>Hydration today 💧</Text>
           <Text style={styles.cardSub}>Dehydration amplifies hot flashes & brain fog</Text>
           <View style={{flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:8}}>
@@ -197,7 +207,9 @@ export default function RitualScreen() {
           </Text>
         </View>
 
-        <View style={styles.card}>
+        }
+
+        {session === 'morning' && <View style={styles.card}>
           <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <Text style={[styles.cardTitle, { flex:1, marginBottom:0, fontSize:16 }]}>Morning supplement ritual</Text>
             <TouchableOpacity delayPressIn={0} onPress={() => setShowSuppModal(true)} style={{ borderWidth:1, borderColor:Colors.gold, borderRadius:14, paddingVertical:4, paddingHorizontal:10 }}>
@@ -221,7 +233,9 @@ export default function RitualScreen() {
           })}
         </View>
 
-        <View style={styles.card}>
+        }
+
+        {session === 'evening' && <View style={styles.card}>
           <Text style={styles.cardTitle}>How is your body today?</Text>
           <Text style={styles.cardSub}>Over 40 symptoms are linked to hormonal change</Text>
           <View style={styles.symptomGrid}>
@@ -237,7 +251,9 @@ export default function RitualScreen() {
           {symptoms.length > 0 && <Text style={styles.symptomNote}>{symptoms.length} symptom{symptoms.length !== 1 ? 's' : ''} logged today ✓</Text>}
         </View>
 
-        <View style={styles.card}>
+        }
+
+        {session === 'evening' && <View style={styles.card}>
           <Text style={styles.cardTitle}>How did you sleep? 🌙</Text>
           <Text style={styles.cardSub}>Sleep quality directly affects hot flash frequency</Text>
           <View style={{flexDirection:'row', gap:8, marginTop:12}}>
@@ -277,7 +293,9 @@ export default function RitualScreen() {
           )}
         </View>
 
-        <View style={styles.card}>
+        }
+
+        {session === 'evening' && <View style={styles.card}>
           <Text style={styles.cardTitle}>Evening reflection</Text>
           <Text style={[styles.cardSub, { fontStyle:'italic' }]}>What did your body do well today?</Text>
           <TextInput
@@ -293,6 +311,8 @@ export default function RitualScreen() {
             <Text style={styles.saveButtonText}>{journalSaved ? '✓ Saved' : 'Save'}</Text>
           </TouchableOpacity>
         </View>
+
+        }
 
         <View style={{ height: 20 }} />
       </ScrollView>
