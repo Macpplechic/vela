@@ -438,6 +438,31 @@ export default function ProfileScreen() {
           ))}
         </View>
 
+        {/* ── Citations ── */}
+        <View style={styles.card}>
+          <Text allowFontScaling={false} style={styles.cardTitle}>Research & Sources</Text>
+          <Text allowFontScaling={false} style={styles.cardSub}>Vela is built on peer-reviewed research. All recommendations are evidence-based.</Text>
+          <View style={{marginTop:12, gap:8}}>
+            {[
+              { num:'1', text:'The Menopause Society (formerly NAMS) — Clinical Practice Guidelines 2023', url:'https://www.menopause.org' },
+              { num:'2', text:'NIH Office of Dietary Supplements — Calcium, Magnesium, Vitamin D fact sheets', url:'https://ods.od.nih.gov' },
+              { num:'3', text:'Freedman RR. Menopausal hot flashes: mechanisms, endocrinology, treatment. J Steroid Biochem Mol Biol. 2014', url:'https://pubmed.ncbi.nlm.nih.gov/23747847/' },
+              { num:'4', text:'Leproult R, Van Cauter E. Role of sleep and sleep loss in hormonal release and metabolism. Endocr Dev. 2010', url:'https://pubmed.ncbi.nlm.nih.gov/19955752/' },
+              { num:'5', text:'Daley A, et al. Exercise for vasomotor menopausal symptoms. Cochrane Database Syst Rev. 2015', url:'https://pubmed.ncbi.nlm.nih.gov/25692420/' },
+            ].map((s, i) => (
+              <TouchableOpacity delayPressIn={0} key={i}
+                onPress={() => require('react-native').Linking.openURL(s.url)}
+                style={{flexDirection:'row', gap:8, paddingVertical:6, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
+                <Text allowFontScaling={false} style={{fontFamily:Fonts.sansMedium, fontSize:12, color:Colors.gold, minWidth:16}}>{s.num}.</Text>
+                <Text allowFontScaling={false} style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.plum, flex:1, lineHeight:16}}>{s.text}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text allowFontScaling={false} style={{fontFamily:Fonts.sans, fontSize:10, color:Colors.mist, marginTop:12, lineHeight:15}}>
+            ⚠️ Vela is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult your healthcare provider before making medical decisions.
+          </Text>
+        </View>
+
         {/* ── Creator program ── */}
         <View style={styles.plumCard}>
           <Text allowFontScaling={false} style={styles.plumLabel}>✦ Vela Creator Program</Text>
