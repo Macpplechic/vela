@@ -148,22 +148,9 @@ export default function PlateScreen() {
     if (result.canceled) return;
     setScannedImage(result.assets[0].uri);
     
-    Alert.prompt(
-      '📷 What did you eat?',
-      'Type the main food in your photo to search and add it',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Search', onPress: (text: string | undefined) => {
-          if (text) {
-            setSearch(text);
-            searchUSDA(text);
+    setSearch(''); // photo taken — user can type food name in search box
+            // search cleared
           }
-        }},
-      ],
-      'plain-text'
-    );
-  };
-
   const filteredFoods: Food[] = [];
 
   const addFood = async (f: Food) => {

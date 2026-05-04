@@ -423,7 +423,7 @@ export default function ProfileScreen() {
         <View style={styles.moduleGrid}>
           {[
             { id:'flux', name:'FluxLog', glyph:'◎', color:Colors.teal, pale:Colors.tealPale, active:fluxActive, daysLeft:fluxDaysLeft, onStart:startFluxTrial },
-            { id:'cool', name:'CoolDown', glyph:'◌', color:Colors.indigo, pale:Colors.indigoPale, active:coolActive, daysLeft:coolDaysLeft, onStart:startCoolTrial },
+            { id:'cool', name:'CoolDown', glyph:'◌', color:Colors.teal, pale:Colors.tealPale, active:coolActive, daysLeft:coolDaysLeft, onStart:startCoolTrial },
           ].map(m => (
             <View key={m.id} style={[styles.moduleCard, { backgroundColor:m.active?m.pale:Colors.cream, borderColor:m.active?m.color:Colors.parchmentDark }]}>
               <Text allowFontScaling={false} style={[styles.moduleGlyph, { color:m.active?m.color:Colors.parchmentDark }]}>{m.glyph}</Text>
