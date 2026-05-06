@@ -335,6 +335,15 @@ export default function CoolScreen() {
             <Text style={styles.modalGlyph}>◇</Text>
             <Text style={styles.modalTitle}>CoolDown</Text>
             <Text style={styles.modalHook}>You deserve to feel in control of your own body again.{'\n'}CoolDown gives you that back.</Text>
+            <View style={{flexDirection:'row', justifyContent:'center', gap:16, marginBottom:12}}>
+              <TouchableOpacity delayPressIn={0} onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/terms')}>
+                <Text style={{fontFamily:'System', fontSize:11, color:Colors.mist, textDecorationLine:'underline'}}>Terms of Use</Text>
+              </TouchableOpacity>
+              <Text style={{fontFamily:'System', fontSize:11, color:Colors.mist}}>·</Text>
+              <TouchableOpacity delayPressIn={0} onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/privacy')}>
+                <Text style={{fontFamily:'System', fontSize:11, color:Colors.mist, textDecorationLine:'underline'}}>Privacy Policy</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity delayPressIn={0} style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
               <View>
                 <Text style={styles.trialBoxTitle}>✦  Start free — full access, 7 days</Text>
