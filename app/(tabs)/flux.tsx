@@ -254,6 +254,32 @@ export default function FluxScreen() {
             </View>
 
             {/* Trial CTA */}
+
+            {/* ── Required Subscription Info ── */}
+            <View style={{backgroundColor:'rgba(255,255,255,0.08)', borderRadius:12, padding:14, marginBottom:12}}>
+              <Text style={{fontFamily:'System', fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:'600', marginBottom:6}}>
+                FluxLog Monthly
+              </Text>
+              <Text style={{fontFamily:'System', fontSize:12, color:'rgba(255,255,255,0.7)', marginBottom:2}}>
+                $4.99 / month · Auto-renews monthly
+              </Text>
+              <Text style={{fontFamily:'System', fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:8}}>
+                Cancel anytime in Apple ID settings · Payment charged to Apple ID at confirmation
+              </Text>
+              <View style={{flexDirection:'row', gap:16}}>
+                <Text
+                  style={{fontFamily:'System', fontSize:12, color:'#A8D8E8', textDecorationLine:'underline'}}
+                  onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/terms')}>
+                  Terms of Use
+                </Text>
+                <Text
+                  style={{fontFamily:'System', fontSize:12, color:'#A8D8E8', textDecorationLine:'underline'}}
+                  onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/privacy')}>
+                  Privacy Policy
+                </Text>
+              </View>
+            </View>
+
             <TouchableOpacity delayPressIn={0} style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
               <Text style={styles.trialBtnTitle}>Start free — 7 days, no card needed</Text>
               <Text style={styles.trialBtnSub}>3,800+ women tracking their peri cycles</Text>
