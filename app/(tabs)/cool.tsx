@@ -182,6 +182,10 @@ export default function CoolScreen() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
+  const [sessionCount, setSessionCount] = useState(0);
+  const [hotFlashCount, setHotFlashCount] = useState(0);
+  const [coolTab, setCoolTab] = useState<'breathe'|'log'|'tips'|'stats'>('breathe');
+  const [showHotFlashLog, setShowHotFlashLog] = useState(false);
   const [activeProtocol, setActiveProtocol] = useState<number | null>(null);
   const [runningProtocol, setRunningProtocol] = useState<Protocol | null>(null);
 
@@ -274,7 +278,117 @@ export default function CoolScreen() {
               </TouchableOpacity>
             ))}
           </>
-        ) : (
+        {/* ── CoolDown Tabs ── */}
+        {coolActive && (
+          <View style={{flexDirection:'row', backgroundColor:Colors.parchmentDark, borderRadius:30, padding:3, marginBottom:12}}>
+            {([
+              {id:'breathe', label:'🌬 Breathe'},
+              {id:'log', label:'🔥 Log'},
+              {id:'tips', label:'💡 Tips'},
+              {id:'stats', label:'📊 Stats'},
+            ] as const).map(t => (
+              <TouchableOpacity delayPressIn={0} key={t.id} onPress={() => setCoolTab(t.id)}
+                style={{flex:1, paddingVertical:8, borderRadius:28, alignItems:'center',
+                  backgroundColor: coolTab===t.id ? Colors.teal : 'transparent'}}>
+                <Text style={{fontFamily:Fonts.sans, fontSize:10, color: coolTab===t.id ? Colors.parchment : Colors.mist}}>{t.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* ── Hot Flash Log Tab ── */}
+        {coolActive && coolTab === 'log' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>🔥 Hot Flash Tracker</Text>
+            <Text style={styles.cardSub}>Tap each time you have a hot flash to track your patterns</Text>
+            <View style={{alignItems:'center', marginVertical:20}}>
+              <TouchableOpacity delayPressIn={0}
+                onPress={() => { setHotFlashCount(prev => prev + 1); require('expo-haptics').impactAsync('medium'); }}
+                style={{width:120, height:120, borderRadius:60, backgroundColor:Colors.rose,
+                  alignItems:'center', justifyContent:'center', shadowColor:Colors.rose,
+                  shadowOffset:{width:0,height:4}, shadowOpacity:0.4, shadowRadius:12}}>
+                <Text style={{fontSize:40}}>🔥</Text>
+                <Text style={{fontFamily:Fonts.sansMedium, fontSize:12, color:'#fff', marginTop:4}}>Log it</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+              <View style={{alignItems:'center'}}>
+                <Text style={{fontFamily:Fonts.serif, fontSize:40, color:Colors.rose}}>{hotFlashCount}</Text>
+                <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>today</Text>
+              </View>
+              <View style={{alignItems:'center'}}>
+                <Text style={{fontFamily:Fonts.serif, fontSize:40, color:Colors.teal}}>{sessionCount}</Text>
+                <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>relief sessions</Text>
+              </View>
+            </View>
+            {hotFlashCount > 0 && (
+              <TouchableOpacity delayPressIn={0} onPress={() => setHotFlashCount(0)}
+                style={{marginTop:12, alignItems:'center'}}>
+                <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>Reset today's count</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {/* ── Tips Tab ── */}
+        {coolActive && coolTab === 'tips' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>💡 Hot Flash Relief Tips</Text>
+            <Text style={styles.cardSub}>Evidence-based strategies to reduce frequency and intensity</Text>
+            <View style={{gap:12, marginTop:12}}>
+              {[
+                {emoji:'🌬', tip:'Paced breathing (6 breaths/min) reduces hot flash frequency by up to 50% — use CoolDown daily'},
+                {emoji:'🧊', tip:'Keep a cold water bottle nearby. Sipping cold water at onset can reduce intensity'},
+                {emoji:'👗', tip:'Dress in layers — remove them quickly when a flash starts'},
+                {emoji:'🌡', tip:'Keep your bedroom cool (65-68°F). A cooler sleep environment reduces night sweats'},
+                {emoji:'☕', tip:'Caffeine and alcohol are common triggers — track yours in FluxLog'},
+                {emoji:'🧘', tip:'Stress amplifies hot flashes. Even 5 minutes of breathing daily makes a difference'},
+                {emoji:'🥗', tip:'Phytoestrogen-rich foods (soy, flaxseed) may reduce frequency for some women'},
+                {emoji:'💊', tip:'Magnesium glycinate before bed can reduce night sweats — ask your doctor'},
+              ].map((item, i) => (
+                <View key={i} style={{flexDirection:'row', gap:10, paddingVertical:8,
+                  borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
+                  <Text style={{fontSize:20}}>{item.emoji}</Text>
+                  <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum, flex:1, lineHeight:18}}>{item.tip}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ── Stats Tab ── */}
+        {coolActive && coolTab === 'stats' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>📊 Your CoolDown Stats</Text>
+            <Text style={styles.cardSub}>Your progress this session</Text>
+            <View style={{gap:10, marginTop:12}}>
+              {[
+                {label:'Breathing sessions completed', value:sessionCount, color:Colors.teal, emoji:'🌬'},
+                {label:'Hot flashes logged today', value:hotFlashCount, color:Colors.rose, emoji:'🔥'},
+                {label:'Minutes of relief', value:sessionCount * 5, color:Colors.sage, emoji:'⏱'},
+              ].map(stat => (
+                <View key={stat.label} style={{flexDirection:'row', alignItems:'center', gap:12,
+                  paddingVertical:14, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
+                  <Text style={{fontSize:24}}>{stat.emoji}</Text>
+                  <View style={{flex:1}}>
+                    <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist}}>{stat.label}</Text>
+                    <Text style={{fontFamily:Fonts.serif, fontSize:28, color:stat.color}}>{stat.value}</Text>
+                  </View>
+                </View>
+              ))}
+              <View style={{backgroundColor:Colors.tealPale, borderRadius:12, padding:12, marginTop:4}}>
+                <Text style={{fontFamily:Fonts.sansMedium, fontSize:12, color:Colors.teal}}>
+                  {sessionCount === 0
+                    ? '✦ Complete your first breathing session to start tracking'
+                    : `✦ ${sessionCount} session${sessionCount!==1?'s':''} completed. Consistency is everything.`}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ── Original paywall ── */}
+        {!coolActive && (
           <>
             <View style={styles.heroCard}>
               <Text style={styles.heroQuestion}>The heat hits without warning. CoolDown stops it in minutes.</Text>

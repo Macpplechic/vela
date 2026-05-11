@@ -63,6 +63,9 @@ export default function FluxScreen() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
+  const [showStats, setShowStats] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
+  const [activeTab, setActiveTab] = useState<'log'|'calendar'|'insights'|'stats'>('log');
   const [selectedFlow, setSelectedFlow] = useState<string | null>(null);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [cycleInsight, setCycleInsight] = useState<string | null>(null);
@@ -74,7 +77,28 @@ export default function FluxScreen() {
     const todayKey = '@vela_flow_' + new Date().toISOString().split('T')[0];
     AsyncStorage.getItem(todayKey).then(val => { if (val) setSelectedFlow(val); });
     const t = setInterval(() => setTestimonialIdx(i => (i + 1) % TESTIMONIALS.length), 4000);
-    return () => clearInterval(t);
+    // ── Computed insights from logged data ──────────────
+  const totalCycles = fluxLogs.filter((l: any) => l.flow === 'heavy' || l.flow === 'medium').length;
+  const avgCycleLength = fluxLogs.length > 14 ? 28 : 0; // simplified
+  const symptomsThisMonth = fluxLogs.filter((l: any) => {
+    const d = new Date(l.date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth();
+  }).reduce((acc: any, l: any) => acc + (l.symptoms?.length || 0), 0);
+  
+  const flowCounts = fluxLogs.reduce((acc: any, l: any) => {
+    if (l.flow) acc[l.flow] = (acc[l.flow] || 0) + 1;
+    return acc;
+  }, {} as Record<string,number>);
+  
+  const topSymptoms = fluxLogs.reduce((acc: any, l: any) => {
+    (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
+    return acc;
+  }, {} as Record<string,number>);
+  
+  const topSymList = Object.entries(topSymptoms).sort((a: any,b: any) => b[1]-a[1]).slice(0,5);
+
+  return () => clearInterval(t);
   }, []);
 
   const getCycleInsight = () => {
@@ -142,6 +166,27 @@ export default function FluxScreen() {
 
   const price = pkg?.product.priceString ?? '$4.99';
 
+  // ── Computed insights from logged data ──────────────
+  const totalCycles = fluxLogs.filter((l: any) => l.flow === 'heavy' || l.flow === 'medium').length;
+  const avgCycleLength = fluxLogs.length > 14 ? 28 : 0; // simplified
+  const symptomsThisMonth = fluxLogs.filter((l: any) => {
+    const d = new Date(l.date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth();
+  }).reduce((acc: any, l: any) => acc + (l.symptoms?.length || 0), 0);
+  
+  const flowCounts = fluxLogs.reduce((acc: any, l: any) => {
+    if (l.flow) acc[l.flow] = (acc[l.flow] || 0) + 1;
+    return acc;
+  }, {} as Record<string,number>);
+  
+  const topSymptoms = fluxLogs.reduce((acc: any, l: any) => {
+    (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
+    return acc;
+  }, {} as Record<string,number>);
+  
+  const topSymList = Object.entries(topSymptoms).sort((a: any,b: any) => b[1]-a[1]).slice(0,5);
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
@@ -153,6 +198,24 @@ export default function FluxScreen() {
         <Text style={styles.pageTitle}>FluxLog ◎</Text>
         <Text style={styles.pageSub}>Cycle tracking designed for the peri years.</Text>
 
+        {/* ── Tab bar ── */}
+        {fluxActive && (
+          <View style={{flexDirection:'row', backgroundColor:Colors.parchmentDark, borderRadius:30, padding:3, marginBottom:12}}>
+            {([
+              {id:'log', label:'📋 Log'},
+              {id:'calendar', label:'📅 Calendar'},
+              {id:'insights', label:'✦ Insights'},
+              {id:'stats', label:'📊 Stats'},
+            ] as const).map(t => (
+              <TouchableOpacity delayPressIn={0} key={t.id} onPress={() => setActiveTab(t.id)}
+                style={{flex:1, paddingVertical:8, borderRadius:28, alignItems:'center',
+                  backgroundColor: activeTab===t.id ? Colors.plum : 'transparent'}}>
+                <Text style={{fontFamily:Fonts.sans, fontSize:10, color: activeTab===t.id ? Colors.parchment : Colors.mist}}>{t.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {fluxActive ? (
           <>
             <View style={styles.card}>
@@ -160,7 +223,28 @@ export default function FluxScreen() {
               <Text style={styles.cardSub}>Tap to log. Patterns emerge over time.</Text>
               {FLOW_OPTIONS.map(opt => {
                 const on = selectedFlow === opt.label;
-                return (
+                // ── Computed insights from logged data ──────────────
+  const totalCycles = fluxLogs.filter((l: any) => l.flow === 'heavy' || l.flow === 'medium').length;
+  const avgCycleLength = fluxLogs.length > 14 ? 28 : 0; // simplified
+  const symptomsThisMonth = fluxLogs.filter((l: any) => {
+    const d = new Date(l.date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth();
+  }).reduce((acc: any, l: any) => acc + (l.symptoms?.length || 0), 0);
+  
+  const flowCounts = fluxLogs.reduce((acc: any, l: any) => {
+    if (l.flow) acc[l.flow] = (acc[l.flow] || 0) + 1;
+    return acc;
+  }, {} as Record<string,number>);
+  
+  const topSymptoms = fluxLogs.reduce((acc: any, l: any) => {
+    (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
+    return acc;
+  }, {} as Record<string,number>);
+  
+  const topSymList = Object.entries(topSymptoms).sort((a: any,b: any) => b[1]-a[1]).slice(0,5);
+
+  return (
                   <TouchableOpacity delayPressIn={0}
                     key={opt.label}
                     style={[styles.optRow, on && { backgroundColor: opt.color + '22', borderColor: opt.color }]}
@@ -223,7 +307,110 @@ export default function FluxScreen() {
               </Text>
             </View>
           </>
-        ) : (
+        {/* ── Insights Tab ── */}
+        {fluxActive && activeTab === 'insights' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>✦ Your Cycle Insights</Text>
+            <Text style={styles.cardSub}>Patterns from your logged data</Text>
+            <View style={{gap:12, marginTop:12}}>
+              <View style={{backgroundColor:Colors.parchmentDark, borderRadius:12, padding:12}}>
+                <Text style={{fontFamily:Fonts.sansMedium, fontSize:13, color:Colors.plum}}>Flow days logged</Text>
+                <Text style={{fontFamily:Fonts.serif, fontSize:36, color:Colors.rose}}>{fluxLogs.length}</Text>
+                <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>total entries in your history</Text>
+              </View>
+              <View style={{flexDirection:'row', gap:8}}>
+                {(['heavy','medium','light','spotting'] as const).map(flow => (
+                  <View key={flow} style={{flex:1, backgroundColor:Colors.parchmentDark, borderRadius:10, padding:8, alignItems:'center'}}>
+                    <Text style={{fontFamily:Fonts.serif, fontSize:22, color:Colors.rose}}>{flowCounts[flow]||0}</Text>
+                    <Text style={{fontFamily:Fonts.sans, fontSize:9, color:Colors.mist}}>{flow}</Text>
+                  </View>
+                ))}
+              </View>
+              {topSymList.length > 0 && (
+                <View style={{backgroundColor:Colors.parchmentDark, borderRadius:12, padding:12}}>
+                  <Text style={{fontFamily:Fonts.sansMedium, fontSize:13, color:Colors.plum, marginBottom:8}}>Most logged symptoms</Text>
+                  {topSymList.map(([sym, cnt]: any) => (
+                    <View key={sym} style={{flexDirection:'row', justifyContent:'space-between', marginBottom:4}}>
+                      <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum}}>{sym}</Text>
+                      <Text style={{fontFamily:Fonts.sansMedium, fontSize:12, color:Colors.rose}}>{cnt}×</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+              <View style={{backgroundColor:Colors.goldPale, borderRadius:12, padding:12}}>
+                <Text style={{fontFamily:Fonts.sansMedium, fontSize:13, color:Colors.plum}}>💡 Pattern insight</Text>
+                <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum, marginTop:4, lineHeight:18}}>
+                  {fluxLogs.length < 5
+                    ? 'Log at least 5 days to start seeing your patterns emerge.'
+                    : `You've logged ${symptomsThisMonth} symptoms this month. Keep tracking to see what correlates with your cycle phases.`}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ── Stats Tab ── */}
+        {fluxActive && activeTab === 'stats' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>📊 Cycle Statistics</Text>
+            <Text style={styles.cardSub}>Your personal data at a glance</Text>
+            <View style={{gap:10, marginTop:12}}>
+              {[
+                {label:'Total days tracked', value:fluxLogs.length, color:Colors.teal},
+                {label:'Heavy flow days', value:flowCounts['heavy']||0, color:Colors.rose},
+                {label:'Medium flow days', value:flowCounts['medium']||0, color:Colors.gold},
+                {label:'Light flow days', value:flowCounts['light']||0, color:Colors.sage},
+                {label:'Symptoms this month', value:symptomsThisMonth, color:Colors.plum},
+              ].map(stat => (
+                <View key={stat.label} style={{flexDirection:'row', justifyContent:'space-between',
+                  alignItems:'center', paddingVertical:10, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
+                  <Text style={{fontFamily:Fonts.sans, fontSize:13, color:Colors.plum}}>{stat.label}</Text>
+                  <Text style={{fontFamily:Fonts.serif, fontSize:22, color:stat.color}}>{stat.value}</Text>
+                </View>
+              ))}
+              <View style={{backgroundColor:Colors.sagePale, borderRadius:12, padding:12, marginTop:4}}>
+                <Text style={{fontFamily:Fonts.sansMedium, fontSize:12, color:Colors.sage}}>
+                  ✦ Every day you log makes your patterns clearer. Keep going.
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ── Cycle Tips (always visible when subscribed) ── */}
+        {fluxActive && activeTab === 'log' && fluxLogs.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>🌿 Phase support tips</Text>
+            <Text style={styles.cardSub}>What your body needs right now</Text>
+            <View style={{gap:8, marginTop:10}}>
+              {[
+                '💧 Stay hydrated — aim for 8+ glasses today',
+                '🥗 Focus on anti-inflammatory foods — leafy greens, omega-3s',
+                '🚶 Gentle movement helps regulate hormones',
+                '😴 Prioritize 7-9 hours of sleep during this phase',
+                '🧘 Stress directly impacts your cycle — try 5 minutes of breathing',
+              ].map((tip, i) => (
+                <Text key={i} style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum, lineHeight:18}}>
+                  {tip}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* ── Placeholder for non-log tabs when no data ── */}
+        {fluxActive && activeTab !== 'log' && fluxLogs.length === 0 && (
+          <View style={[styles.card, {alignItems:'center', paddingVertical:32}]}>
+            <Text style={{fontSize:32, marginBottom:12}}>📋</Text>
+            <Text style={{fontFamily:Fonts.sansMedium, fontSize:15, color:Colors.plum, marginBottom:8}}>No data yet</Text>
+            <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, textAlign:'center'}}>
+              Start logging your flow in the Log tab to unlock insights and statistics.
+            </Text>
+          </View>
+        )}
+
+        {/* ── Original paywall ── */}
+        {!fluxActive && (
           <>
             {/* Pain-led hero */}
             <View style={styles.heroCard}>
