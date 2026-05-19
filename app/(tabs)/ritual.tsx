@@ -74,6 +74,9 @@ export default function RitualScreen() {
     pct(totals.omega3, pd.targets.omega3)
   ) / 4);
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
+  const triggerInsight = detectTriggers(velaHistory);
+  const totalSymptoms = velaHistory.slice(-7).reduce((a: number, e: any) => a + (e.symptoms ? e.symptoms.length : 0), 0);
+  const avgSleep = sleepHistory.length > 0 ? Math.round(sleepHistory.slice(-7).reduce((a: number, e: any) => a + (e.quality || 0), 0) / Math.min(7, sleepHistory.length)) : 0;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const greetingEmoji = hour < 12 ? "🌿" : hour < 17 ? "☀️" : "🌙";
@@ -148,6 +151,30 @@ export default function RitualScreen() {
           <Text style={styles.ritualText}>{pd.ritual}</Text>
         </View>
 
+        {velaHistory.length > 0 && (
+          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
+            {([
+              { label: 'Streak', value: streak > 0 ? String(streak) + ' days' : '0', color: Colors.gold },
+              { label: 'Symptoms', value: String(totalSymptoms), color: Colors.rose },
+              { label: 'Sleep', value: avgSleep === 0 ? '-' : avgSleep <= 2 ? 'poor' : avgSleep === 3 ? 'good' : 'great', color: Colors.teal },
+              { label: 'Days', value: String(velaHistory.length), color: Colors.sage },
+            ] as Array<{label:string,value:string,color:string}>).map(stat => (
+              <View key={stat.label} style={{ flex: 1, backgroundColor: Colors.cream, borderRadius: 14, padding: 12, alignItems: 'center', borderWidth: 0.5, borderColor: Colors.parchmentDark }}>
+                <Text style={{ fontFamily: Fonts.serif, fontSize: 20, color: stat.color, marginBottom: 3 }}>{stat.value}</Text>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 9, color: Colors.mist, textAlign: 'center' }}>{stat.label}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+        {triggerInsight != null && (
+          <View style={{ backgroundColor: '#FDF3DC', borderRadius: 16, padding: 16, marginBottom: 14, borderLeftWidth: 3, borderLeftColor: Colors.gold, flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+            <Text style={{ fontSize: 18, marginTop: 1 }}>{'💡'}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.plum, marginBottom: 4, letterSpacing: 1, textTransform: 'uppercase' }}>Pattern detected</Text>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.plum, lineHeight: 20 }}>{triggerInsight}</Text>
+            </View>
+          </View>
+        )}
         <View style={styles.weeklyCard}>
           <Text style={styles.weeklyTitle}>This week</Text>
           <View style={styles.weeklyRow}>
