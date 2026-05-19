@@ -1,191 +1,200 @@
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Alert, Linking } from 'react-native';
+import { useState, useMemo } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
 import * as Haptics from 'expo-haptics';
 import { Colors, Fonts } from '../../constants/Colors';
 import { useVelaStore } from '../../hooks/useVelaStore';
 
 const RC_API_KEY = 'appl_ZXvRoLscVYwTsOwsgaswQuLvRgC';
 
-const TESTIMONIALS = [
-  { text: '"Finally something built for MY body, not a 25-year-old."', name: 'Sarah, 47' },
-  { text: '"My doctor was blown away by my 90-day report."', name: 'Maria, 52' },
-  { text: '"I finally know what\'s triggering my symptoms."', name: 'Jennifer, 44' },
+const FLOW_OPTIONS = ['spotting', 'light', 'medium', 'heavy'] as const;
+type FlowType = typeof FLOW_OPTIONS[number];
+
+const SYMPTOMS = [
+  'Hot flash', 'Night sweat', 'Brain fog', 'Mood swing',
+  'Fatigue', 'Insomnia', 'Headache', 'Joint pain',
+  'Anxiety', 'Bloating', 'Heart palpitations', 'Low libido',
 ];
 
-const FLOW_OPTIONS = [
-  { label: 'Light spotting', color: Colors.rose + '80' },
-  { label: 'Light flow', color: Colors.rose + 'AA' },
-  { label: 'Moderate flow', color: Colors.rose },
-  { label: 'Heavy flow', color: '#8B1A1A' },
-  { label: 'No period', color: Colors.mist },
-  { label: 'Skipped month', color: Colors.gold },
-  { label: 'Irregular', color: Colors.plumLight ?? '#7B5EA7' },
-];
+const FLOW_COLORS: Record<string, string> = {
+  spotting: '#E8C5C5',
+  light: '#D4877E',
+  medium: Colors.rose,
+  heavy: '#8B3A3A',
+};
 
-function predictNextPeriod(logs: any[]): string | null {
-  // Get logs that have period symptoms
-  const periodLogs = logs.filter(l =>
-    l.symptoms.some((s: string) => ['Heavy flow','Moderate flow','Light flow','Light spotting'].includes(s))
-  ).sort((a: any, b: any) => a.date.localeCompare(b.date));
-
-  if (periodLogs.length < 2) return null;
-
-  // Calculate average cycle length from last 3 cycles
-  const cycleLengths: number[] = [];
-  for (let i = 1; i < Math.min(periodLogs.length, 4); i++) {
-    const prev = new Date(periodLogs[i-1].date);
-    const curr = new Date(periodLogs[i].date);
-    const diff = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24));
-    if (diff > 15 && diff < 90) cycleLengths.push(diff);
-  }
-
-  if (cycleLengths.length === 0) return null;
-
-  const avgCycle = Math.round(cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length);
-  const lastPeriod = new Date(periodLogs[periodLogs.length - 1].date);
-  const predicted = new Date(lastPeriod);
-  predicted.setDate(predicted.getDate() + avgCycle);
-
-  const today = new Date();
-  const daysUntil = Math.round((predicted.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (daysUntil < 0) return `${Math.abs(daysUntil)} days late (avg cycle: ${avgCycle} days)`;
-  if (daysUntil === 0) return 'Expected today';
-  if (daysUntil <= 3) return `In ${daysUntil} day${daysUntil !== 1 ? 's' : ''} — coming soon`;
-  return `In ~${daysUntil} days (avg cycle: ${avgCycle} days)`;
-}
+const PHASE_TIPS: Record<string, { title: string; tips: string[] }> = {
+  early: {
+    title: 'Early perimenopause',
+    tips: [
+      'Cycles may start varying — this is normal',
+      'Track mood changes around ovulation',
+      'Magnesium can help with sleep disruptions starting now',
+      'Strength training helps protect bone density from now on',
+    ],
+  },
+  mid: {
+    title: 'Mid perimenopause',
+    tips: [
+      'Hot flashes may peak during this phase — track triggers',
+      'Progesterone naturally declines — prioritize sleep',
+      'Increase calcium and vitamin D intake',
+      'Consider tracking cycle length changes monthly',
+    ],
+  },
+  late: {
+    title: 'Late perimenopause',
+    tips: [
+      'Cycles become more irregular — gaps are normal',
+      'Vaginal dryness may appear — hydration helps',
+      'Heart health becomes more important as estrogen drops',
+      'Consider discussing options with your doctor',
+    ],
+  },
+  post: {
+    title: 'Post-menopause',
+    tips: [
+      'Focus on bone density — weight-bearing exercise is key',
+      'Heart disease risk increases — track blood pressure',
+      'Sleep architecture changes — CoolDown breathing helps',
+      'Annual bone density screening is recommended',
+    ],
+  },
+};
 
 export default function FluxScreen() {
-  const { fluxActive, fluxLogs, setFluxLogs, unlockFlux, startFluxTrial } = useVelaStore();
-  const [showPaywall, setShowPaywall] = useState(false);
+  const { fluxActive, fluxLogs, setFluxLogs, unlockFlux, startFluxTrial, startBundleTrial, unlockBundle, bundleActive, phase } = useVelaStore();
+  const [pkg, setPkg] = useState<any>(null);
+  const [bundlePkg, setBundlePkg] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
-  const [showStats, setShowStats] = useState(false);
-  const [showInsights, setShowInsights] = useState(false);
-  const [activeTab, setActiveTab] = useState<'log'|'calendar'|'insights'|'stats'>('log');
-  const [selectedFlow, setSelectedFlow] = useState<string | null>(null);
-  const [testimonialIdx, setTestimonialIdx] = useState(0);
-  const [cycleInsight, setCycleInsight] = useState<string | null>(null);
-
+  const [activeTab, setActiveTab] = useState<'log' | 'calendar' | 'insights' | 'stats'>('log');
+  const [selectedFlow, setSelectedFlow] = useState<FlowType | null>(null);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [todayLogged, setTodayLogged] = useState(false);
 
   useEffect(() => {
-    loadOffering();
-    // Load today's saved flow
-    const todayKey = '@vela_flow_' + new Date().toISOString().split('T')[0];
-    AsyncStorage.getItem(todayKey).then(val => { if (val) setSelectedFlow(val); });
-    const t = setInterval(() => setTestimonialIdx(i => (i + 1) % TESTIMONIALS.length), 4000);
-    // ── Computed insights from logged data ──────────────
-  const totalCycles = fluxLogs.filter((l: any) => l.flow === 'heavy' || l.flow === 'medium').length;
-  const avgCycleLength = fluxLogs.length > 14 ? 28 : 0; // simplified
-  const symptomsThisMonth = fluxLogs.filter((l: any) => {
-    const d = new Date(l.date);
-    const now = new Date();
-    return d.getMonth() === now.getMonth();
-  }).reduce((acc: any, l: any) => acc + (l.symptoms?.length || 0), 0);
-  
-  const flowCounts = fluxLogs.reduce((acc: any, l: any) => {
-    if (l.flow) acc[l.flow] = (acc[l.flow] || 0) + 1;
-    return acc;
-  }, {} as Record<string,number>);
-  
-  const topSymptoms = fluxLogs.reduce((acc: any, l: any) => {
-    (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
-    return acc;
-  }, {} as Record<string,number>);
-  
-  const topSymList = Object.entries(topSymptoms).sort((a: any,b: any) => b[1]-a[1]).slice(0,5);
-
-  return () => clearInterval(t);
+    Purchases.configure({ apiKey: RC_API_KEY });
+    (async () => {
+      try {
+        const offerings = await Purchases.getOfferings();
+        let found: PurchasesPackage | null = offerings.all['fluxlog']?.availablePackages[0] ?? null;
+        if (!found) found = offerings.current?.availablePackages.find(
+          p => p.product.identifier === 'com.velawellness.app.fluxlog_monthly'
+        ) ?? null;
+        if (found != null) setPkg(found as PurchasesPackage);
+        let bundle = offerings.all['bundle']?.availablePackages[0] ?? offerings.current?.availablePackages.find(p => p.product.identifier === 'com.velawellness.app.bundle_monthly') ?? null;
+        if (bundle != null) setBundlePkg(bundle as PurchasesPackage);
+      } catch {}
+    })();
   }, []);
 
-  const getCycleInsight = () => {
-    const insights: Record<string, string> = {
-      'Light spotting': 'Spotting between cycles is very common in perimenopause — estrogen fluctuations cause the lining to shed irregularly. Track it consistently; if it continues for 3+ months, bring your log to your doctor.',
-      'Light flow': 'Lighter periods often mean your cycle is changing — this is normal in early perimenopause. Staying hydrated and reducing stress can help regulate things.',
-      'Moderate flow': 'Moderate flow is your body in transition. Magnesium-rich foods like pumpkin seeds and dark chocolate can help reduce cramping and mood dips.',
-      'Heavy flow': 'Heavy flow can cause iron depletion — add iron-rich foods like lentils, spinach, and red meat this week. If soaking through pads hourly, talk to your doctor.',
-      'No period': 'A skipped period is one of the hallmark signs of perimenopause. Track the date — this data is valuable for your doctor and for understanding your pattern.',
-      'Skipped month': 'Skipped months become more frequent as you move through perimenopause. This is your body shifting. Log every occurrence — patterns emerge over 3–6 months.',
-      'Irregular': 'Irregular cycles are the norm in perimenopause, not the exception. Reducing caffeine and alcohol can help stabilize frequency. Keep logging — consistency is key.',
-    };
-    const insight = insights[selectedFlow ?? ''] ?? 'Every log you make builds a clearer picture of your hormonal pattern. Keep going — data is power.';
-    setCycleInsight(insight);
-  };
-
-  const loadOffering = async () => {
-    try {
-      const offerings = await Purchases.getOfferings();
-      let found = null;
-      const allOfferings = Object.values(offerings.all);
-      for (const offering of allOfferings) {
-        const match = offering.availablePackages.find(
-          p => p.product.identifier === 'com.velawellness.app.fluxlog_monthly'
-        );
-        if (match) { found = match; break; }
-      }
-      if (!found) found = offerings.current?.availablePackages.find(
-        p => p.product.identifier === 'com.velawellness.app.fluxlog_monthly'
-      ) ?? null;
-      if (found) setPkg(found);
-    } catch (e) { /* offerings unavailable */ }
-  };
-
   const handlePurchase = async () => {
-    if (!pkg) { Alert.alert('Not available', 'Purchase unavailable right now. Try again later.'); return; }
+    if (!pkg) return;
     setLoading(true);
     try {
-      await Purchases.purchasePackage(pkg);
+      await Purchases.purchasePackage(pkg as PurchasesPackage);
       await unlockFlux();
-      setShowPaywall(false);
-      Alert.alert('Welcome to FluxLog ◎', 'Your cycle tracking is now unlocked.');
-    } catch (e: any) {
-      if (!e.userCancelled) Alert.alert('Purchase failed', e.message ?? 'Something went wrong.');
-    } finally { setLoading(false); }
-  };
-
-  const handleTrial = async () => {
-    await startFluxTrial();
-    setShowPaywall(false);
+    } catch {}
+    setLoading(false);
   };
 
   const handleRestore = async () => {
     setLoading(true);
     try {
-      const customerInfo = await Purchases.restorePurchases();
-      if (customerInfo.entitlements.active['fluxlog']) {
-        await unlockFlux();
-        setShowPaywall(false);
-        Alert.alert('Restored', 'Your FluxLog access has been restored.');
-      } else { Alert.alert('Nothing to restore', 'No previous FluxLog purchase found.'); }
-    } catch (e: any) { Alert.alert('Restore failed', e.message ?? 'Could not restore purchases.');
-    } finally { setLoading(false); }
+      const info = await Purchases.restorePurchases();
+      if (info.entitlements.active['fluxlog']) await unlockFlux();
+    } catch {}
+    setLoading(false);
   };
 
-  const price = pkg?.product.priceString ?? '$4.99';
+  const handleTrial = async () => {
+    await startBundleTrial();
+  };
 
-  // ── Computed insights from logged data ──────────────
-  const totalCycles = fluxLogs.filter((l: any) => l.flow === 'heavy' || l.flow === 'medium').length;
-  const avgCycleLength = fluxLogs.length > 14 ? 28 : 0; // simplified
-  const symptomsThisMonth = fluxLogs.filter((l: any) => {
-    const d = new Date(l.date);
-    const now = new Date();
-    return d.getMonth() === now.getMonth();
-  }).reduce((acc: any, l: any) => acc + (l.symptoms?.length || 0), 0);
-  
-  const flowCounts = fluxLogs.reduce((acc: any, l: any) => {
+  const handleBundlePurchase = async () => {
+    if (!bundlePkg) return;
+    setLoading(true);
+    try {
+      await Purchases.purchasePackage(bundlePkg as PurchasesPackage);
+      await unlockBundle();
+    } catch {}
+    setLoading(false);
+  };
+
+  const logToday = async () => {
+    if (!selectedFlow && selectedSymptoms.length === 0) return;
+    const today = new Date().toISOString().split('T')[0];
+    const entry = {
+      date: today,
+      flow: selectedFlow,
+      symptoms: selectedSymptoms,
+    };
+    const updated = [...(fluxLogs || []).filter((l: any) => l.date !== today), entry];
+    await setFluxLogs(updated);
+    setTodayLogged(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
+  const toggleSymptom = (s: string) => {
+    setSelectedSymptoms(prev =>
+      prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+    );
+  };
+
+  // ── Computed stats ──────────────────────────────────────────
+  const logs = fluxLogs || [];
+  const today = new Date().toISOString().split('T')[0];
+  const thisMonth = new Date().getMonth();
+
+  const flowCounts = useMemo(() => logs.reduce((acc: any, l: any) => {
     if (l.flow) acc[l.flow] = (acc[l.flow] || 0) + 1;
     return acc;
-  }, {} as Record<string,number>);
-  
-  const topSymptoms = fluxLogs.reduce((acc: any, l: any) => {
-    (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
-    return acc;
-  }, {} as Record<string,number>);
-  
-  const topSymList = Object.entries(topSymptoms).sort((a: any,b: any) => b[1]-a[1]).slice(0,5);
+  }, {} as Record<string, number>), [logs]);
+
+  const topSymptoms = useMemo(() => {
+    const counts = logs.reduce((acc: any, l: any) => {
+      (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
+      return acc;
+    }, {} as Record<string, number>);
+    return Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]).slice(0, 5);
+  }, [logs]);
+
+  const symptomsThisMonth = useMemo(() => logs.filter((l: any) => {
+    return new Date(l.date).getMonth() === thisMonth;
+  }).reduce((acc: number, l: any) => acc + (l.symptoms?.length || 0), 0), [logs]);
+
+  const last7Days = useMemo(() => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const log = logs.find((l: any) => l.date === dateStr);
+      days.push({ date: dateStr, log, label: d.toLocaleDateString('en', { weekday: 'short' }) });
+    }
+    return days;
+  }, [logs]);
+
+  const phaseTip = PHASE_TIPS[phase ?? 'late'];
+
+  // ── Calendar grid ────────────────────────────────────────────
+  const calendarDays = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const days = [];
+    for (let i = 0; i < firstDay; i++) days.push(null);
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      const log = logs.find((l: any) => l.date === dateStr);
+      days.push({ day: i, dateStr, log });
+    }
+    return days;
+  }, [logs]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -195,155 +204,228 @@ export default function FluxScreen() {
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
-        <Text style={styles.pageTitle}>FluxLog ◎</Text>
-        <Text style={styles.pageSub}>Cycle tracking designed for the peri years.</Text>
 
-        {/* ── Tab bar ── */}
+        {/* ── Page header ── */}
+        <View style={{ marginBottom: 16 }}>
+          <Text style={styles.pageTitle}>FluxLog ◎</Text>
+          <Text style={styles.pageSub}>Track your cycle through perimenopause</Text>
+          {fluxActive && logs.length > 0 && (
+            <View style={{ backgroundColor: Colors.rosePale ?? '#FDECEA', borderRadius: 12, padding: 10, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16 }}>◎</Text>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.rose }}>
+                {logs.length} day{logs.length !== 1 ? 's' : ''} tracked · {topSymptoms.length} symptom pattern{topSymptoms.length !== 1 ? 's' : ''} identified
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* ── Tab bar (subscribers only) ── */}
         {fluxActive && (
-          <View style={{flexDirection:'row', backgroundColor:Colors.parchmentDark, borderRadius:30, padding:3, marginBottom:12}}>
-            {([
-              {id:'log', label:'📋 Log'},
-              {id:'calendar', label:'📅 Calendar'},
-              {id:'insights', label:'✦ Insights'},
-              {id:'stats', label:'📊 Stats'},
-            ] as const).map(t => (
-              <TouchableOpacity delayPressIn={0} key={t.id} onPress={() => setActiveTab(t.id)}
-                style={{flex:1, paddingVertical:8, borderRadius:28, alignItems:'center',
-                  backgroundColor: activeTab===t.id ? Colors.plum : 'transparent'}}>
-                <Text style={{fontFamily:Fonts.sans, fontSize:10, color: activeTab===t.id ? Colors.parchment : Colors.mist}}>{t.label}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={{ flexDirection: 'row', backgroundColor: Colors.parchmentDark, borderRadius: 30, padding: 3, marginBottom: 16 }}>
+            {(['log', 'calendar', 'insights', 'stats'] as const).map(t => {
+              const labels: Record<string, string> = { log: '📋 Log', calendar: '📅 Calendar', insights: '✦ Insights', stats: '📊 Stats' };
+              return (
+                <TouchableOpacity delayPressIn={0} key={t} onPress={() => setActiveTab(t)}
+                  style={{ flex: 1, paddingVertical: 8, borderRadius: 28, alignItems: 'center', backgroundColor: activeTab === t ? Colors.plum : 'transparent' }}>
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: activeTab === t ? Colors.parchment : Colors.mist }}>{labels[t]}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
 
-        {fluxActive ? (
-          <>
+        {/* ── Log Tab ── */}
+        {(!fluxActive || activeTab === 'log') && fluxActive && (
+          <View>
+            {/* Today's log */}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>How is your flow today?</Text>
-              <Text style={styles.cardSub}>Tap to log. Patterns emerge over time.</Text>
-              {FLOW_OPTIONS.map(opt => {
-                const on = selectedFlow === opt.label;
-                // ── Computed insights from logged data ──────────────
-  const totalCycles = fluxLogs.filter((l: any) => l.flow === 'heavy' || l.flow === 'medium').length;
-  const avgCycleLength = fluxLogs.length > 14 ? 28 : 0; // simplified
-  const symptomsThisMonth = fluxLogs.filter((l: any) => {
-    const d = new Date(l.date);
-    const now = new Date();
-    return d.getMonth() === now.getMonth();
-  }).reduce((acc: any, l: any) => acc + (l.symptoms?.length || 0), 0);
-  
-  const flowCounts = fluxLogs.reduce((acc: any, l: any) => {
-    if (l.flow) acc[l.flow] = (acc[l.flow] || 0) + 1;
-    return acc;
-  }, {} as Record<string,number>);
-  
-  const topSymptoms = fluxLogs.reduce((acc: any, l: any) => {
-    (l.symptoms || []).forEach((s: string) => { acc[s] = (acc[s] || 0) + 1; });
-    return acc;
-  }, {} as Record<string,number>);
-  
-  const topSymList = Object.entries(topSymptoms).sort((a: any,b: any) => b[1]-a[1]).slice(0,5);
-
-  return (
-                  <TouchableOpacity delayPressIn={0}
-                    key={opt.label}
-                    style={[styles.optRow, on && { backgroundColor: opt.color + '22', borderColor: opt.color }]}
-                    onPress={async () => {
-                    const next = on ? null : opt.label;
-                    setSelectedFlow(next);
-                    const todayKey = '@vela_flow_' + new Date().toISOString().split('T')[0];
-                    if (next) await AsyncStorage.setItem(todayKey, next);
-                    else await AsyncStorage.removeItem(todayKey);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.optDot, { borderColor: opt.color, backgroundColor: on ? opt.color : 'transparent' }]} />
-                    <Text style={[styles.optText, on && { color: Colors.plum, fontFamily: Fonts.sansMedium }]}>{opt.label}</Text>
-                    {on && <Text style={{ color: opt.color }}>✓</Text>}
+              <Text style={styles.cardSub}>{new Date().toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, marginBottom: 16 }}>
+                {FLOW_OPTIONS.map(f => (
+                  <TouchableOpacity delayPressIn={0} key={f} onPress={() => setSelectedFlow(selectedFlow === f ? null : f)}
+                    style={{ flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center', borderWidth: 1.5,
+                      borderColor: selectedFlow === f ? FLOW_COLORS[f] : Colors.parchmentDark,
+                      backgroundColor: selectedFlow === f ? FLOW_COLORS[f] + '22' : 'transparent' }}>
+                    <Text style={{ fontSize: 16, marginBottom: 2 }}>
+                      {f === 'spotting' ? '🩸' : f === 'light' ? '💧' : f === 'medium' ? '🌊' : '🌧'}
+                    </Text>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: selectedFlow === f ? Colors.plum : Colors.mist }}>{f}</Text>
                   </TouchableOpacity>
-                );
-              })}
-            </View>
+                ))}
+              </View>
 
-            {selectedFlow && (
-              <TouchableOpacity delayPressIn={0} style={{backgroundColor:Colors.plum,borderRadius:14,paddingVertical:10,paddingHorizontal:16,marginBottom:8,alignItems:'center'}} onPress={getCycleInsight} activeOpacity={0.85}>
-                <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.parchment}}>✦ What does this mean?</Text>
+              <Text style={[styles.cardSub, { marginBottom: 10, color: Colors.plum }]}>Symptoms today</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
+                {SYMPTOMS.map(s => (
+                  <TouchableOpacity delayPressIn={0} key={s} onPress={() => toggleSymptom(s)}
+                    style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 100, borderWidth: 1,
+                      borderColor: selectedSymptoms.includes(s) ? Colors.rose : Colors.parchmentDark,
+                      backgroundColor: selectedSymptoms.includes(s) ? Colors.rose + '18' : 'transparent' }}>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: selectedSymptoms.includes(s) ? Colors.rose : Colors.mist }}>{s}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity delayPressIn={0} onPress={logToday}
+                style={{ backgroundColor: todayLogged ? Colors.sage : Colors.plum, borderRadius: 20, padding: 14, alignItems: 'center', marginTop: 16 }}>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 14, color: Colors.parchment }}>
+                  {todayLogged ? '✓ Logged for today' : 'Save today\'s log'}
+                </Text>
               </TouchableOpacity>
-            )}
-            {cycleInsight && (
-              <View style={{backgroundColor:'#F0EBF5',borderRadius:14,padding:14,marginBottom:8,borderWidth:1,borderColor:Colors.plum}}>
-                <Text style={{fontFamily:Fonts.sansMedium,fontSize:10,color:Colors.plum,letterSpacing:2,marginBottom:6}}>✦ VELA INSIGHT</Text>
-                <Text style={{fontFamily:Fonts.sans,fontSize:13,color:Colors.plum,lineHeight:20}}>{cycleInsight}</Text>
-                <TouchableOpacity delayPressIn={0} onPress={() => setCycleInsight(null)}><Text style={{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,marginTop:8,textAlign:'right'}}>dismiss</Text></TouchableOpacity>
-              </View>
-            )}
-            {selectedFlow && (
-              <View style={{ backgroundColor: Colors.sagePale ?? '#EEF5EE', borderRadius: 14, padding: 12, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Text style={{ color: Colors.sage, fontFamily: Fonts.sans, fontSize: 13 }}>✓ Logged today: {selectedFlow} — great consistency!</Text>
-              </View>
-            )}
+            </View>
 
+            {/* Phase support */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Cycle insights</Text>
-              <Text style={styles.cardSub}>Patterns emerge after a few weeks of logging.</Text>
-              {[
-                { label: 'Days tracked this month', val: `${Object.keys(AsyncStorage).length || 0}` },
-                { label: 'Current flow', val: selectedFlow ?? '—' },
-                { label: 'Last logged', val: 'Today' },
-                { label: 'Streak', val: selectedFlow ? 'Active' : '—' },
-              ].map(item => (
-                <View key={item.label} style={styles.insightRow}>
-                  <Text style={styles.insightLabel}>{item.label}</Text>
-                  <Text style={styles.insightVal}>{item.val}</Text>
-                </View>
-              ))}
-            </View>
-
-            <View style={[styles.card, { backgroundColor: Colors.tealPale ?? '#E8F4F2', borderColor: Colors.teal }]}>
-              <Text style={[styles.cardTitle, { color: Colors.teal }]}>Why tracking now matters</Text>
-              <Text style={[styles.cardSub, { color: Colors.plum, marginBottom: 0 }]}>
-                Perimenopause cycles are unpredictable by design — but your patterns tell a story. 90 days of data gives you and your doctor something real to work with. Most women wish they'd started logging sooner.
-              </Text>
-            </View>
-          </>
-        {/* ── Insights Tab ── */}
-        {fluxActive && activeTab === 'insights' && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>✦ Your Cycle Insights</Text>
-            <Text style={styles.cardSub}>Patterns from your logged data</Text>
-            <View style={{gap:12, marginTop:12}}>
-              <View style={{backgroundColor:Colors.parchmentDark, borderRadius:12, padding:12}}>
-                <Text style={{fontFamily:Fonts.sansMedium, fontSize:13, color:Colors.plum}}>Flow days logged</Text>
-                <Text style={{fontFamily:Fonts.serif, fontSize:36, color:Colors.rose}}>{fluxLogs.length}</Text>
-                <Text style={{fontFamily:Fonts.sans, fontSize:11, color:Colors.mist}}>total entries in your history</Text>
-              </View>
-              <View style={{flexDirection:'row', gap:8}}>
-                {(['heavy','medium','light','spotting'] as const).map(flow => (
-                  <View key={flow} style={{flex:1, backgroundColor:Colors.parchmentDark, borderRadius:10, padding:8, alignItems:'center'}}>
-                    <Text style={{fontFamily:Fonts.serif, fontSize:22, color:Colors.rose}}>{flowCounts[flow]||0}</Text>
-                    <Text style={{fontFamily:Fonts.sans, fontSize:9, color:Colors.mist}}>{flow}</Text>
+              <Text style={styles.cardTitle}>🌿 {phaseTip.title}</Text>
+              <Text style={styles.cardSub}>What your body needs right now</Text>
+              <View style={{ gap: 8, marginTop: 10 }}>
+                {phaseTip.tips.map((tip, i) => (
+                  <View key={i} style={{ flexDirection: 'row', gap: 8 }}>
+                    <Text style={{ color: Colors.teal, fontSize: 12, marginTop: 2 }}>✦</Text>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.plum, flex: 1, lineHeight: 18 }}>{tip}</Text>
                   </View>
                 ))}
               </View>
-              {topSymList.length > 0 && (
-                <View style={{backgroundColor:Colors.parchmentDark, borderRadius:12, padding:12}}>
-                  <Text style={{fontFamily:Fonts.sansMedium, fontSize:13, color:Colors.plum, marginBottom:8}}>Most logged symptoms</Text>
-                  {topSymList.map(([sym, cnt]: any) => (
-                    <View key={sym} style={{flexDirection:'row', justifyContent:'space-between', marginBottom:4}}>
-                      <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum}}>{sym}</Text>
-                      <Text style={{fontFamily:Fonts.sansMedium, fontSize:12, color:Colors.rose}}>{cnt}×</Text>
+            </View>
+
+            {/* Last 7 days */}
+            {logs.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Last 7 days</Text>
+                <View style={{ flexDirection: 'row', gap: 6, marginTop: 10 }}>
+                  {last7Days.map((d, i) => (
+                    <View key={i} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
+                      <Text style={{ fontFamily: Fonts.sans, fontSize: 9, color: Colors.mist }}>{d.label}</Text>
+                      <View style={{ width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
+                        backgroundColor: d.log?.flow ? FLOW_COLORS[d.log.flow] + '33' : Colors.parchmentDark,
+                        borderWidth: d.date === today ? 2 : 0, borderColor: Colors.plum }}>
+                        <Text style={{ fontSize: d.log?.flow ? 14 : 10 }}>
+                          {d.log?.flow ? (d.log.flow === 'spotting' ? '🩸' : d.log.flow === 'light' ? '💧' : d.log.flow === 'medium' ? '🌊' : '🌧') : '·'}
+                        </Text>
+                      </View>
+                      {d.log?.symptoms && d.log.symptoms.length > 0 && (
+                        <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.rose }} />
+                      )}
                     </View>
                   ))}
                 </View>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* ── Calendar Tab ── */}
+        {fluxActive && activeTab === 'calendar' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>📅 {new Date().toLocaleDateString('en', { month: 'long', year: 'numeric' })}</Text>
+            <Text style={styles.cardSub}>Your cycle this month</Text>
+            <View style={{ flexDirection: 'row', marginTop: 12, marginBottom: 4 }}>
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                <Text key={i} style={{ flex: 1, textAlign: 'center', fontFamily: Fonts.sansMedium, fontSize: 10, color: Colors.mist }}>{d}</Text>
+              ))}
+            </View>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+              {calendarDays.map((d, i) => (
+                <View key={i} style={{ width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 2 }}>
+                  {d ? (
+                    <View style={{ width: '100%', aspectRatio: 1, borderRadius: 100, alignItems: 'center', justifyContent: 'center',
+                      backgroundColor: d.log?.flow ? FLOW_COLORS[d.log.flow] + '33' : 'transparent',
+                      borderWidth: d.dateStr === today ? 2 : 0, borderColor: Colors.plum }}>
+                      <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: d.log ? Colors.plum : Colors.mist }}>{d.day}</Text>
+                      {d.log?.symptoms && d.log.symptoms.length > 0 && (
+                        <View style={{ position: 'absolute', bottom: 2, width: 3, height: 3, borderRadius: 2, backgroundColor: Colors.rose }} />
+                      )}
+                    </View>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
+              {Object.entries(FLOW_COLORS).map(([f, c]) => (
+                <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: c + '66' }} />
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>{f}</Text>
+                </View>
+              ))}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.rose }} />
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>symptoms</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ── Insights Tab ── */}
+        {fluxActive && activeTab === 'insights' && (
+          <View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>✦ Your Cycle Insights</Text>
+              <Text style={styles.cardSub}>Patterns from your logged data</Text>
+              {logs.length < 5 ? (
+                <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                  <Text style={{ fontSize: 32, marginBottom: 10 }}>◎</Text>
+                  <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 14, color: Colors.plum, marginBottom: 6 }}>Keep logging</Text>
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist, textAlign: 'center', lineHeight: 18 }}>
+                    Log at least 5 days to start seeing your patterns. You have {logs.length} so far.
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ gap: 12, marginTop: 12 }}>
+                  <View style={{ backgroundColor: Colors.parchmentDark, borderRadius: 12, padding: 12 }}>
+                    <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 12, color: Colors.plum, marginBottom: 8 }}>Flow breakdown</Text>
+                    {Object.entries(FLOW_COLORS).map(([f, c]) => (
+                      flowCounts[f] > 0 ? (
+                        <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist, width: 56 }}>{f}</Text>
+                          <View style={{ flex: 1, height: 6, backgroundColor: Colors.parchment, borderRadius: 3, overflow: 'hidden' }}>
+                            <View style={{ height: 6, backgroundColor: c, borderRadius: 3, width: `${(flowCounts[f] / logs.length) * 100}%` }} />
+                          </View>
+                          <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.plum, width: 20 }}>{flowCounts[f]}</Text>
+                        </View>
+                      ) : null
+                    ))}
+                  </View>
+
+                  {topSymptoms.length > 0 && (
+                    <View style={{ backgroundColor: Colors.parchmentDark, borderRadius: 12, padding: 12 }}>
+                      <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 12, color: Colors.plum, marginBottom: 8 }}>Top symptoms</Text>
+                      {topSymptoms.map(([sym, cnt]: any) => (
+                        <View key={sym} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.plum }}>{sym}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <View style={{ width: 60, height: 4, backgroundColor: Colors.parchment, borderRadius: 2, overflow: 'hidden' }}>
+                              <View style={{ height: 4, backgroundColor: Colors.rose, borderRadius: 2, width: `${(cnt / logs.length) * 100}%` }} />
+                            </View>
+                            <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.rose }}>{cnt}×</Text>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  <View style={{ backgroundColor: Colors.goldPale ?? '#FDF3DC', borderRadius: 12, padding: 12 }}>
+                    <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 12, color: Colors.plum }}>💡 Pattern insight</Text>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.plum, marginTop: 6, lineHeight: 18 }}>
+                      {symptomsThisMonth > 0
+                        ? `You logged ${symptomsThisMonth} symptoms this month. ${topSymptoms[0] ? `${topSymptoms[0][0]} appears most frequently.` : ''} Keep tracking to see what correlates with your cycle phases.`
+                        : 'No symptoms logged this month — great! Keep tracking to build a complete picture.'}
+                    </Text>
+                  </View>
+                </View>
               )}
-              <View style={{backgroundColor:Colors.goldPale, borderRadius:12, padding:12}}>
-                <Text style={{fontFamily:Fonts.sansMedium, fontSize:13, color:Colors.plum}}>💡 Pattern insight</Text>
-                <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum, marginTop:4, lineHeight:18}}>
-                  {fluxLogs.length < 5
-                    ? 'Log at least 5 days to start seeing your patterns emerge.'
-                    : `You've logged ${symptomsThisMonth} symptoms this month. Keep tracking to see what correlates with your cycle phases.`}
-                </Text>
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>🌿 Phase tips</Text>
+              <Text style={styles.cardSub}>{phaseTip.title}</Text>
+              <View style={{ gap: 8, marginTop: 10 }}>
+                {phaseTip.tips.map((tip, i) => (
+                  <View key={i} style={{ flexDirection: 'row', gap: 8 }}>
+                    <Text style={{ color: Colors.teal, fontSize: 12, marginTop: 2 }}>✦</Text>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.plum, flex: 1, lineHeight: 18 }}>{tip}</Text>
+                  </View>
+                ))}
               </View>
             </View>
           </View>
@@ -354,258 +436,131 @@ export default function FluxScreen() {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>📊 Cycle Statistics</Text>
             <Text style={styles.cardSub}>Your personal data at a glance</Text>
-            <View style={{gap:10, marginTop:12}}>
+            <View style={{ gap: 0, marginTop: 12 }}>
               {[
-                {label:'Total days tracked', value:fluxLogs.length, color:Colors.teal},
-                {label:'Heavy flow days', value:flowCounts['heavy']||0, color:Colors.rose},
-                {label:'Medium flow days', value:flowCounts['medium']||0, color:Colors.gold},
-                {label:'Light flow days', value:flowCounts['light']||0, color:Colors.sage},
-                {label:'Symptoms this month', value:symptomsThisMonth, color:Colors.plum},
+                { label: 'Total days tracked', value: logs.length, color: Colors.teal, emoji: '◎' },
+                { label: 'Heavy flow days', value: flowCounts['heavy'] || 0, color: Colors.rose, emoji: '🌧' },
+                { label: 'Medium flow days', value: flowCounts['medium'] || 0, color: Colors.gold, emoji: '🌊' },
+                { label: 'Light flow days', value: flowCounts['light'] || 0, color: Colors.sage, emoji: '💧' },
+                { label: 'Spotting days', value: flowCounts['spotting'] || 0, color: Colors.mist, emoji: '🩸' },
+                { label: 'Symptoms this month', value: symptomsThisMonth, color: Colors.rose, emoji: '📍' },
               ].map(stat => (
-                <View key={stat.label} style={{flexDirection:'row', justifyContent:'space-between',
-                  alignItems:'center', paddingVertical:10, borderBottomWidth:0.5, borderBottomColor:Colors.parchmentDark}}>
-                  <Text style={{fontFamily:Fonts.sans, fontSize:13, color:Colors.plum}}>{stat.label}</Text>
-                  <Text style={{fontFamily:Fonts.serif, fontSize:22, color:stat.color}}>{stat.value}</Text>
+                <View key={stat.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: Colors.parchmentDark }}>
+                  <Text style={{ fontSize: 18 }}>{stat.emoji}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist }}>{stat.label}</Text>
+                    <Text style={{ fontFamily: Fonts.serif, fontSize: 28, color: stat.color }}>{stat.value}</Text>
+                  </View>
                 </View>
               ))}
-              <View style={{backgroundColor:Colors.sagePale, borderRadius:12, padding:12, marginTop:4}}>
-                <Text style={{fontFamily:Fonts.sansMedium, fontSize:12, color:Colors.sage}}>
-                  ✦ Every day you log makes your patterns clearer. Keep going.
-                </Text>
-              </View>
+            </View>
+            <View style={{ backgroundColor: Colors.sagePale ?? '#EBF4EC', borderRadius: 12, padding: 12, marginTop: 12 }}>
+              <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 12, color: Colors.sage }}>
+                {logs.length === 0
+                  ? '✦ Start logging today to build your cycle picture'
+                  : `✦ ${logs.length} day${logs.length !== 1 ? 's' : ''} tracked. Every entry makes your patterns clearer.`}
+              </Text>
             </View>
           </View>
         )}
 
-        {/* ── Cycle Tips (always visible when subscribed) ── */}
-        {fluxActive && activeTab === 'log' && fluxLogs.length > 0 && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>🌿 Phase support tips</Text>
-            <Text style={styles.cardSub}>What your body needs right now</Text>
-            <View style={{gap:8, marginTop:10}}>
-              {[
-                '💧 Stay hydrated — aim for 8+ glasses today',
-                '🥗 Focus on anti-inflammatory foods — leafy greens, omega-3s',
-                '🚶 Gentle movement helps regulate hormones',
-                '😴 Prioritize 7-9 hours of sleep during this phase',
-                '🧘 Stress directly impacts your cycle — try 5 minutes of breathing',
-              ].map((tip, i) => (
-                <Text key={i} style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum, lineHeight:18}}>
-                  {tip}
-                </Text>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* ── Placeholder for non-log tabs when no data ── */}
-        {fluxActive && activeTab !== 'log' && fluxLogs.length === 0 && (
-          <View style={[styles.card, {alignItems:'center', paddingVertical:32}]}>
-            <Text style={{fontSize:32, marginBottom:12}}>📋</Text>
-            <Text style={{fontFamily:Fonts.sansMedium, fontSize:15, color:Colors.plum, marginBottom:8}}>No data yet</Text>
-            <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist, textAlign:'center'}}>
-              Start logging your flow in the Log tab to unlock insights and statistics.
-            </Text>
-          </View>
-        )}
-
-        {/* ── Original paywall ── */}
+        {/* ── Paywall ── */}
         {!fluxActive && (
-          <>
-            {/* Pain-led hero */}
-            <View style={styles.heroCard}>
-              <Text style={styles.heroQuestion}>Your cycle stopped making sense. FluxLog is built for exactly that.</Text>
-              <Text style={styles.heroAnswer}>Irregular, unpredictable, confusing — perimenopause cycles don't fit any other app. This one was made for yours.</Text>
+          <View style={styles.paywallCard}>
+
+            {/* Best value badge */}
+            <View style={{ backgroundColor: Colors.gold, borderRadius: 20, paddingVertical: 4, paddingHorizontal: 14, alignSelf: 'flex-start', marginBottom: 14 }}>
+              <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.plum }}>BEST VALUE — SAVE 17%</Text>
             </View>
 
-            {/* Rotating testimonial */}
-            <View style={styles.testimonialCard}>
-              <Text style={styles.testimonialText}>{TESTIMONIALS[testimonialIdx].text}</Text>
-              <Text style={styles.testimonialName}>— {TESTIMONIALS[testimonialIdx].name}</Text>
-            </View>
+            <Text style={styles.paywallHeadline}>
+              Everything your body{'\n'}needs. One subscription.
+            </Text>
+            <Text style={styles.paywallSub}>
+              Vela Full Access unlocks FluxLog and CoolDown together — cycle tracking, hot flash relief, pattern insights, and guided breathing protocols.
+            </Text>
 
-            {/* Features */}
-            <View style={styles.featureCard}>
-              <Text style={styles.featureCardTitle}>FluxLog tracks what other apps can't</Text>
+            {/* Feature list */}
+            <View style={{ gap: 10, marginBottom: 20 }}>
               {[
-                ['◎', 'Built for irregular, skipped, and surprise cycles'],
-                ['◎', 'Find your triggers — food, stress, sleep, caffeine'],
-                ['◎', 'Auto-builds your 90-day doctor report'],
-                ['◎', 'Designed for peri — not fertility, not teens'],
-              ].map(([glyph, text]) => (
-                <View key={text} style={styles.featureRow}>
-                  <Text style={styles.featureGlyph}>{glyph}</Text>
-                  <Text style={styles.featureText}>{text}</Text>
+                { emoji: '◎', text: 'FluxLog — cycle + symptom tracking' },
+                { emoji: '📅', text: 'Visual calendar + pattern insights' },
+                { emoji: '⚡', text: 'CoolDown — 8 hot flash protocols' },
+                { emoji: '🌬', text: 'Emergency Cool in 90 seconds' },
+                { emoji: '📊', text: 'Stats, trends and phase tips' },
+              ].map(f => (
+                <View key={f.text} style={styles.featureRow}>
+                  <Text style={{ fontSize: 14, width: 22 }}>{f.emoji}</Text>
+                  <Text style={styles.featureText}>{f.text}</Text>
                 </View>
               ))}
             </View>
 
-            {/* Trial CTA */}
-
-            {/* ── Required Subscription Info ── */}
-            <View style={{backgroundColor:'rgba(255,255,255,0.08)', borderRadius:12, padding:14, marginBottom:12}}>
-              <Text style={{fontFamily:'System', fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:'600', marginBottom:6}}>
-                FluxLog Monthly
-              </Text>
-              <Text style={{fontFamily:'System', fontSize:12, color:'rgba(255,255,255,0.7)', marginBottom:2}}>
-                $4.99 / month · Auto-renews monthly
-              </Text>
-              <Text style={{fontFamily:'System', fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:8}}>
-                Cancel anytime in Apple ID settings · Payment charged to Apple ID at confirmation
-              </Text>
-              <View style={{flexDirection:'row', gap:16}}>
-                <Text
-                  style={{fontFamily:'System', fontSize:12, color:'#A8D8E8', textDecorationLine:'underline'}}
-                  onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/terms')}>
-                  Terms of Use
-                </Text>
-                <Text
-                  style={{fontFamily:'System', fontSize:12, color:'#A8D8E8', textDecorationLine:'underline'}}
-                  onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/privacy')}>
-                  Privacy Policy
-                </Text>
+            {/* Price comparison */}
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 14, padding: 14, marginBottom: 18 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecorationLine: 'line-through' }}>FluxLog + CoolDown separately</Text>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecorationLine: 'line-through' }}>$9.98/mo</Text>
               </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 14, color: '#fff' }}>Vela Full Access</Text>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 14, color: Colors.gold }}>$8.99/mo</Text>
+              </View>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>3,800+ women · Most wish they started sooner</Text>
             </View>
 
+            {/* Primary CTA — bundle */}
             <TouchableOpacity delayPressIn={0} style={styles.trialBtn} onPress={handleTrial} activeOpacity={0.85}>
-              <Text style={styles.trialBtnTitle}>Start free — 7 days, no card needed</Text>
-              <Text style={styles.trialBtnSub}>3,800+ women tracking their peri cycles</Text>
+              <Text style={styles.trialBtnTitle}>Try free for 7 days</Text>
+              <Text style={styles.trialBtnSub}>Full access · No card required · Cancel anytime</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity delayPressIn={0} style={styles.subscribeBtn} onPress={() => setShowPaywall(true)} activeOpacity={0.85}>
-              <Text style={styles.subscribeBtnText}>Unlock FluxLog · {price}/month</Text>
+            {/* Secondary — flux only */}
+            <TouchableOpacity delayPressIn={0} onPress={async () => { if (pkg) { setLoading(true); try { await Purchases.purchasePackage(pkg as PurchasesPackage); await unlockFlux(); } catch {} setLoading(false); } }} activeOpacity={0.7}
+              style={{ alignItems: 'center', paddingVertical: 10, marginBottom: 4 }}>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Just FluxLog — $4.99/mo</Text>
             </TouchableOpacity>
 
-            <Text style={styles.legalSmall}>Cancel anytime · Billed monthly through Apple</Text>
-          </>
-        )}
-      </ScrollView>
-
-      <Modal visible={showPaywall} animationType="slide" onRequestClose={() => setShowPaywall(false)}>
-        <SafeAreaView style={styles.modalSafe} edges={['top']}>
-          <TouchableOpacity delayPressIn={0} style={styles.modalClose} onPress={() => setShowPaywall(false)}>
-            <Text style={styles.modalCloseText}>✕</Text>
-          </TouchableOpacity>
-          <ScrollView contentContainerStyle={[styles.modalContent, { paddingBottom: 60 }]}>
-            <Text style={styles.modalGlyph}>◎</Text>
-            <Text style={styles.modalTitle}>FluxLog</Text>
-            <Text style={styles.modalHook}>Your body is changing. FluxLog helps you
-understand it — and take back control.</Text>
-
-            {/* Trial box */}
-            <View style={{flexDirection:'row', justifyContent:'center', gap:16, marginBottom:12}}>
-              <TouchableOpacity delayPressIn={0} onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/terms')}>
-                <Text style={{fontFamily:'System', fontSize:11, color:Colors.mist, textDecorationLine:'underline'}}>Terms of Use</Text>
-              </TouchableOpacity>
-              <Text style={{fontFamily:'System', fontSize:11, color:Colors.mist}}>·</Text>
-              <TouchableOpacity delayPressIn={0} onPress={() => require('react-native').Linking.openURL('https://macpplechic.github.io/vela/privacy')}>
-                <Text style={{fontFamily:'System', fontSize:11, color:Colors.mist, textDecorationLine:'underline'}}>Privacy Policy</Text>
-              </TouchableOpacity>
+            <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginBottom: 8 }}>
+              $8.99/month after trial · Auto-renews · Cancel anytime in Apple ID settings
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginBottom: 8 }}>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: '#A8D8E8', textDecorationLine: 'underline' }}
+                onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms</Text>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: '#A8D8E8', textDecorationLine: 'underline' }}
+                onPress={() => Linking.openURL('https://macpplechic.github.io/vela/privacy')}>Privacy</Text>
             </View>
-            <TouchableOpacity delayPressIn={0} style={styles.trialBox} onPress={handleTrial} activeOpacity={0.85}>
-              <View>
-                <Text style={styles.trialBoxTitle}>✦  Start free — full access, 7 days</Text>
-                <Text style={styles.trialBoxSub}>No card required · Cancel anytime · Instant access</Text>
-              </View>
-              <Text style={styles.trialBoxArrow}>→</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.orDivider}>— or subscribe now —</Text>
-
-            <View style={styles.priceCard}>
-              <Text style={styles.priceAmount}>{price}</Text>
-              <Text style={styles.pricePer}>per month</Text>
-            </View>
-
-            {['Log any cycle — spotting, skipped, irregular','Patterns emerge within 2 weeks of logging','Correlate flow with food, stress & caffeine','Auto-builds your doctor report in 90 days','Cancel anytime, no questions asked'].map(f => (
-              <View key={f} style={styles.modalFeatureRow}>
-                <Text style={styles.modalFeatureCheck}>✦</Text>
-                <Text style={styles.modalFeatureText}>{f}</Text>
-              </View>
-            ))}
-
-            <TouchableOpacity delayPressIn={0} style={[styles.purchaseBtn, loading && { opacity: 0.7 }]} onPress={handlePurchase} disabled={loading} activeOpacity={0.85}>
-              {loading ? <ActivityIndicator color={Colors.parchment} /> : <Text style={styles.purchaseBtnText}>Unlock FluxLog · {price}/month</Text>}
-            </TouchableOpacity>
-
-            <TouchableOpacity delayPressIn={0} style={styles.restoreBtn} onPress={handleRestore} disabled={loading}>
+            <TouchableOpacity delayPressIn={0} style={styles.restoreBtn} onPress={handleRestore} activeOpacity={0.7}>
               <Text style={styles.restoreBtnText}>Already subscribed? Restore access</Text>
             </TouchableOpacity>
-            <View style={styles.legalRow}>
-              <Text style={styles.legalText}>{'FluxLog is less than a coffee a week. Auto-renews unless cancelled 24hrs before renewal. Manage in App Store settings. '}
-                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
-                <Text style={styles.legalText}>{' · '}</Text>
-                <Text style={styles.legalLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/privacy')}>Privacy Policy</Text>
-              </Text>
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+          </View>
+        )}
+
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe:{flex:1,backgroundColor:Colors.parchment},
-  header:{backgroundColor:Colors.plum,paddingHorizontal:20,paddingTop:8,paddingBottom:14},
-  logoText:{fontFamily:Fonts.serif,fontSize:24,color:Colors.goldLight,letterSpacing:4},
-  subText:{fontFamily:Fonts.sans,fontSize:10,color:Colors.mist,letterSpacing:3,textTransform:'uppercase',marginTop:1},
-  content:{padding:20},
-  pageTitle:{fontFamily:Fonts.serif,fontSize:26,color:Colors.plum,marginBottom:4},
-  pageSub:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist,marginBottom:20},
-  calGrid:{flexDirection:'row',flexWrap:'wrap',gap:4,marginBottom:10},
-  calDot:{width:30,height:30,borderRadius:6,alignItems:'center',justifyContent:'center'},
-  calDotText:{fontFamily:Fonts.sans,fontSize:9,color:Colors.plum},
-  calLegend:{flexDirection:'row',flexWrap:'wrap',gap:10},
-  card:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:12},
-  cardTitle:{fontFamily:Fonts.serif,fontSize:18,color:Colors.plum,marginBottom:4},
-  cardSub:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist,marginBottom:14},
-  optRow:{flexDirection:'row',alignItems:'center',gap:12,paddingVertical:11,borderBottomWidth:0.5,borderBottomColor:Colors.parchmentDark,borderRadius:8,paddingHorizontal:4,borderWidth:0,marginBottom:2},
-  optDot:{width:12,height:12,borderRadius:6,borderWidth:1.5},
-  optText:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum,flex:1},
-  insightRow:{flexDirection:'row',justifyContent:'space-between',paddingVertical:10,borderBottomWidth:0.5,borderBottomColor:Colors.parchmentDark},
-  insightLabel:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist},
-  insightVal:{fontFamily:Fonts.sansMedium,fontSize:13,color:Colors.plum},
-  heroCard:{backgroundColor:Colors.plum,borderRadius:20,padding:24,marginBottom:12},
-  heroQuestion:{fontFamily:Fonts.serif,fontSize:20,color:Colors.goldLight,lineHeight:28,marginBottom:12},
-  heroAnswer:{fontFamily:Fonts.sans,fontSize:13,color:'rgba(245,239,230,0.8)',lineHeight:20},
-  testimonialCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:20,marginBottom:12,alignItems:'center'},
-  testimonialText:{fontFamily:Fonts.serif,fontSize:15,color:Colors.plum,textAlign:'center',lineHeight:22,fontStyle:'italic',marginBottom:8},
-  testimonialName:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,letterSpacing:1},
-  featureCard:{backgroundColor:Colors.cream,borderWidth:0.5,borderColor:Colors.parchmentDark,borderRadius:18,padding:18,marginBottom:16},
-  featureCardTitle:{fontFamily:Fonts.serif,fontSize:16,color:Colors.plum,marginBottom:14},
-  featureRow:{flexDirection:'row',gap:12,marginBottom:10,alignItems:'flex-start'},
-  featureGlyph:{fontFamily:Fonts.sans,fontSize:13,color:Colors.teal,marginTop:1},
-  featureText:{fontFamily:Fonts.sans,fontSize:13,color:Colors.plum,flex:1,lineHeight:20},
-  trialBtn:{backgroundColor:Colors.teal,borderRadius:18,padding:18,alignItems:'center',marginBottom:10},
-  trialBtnTitle:{fontFamily:Fonts.sansMedium,fontSize:16,color:Colors.cream,marginBottom:3},
-  trialBtnSub:{fontFamily:Fonts.sans,fontSize:12,color:'rgba(255,255,255,0.75)'},
-  subscribeBtn:{borderWidth:1,borderColor:Colors.plum,borderRadius:18,padding:14,alignItems:'center',marginBottom:8},
-  subscribeBtnText:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum},
-  legalSmall:{fontFamily:Fonts.sans,fontSize:10,color:Colors.mist,textAlign:'center',marginBottom:8},
-  modalSafe:{flex:1,backgroundColor:Colors.parchment},
-  modalClose:{alignSelf:'flex-end',padding:20},
-  modalCloseText:{fontFamily:Fonts.sans,fontSize:18,color:Colors.mist},
-  modalContent:{padding:28,alignItems:'center'},
-  modalGlyph:{fontSize:48,color:Colors.plum,marginBottom:12},
-  modalTitle:{fontFamily:Fonts.serif,fontSize:32,color:Colors.plum,letterSpacing:2,marginBottom:12},
-  modalHook:{fontFamily:Fonts.sans,fontSize:14,color:Colors.mist,textAlign:'center',lineHeight:22,marginBottom:24},
-  trialBox:{backgroundColor:Colors.tealPale??'#E8F4F2',borderWidth:1,borderColor:Colors.teal,borderRadius:16,padding:16,flexDirection:'row',justifyContent:'space-between',alignItems:'center',alignSelf:'stretch',marginBottom:16},
-  trialBoxTitle:{fontFamily:Fonts.sansMedium,fontSize:14,color:Colors.plum,marginBottom:3},
-  trialBoxSub:{fontFamily:Fonts.sans,fontSize:12,color:Colors.mist},
-  trialBoxArrow:{fontFamily:Fonts.sans,fontSize:18,color:Colors.teal},
-  orDivider:{fontFamily:Fonts.sans,fontSize:11,color:Colors.mist,letterSpacing:2,marginBottom:16},
-  priceCard:{backgroundColor:Colors.goldPale,borderWidth:1,borderColor:Colors.gold,borderRadius:16,paddingVertical:16,paddingHorizontal:40,alignItems:'center',marginBottom:24},
-  priceAmount:{fontFamily:Fonts.sansMedium,fontSize:36,color:Colors.plum},
-  pricePer:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist,marginTop:2},
-  modalFeatureRow:{flexDirection:'row',alignItems:'flex-start',gap:12,marginBottom:12,alignSelf:'stretch'},
-  modalFeatureCheck:{fontFamily:Fonts.sans,fontSize:13,color:Colors.gold,marginTop:1},
-  modalFeatureText:{fontFamily:Fonts.sans,fontSize:14,color:Colors.plum,flex:1,lineHeight:20},
-  purchaseBtn:{backgroundColor:Colors.plum,borderRadius:30,paddingVertical:16,paddingHorizontal:32,alignSelf:'stretch',alignItems:'center',marginTop:16,marginBottom:12},
-  purchaseBtnText:{fontFamily:Fonts.sansMedium,fontSize:15,color:Colors.parchment,letterSpacing:0.5},
-  restoreBtn:{paddingVertical:12,alignItems:'center'},
-  restoreBtnText:{fontFamily:Fonts.sans,fontSize:13,color:Colors.mist},
-  legalRow:{marginTop:16,paddingHorizontal:8},
-  legalText:{fontFamily:Fonts.sans,fontSize:10,color:Colors.mist,textAlign:'center',lineHeight:16},
-  legalLink:{fontFamily:Fonts.sans,fontSize:10,color:Colors.plum,textDecorationLine:'underline'},
+  safe: { flex: 1, backgroundColor: Colors.parchment },
+  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 4 },
+  logoText: { fontFamily: Fonts.serif, fontSize: 18, color: Colors.plum },
+  subText: { fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist, letterSpacing: 0.5 },
+  content: { paddingHorizontal: 16, paddingTop: 8 },
+  pageTitle: { fontFamily: Fonts.serif, fontSize: 28, color: Colors.plum },
+  pageSub: { fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist, marginTop: 2 },
+  card: { backgroundColor: Colors.cream, borderRadius: 20, padding: 18, marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8 },
+  cardTitle: { fontFamily: Fonts.sansMedium, fontSize: 15, color: Colors.plum, marginBottom: 2 },
+  cardSub: { fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist, marginBottom: 4 },
+  paywallCard: { backgroundColor: Colors.plum, borderRadius: 24, padding: 24, marginBottom: 14 },
+  paywallHeadline: { fontFamily: Fonts.serif, fontSize: 22, color: '#fff', marginBottom: 12, lineHeight: 30 },
+  paywallSub: { fontFamily: Fonts.sans, fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 20, marginBottom: 20 },
+  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  featureText: { fontFamily: Fonts.sans, fontSize: 13, color: 'rgba(255,255,255,0.9)', flex: 1 },
+  socialProof: { backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 14, alignItems: 'center', marginBottom: 18 },
+  trialBtn: { backgroundColor: Colors.teal, borderRadius: 18, padding: 18, alignItems: 'center', marginBottom: 12 },
+  trialBtnTitle: { fontFamily: Fonts.sansMedium, fontSize: 17, color: Colors.cream, marginBottom: 3 },
+  trialBtnSub: { fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(255,255,255,0.75)' },
+  restoreBtn: { alignItems: 'center', paddingVertical: 8 },
+  restoreBtnText: { fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(255,255,255,0.5)' },
 });

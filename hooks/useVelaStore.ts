@@ -20,10 +20,11 @@ export interface NutrientTotals {
 }
 
 export interface FluxLog {
-  id: number;
+  id?: number;
   date: string;
-  symptoms: string[];
-  triggers: {
+  flow?: string | null;
+  symptoms?: string[];
+  triggers?: {
     food: string; stress: number; sleep: number;
     exercise: string; alcohol: boolean; caffeine: boolean; weather: string;
   };
@@ -53,6 +54,8 @@ const K = {
   COOL_TRIAL_STARTED: '@vela_cool_trial',
   FLUX_UNLOCKED:      '@vela_flux_unlocked',
   COOL_UNLOCKED:      '@vela_cool_unlocked',
+  BUNDLE_UNLOCKED:    '@vela_bundle_unlocked',
+  BUNDLE_TRIAL:       '@vela_bundle_trial',
   HISTORY:            '@vela_history',
   LAST_ACTIVE_DATE:   '@vela_last_active_date',
   SLEEP_HISTORY:      '@vela_sleep_history',
@@ -109,6 +112,8 @@ export function useVelaStore() {
   const [coolTrialStarted, setCoolTrialState]   = useState<string | null>(null);
   const [fluxUnlocked, setFluxUnlockedState]    = useState(false);
   const [coolUnlocked, setCoolUnlockedState]    = useState(false);
+  const [bundleUnlocked, setBundleUnlockedState] = useState(false);
+  const [bundleTrialStarted, setBundleTrialState] = useState<string | null>(null);
   const [history, setHistoryState]              = useState<DailyEntry[]>([]);
   const [sleepHistory, setSleepHistoryState]    = useState<SleepEntry[]>([]);
   const [streak, setStreakState]                = useState(0);
@@ -239,6 +244,7 @@ export function useVelaStore() {
 
   const unlockFlux = async () => { setFluxUnlockedState(true); await AsyncStorage.setItem(K.FLUX_UNLOCKED, JSON.stringify(true)); };
   const unlockCool = async () => { setCoolUnlockedState(true); await AsyncStorage.setItem(K.COOL_UNLOCKED, JSON.stringify(true)); };
+  const unlockBundle = async () => { setBundleUnlockedState(true); setFluxUnlockedState(true); setCoolUnlockedState(true); await AsyncStorage.multiSet([[K.BUNDLE_UNLOCKED, JSON.stringify(true)],[K.FLUX_UNLOCKED, JSON.stringify(true)],[K.COOL_UNLOCKED, JSON.stringify(true)]]); };
 
   const setFluxLogs = useCallback(async (logs: FluxLog[]) => {
     setFluxLogsState(logs);
@@ -284,6 +290,14 @@ export function useVelaStore() {
     await AsyncStorage.setItem(K.COOL_TRIAL_STARTED, date);
   }, []);
 
+  const startBundleTrial = useCallback(async () => {
+    const now = new Date().toISOString();
+    setBundleTrialState(now);
+    setFluxTrialState(now);
+    setCoolTrialState(now);
+    await AsyncStorage.multiSet([[K.BUNDLE_TRIAL, now],[K.FLUX_TRIAL_STARTED, now],[K.COOL_TRIAL_STARTED, now]]);
+  }, []);
+
   const setBlockedUsers = useCallback(async (users: string[]) => {
     setBlockedUsersState(users);
     await AsyncStorage.setItem(K.BLOCKED_USERS, JSON.stringify(users));
@@ -305,8 +319,10 @@ export function useVelaStore() {
 
   const fluxDaysLeft = trialDaysLeft(fluxTrialStarted);
   const coolDaysLeft = trialDaysLeft(coolTrialStarted);
-  const fluxActive   = fluxUnlocked || (fluxTrialStarted !== null && (fluxDaysLeft ?? 0) > 0);
-  const coolActive   = coolUnlocked || (coolTrialStarted !== null && (coolDaysLeft ?? 0) > 0);
+  const bundleDaysLeft = trialDaysLeft(bundleTrialStarted);
+  const fluxActive   = bundleUnlocked || fluxUnlocked || (fluxTrialStarted !== null && (fluxDaysLeft ?? 0) > 0) || (bundleTrialStarted !== null && (bundleDaysLeft ?? 0) > 0);
+  const coolActive   = bundleUnlocked || coolUnlocked || (coolTrialStarted !== null && (coolDaysLeft ?? 0) > 0) || (bundleTrialStarted !== null && (bundleDaysLeft ?? 0) > 0);
+  const bundleActive = bundleUnlocked || (bundleTrialStarted !== null && (bundleDaysLeft ?? 0) > 0);
   const totals       = calcTotals(foods);
   const mySuppsData = (mySupps.map((id: string) => SUPP_LIBRARY.find((s: any) => s.id === id)).filter(Boolean)) as any[];
 
@@ -379,7 +395,8 @@ export function useVelaStore() {
     history, sleepHistory, streak, lastStreakDate, getMonthHistory, topSymptoms, avgNutrients, suppAdherence,
     setPhase, setOnboarded, setMySupps, setCheckedSupps, setSymptoms,
     setJournal, setFoods, setLikedPosts, setFluxLogs, setSleepLog, saveSleepEntry, incrementStreak,
-    startFluxTrial, startCoolTrial, resetOnboarding,
+    startFluxTrial, startCoolTrial, startBundleTrial, resetOnboarding,
+    unlockBundle, bundleActive, bundleDaysLeft,
     blockedUsers, setBlockedUsers,
   };
 }
