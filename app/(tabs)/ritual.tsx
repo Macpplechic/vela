@@ -116,7 +116,8 @@ export default function RitualScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.dateText}>{today}</Text>
-        <Text style={styles.greeting}>{greeting}, beautiful. {greetingEmoji}</Text>
+        <Text style={styles.greeting}>{greeting}. {greetingEmoji}</Text>
+        <Text style={styles.subtitle}>{pd.label} · {hour < 12 ? 'Take your supplements before your first meal' : hour < 17 ? 'Hydration check — how many glasses so far?' : 'Log how your body felt today'}</Text>
         {streak >= 3 && (
           <View style={styles.streakCelebration}>
             <Text style={styles.streakCelebrationText}>{
@@ -128,8 +129,6 @@ export default function RitualScreen() {
             }</Text>
           </View>
         )}
-        <Text style={styles.subtitle}>Your 5-minute morning ritual awaits.</Text>
-
         {velaHistory.length === 0 && (
           <View style={styles.welcomeCard}>
             <Text style={styles.welcomeTitle}>Welcome to Vela ✦</Text>
@@ -146,11 +145,6 @@ export default function RitualScreen() {
           </View>
         )}
 
-        <View style={[styles.ritualCard, { backgroundColor: pd.bg, borderLeftColor: pd.color }]}>
-          <Text style={[styles.ritualLabel, { color: pd.color }]}>Today's ritual · {pd.label}</Text>
-          <Text style={styles.ritualText}>{pd.ritual}</Text>
-        </View>
-
         {velaHistory.length > 0 && (
           <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
             {([
@@ -166,6 +160,11 @@ export default function RitualScreen() {
             ))}
           </View>
         )}
+        <View style={[styles.ritualCard, { backgroundColor: pd.bg, borderLeftColor: pd.color }]}>
+          <Text style={[styles.ritualLabel, { color: pd.color }]}>Today's ritual · {pd.label}</Text>
+          <Text style={styles.ritualText}>{pd.ritual}</Text>
+        </View>
+
         {triggerInsight != null && (
           <View style={{ backgroundColor: '#FDF3DC', borderRadius: 16, padding: 16, marginBottom: 14, borderLeftWidth: 3, borderLeftColor: Colors.gold, flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
             <Text style={{ fontSize: 18, marginTop: 1 }}>{'💡'}</Text>
