@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, Alert, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import ViewShot from 'react-native-view-shot';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors, Fonts } from '../../constants/Colors';
@@ -53,6 +54,20 @@ export default function ProfileScreen() {
   const [notifsEnabled, setNotifsEnabled] = useState(true);
   const [notifsLoading, setNotifsLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [sharingCard, setSharingCard] = useState(false);
+  const insightCardRef = useRef<any>(null);
+
+  const handleShareInsightCard = async () => {
+    if (!insightCardRef.current) return;
+    setSharingCard(true);
+    try {
+      const uri = await insightCardRef.current.capture();
+      await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Share your Vela snapshot' });
+    } catch (e) {
+      Alert.alert('Could not share', 'Please try again.');
+    }
+    setSharingCard(false);
+  };
   const [showHistory, setShowHistory] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
@@ -584,6 +599,64 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* ── Shareable insight card ── */}
+        {history.length >= 3 && (
+          <View style={{ paddingHorizontal: 0, marginBottom: 20 }}>
+            <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.mist, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>Your Vela snapshot</Text>
+            <ViewShot ref={insightCardRef} options={{ format: 'png', quality: 1.0 }}>
+              <View style={insightStyles.card}>
+                <View style={insightStyles.header}>
+                  <Text style={insightStyles.logo}>vela</Text>
+                  <Text style={insightStyles.tagline}>your shift. your terms.</Text>
+                </View>
+                <View style={insightStyles.phasePill}>
+                  <Text style={insightStyles.phaseText}>{pd.glyph} {pd.label}</Text>
+                </View>
+                <View style={insightStyles.statsRow}>
+                  {([
+                    { label: 'Day streak', value: String(streak), color: '#C9A84C' },
+                    { label: 'Days logged', value: String(history.length), color: '#4A9B8E' },
+                    { label: 'Supp adherence', value: suppAdherence() + '%', color: '#7B9E6B' },
+                  ] as Array<{label:string,value:string,color:string}>).map(s => (
+                    <View key={s.label} style={insightStyles.statBox}>
+                      <Text style={[insightStyles.statValue, { color: s.color }]}>{s.value}</Text>
+                      <Text style={insightStyles.statLabel}>{s.label}</Text>
+                    </View>
+                  ))}
+                </View>
+                {topSymptoms(3).length > 0 && (
+                  <View style={insightStyles.section}>
+                    <Text style={insightStyles.sectionTitle}>TOP SYMPTOMS THIS MONTH</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                      {topSymptoms(3).map((s: any) => (
+                        <View key={s.symptom} style={insightStyles.symptomPill}>
+                          <Text style={insightStyles.symptomText}>{s.symptom} {s.count}x</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+                {avgNutrients().protein > 0 && (
+                  <View style={insightStyles.section}>
+                    <Text style={insightStyles.sectionTitle}>AVG DAILY PROTEIN (30 DAYS)</Text>
+                    <Text style={insightStyles.bigStat}>{Math.round(avgNutrients().protein)}g</Text>
+                  </View>
+                )}
+                <View style={insightStyles.footer}>
+                  <Text style={insightStyles.footerText}>velawellness.com · tracked with vela</Text>
+                </View>
+              </View>
+            </ViewShot>
+            <TouchableOpacity delayPressIn={0} onPress={handleShareInsightCard} activeOpacity={0.85}
+              style={{ backgroundColor: Colors.plum, borderRadius: 18, padding: 16, alignItems: 'center', marginTop: 12 }}>
+              <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 15, color: Colors.parchment }}>
+                {sharingCard ? 'Preparing...' : 'Share my snapshot ↗'}
+              </Text>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: 'rgba(245,239,230,0.6)', marginTop: 3 }}>Share to Instagram, messages, anywhere</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
       </ScrollView>
 
       {/* ── Supplement Library Modal ── */}
@@ -771,4 +844,24 @@ const styles = StyleSheet.create({
   linkBoxVal:{ fontFamily:'monospace', fontSize:14, color:Colors.plum },
   plumBtn:{ backgroundColor:Colors.plum, borderRadius:14, padding:14, alignItems:'center' },
   plumBtnText:{ fontFamily:Fonts.sans, fontSize:13, color:Colors.parchment },
+});
+
+const insightStyles = StyleSheet.create({
+  card: { backgroundColor: '#2D1B4E', borderRadius: 24, padding: 24 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 },
+  logo: { fontFamily: Fonts.serif, fontSize: 28, color: '#C9A84C', letterSpacing: 3 },
+  tagline: { fontFamily: Fonts.sans, fontSize: 10, color: 'rgba(245,239,230,0.5)', letterSpacing: 2 },
+  phasePill: { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, paddingVertical: 5, paddingHorizontal: 14, alignSelf: 'flex-start', marginBottom: 16 },
+  phaseText: { fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(245,239,230,0.8)', letterSpacing: 1 },
+  statsRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  statBox: { flex: 1, backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 14, padding: 12, alignItems: 'center' },
+  statValue: { fontFamily: Fonts.serif, fontSize: 24, marginBottom: 2 },
+  statLabel: { fontFamily: Fonts.sans, fontSize: 9, color: 'rgba(245,239,230,0.5)', textAlign: 'center', letterSpacing: 1 },
+  section: { backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 14, padding: 12, marginBottom: 10 },
+  sectionTitle: { fontFamily: Fonts.sans, fontSize: 9, color: 'rgba(245,239,230,0.4)', letterSpacing: 2 },
+  symptomPill: { backgroundColor: 'rgba(201,168,76,0.2)', borderRadius: 20, paddingVertical: 4, paddingHorizontal: 10 },
+  symptomText: { fontFamily: Fonts.sans, fontSize: 11, color: '#C9A84C' },
+  bigStat: { fontFamily: Fonts.serif, fontSize: 36, color: '#4A9B8E', marginTop: 4 },
+  footer: { marginTop: 16, alignItems: 'center' },
+  footerText: { fontFamily: Fonts.sans, fontSize: 10, color: 'rgba(245,239,230,0.25)', letterSpacing: 1 },
 });
