@@ -193,10 +193,12 @@ export default function RitualScreen() {
             })}
           </View>
           <Text style={styles.weeklyMotivation}>
-            {streak >= 7 ? `🔥 ${streak} day streak — you're unstoppable` :
-             streak >= 3 ? `🔥 ${streak} days strong — keep it going` :
-             streak === 1 ? 'Day 1 — every streak starts here ✦' :
-             'Log today to start your streak ◇'}
+            {streak >= 30 ? `💎 ${streak} days. You have built something real.` :
+             streak >= 14 ? `🏆 ${streak} days straight. This is a habit now.` :
+             streak >= 7 ? `🔥 One full week. Your body is responding.` :
+             streak >= 3 ? `🔥 ${streak} days — the hardest part is starting. You did it.` :
+             streak === 1 ? 'Day 1. Every transformation begins exactly here.' :
+             'Open the app. Log one thing. That is enough.'}
           </Text>
         </View>
 
