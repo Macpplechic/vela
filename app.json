@@ -2,9 +2,9 @@
   "expo": {
     "name": "Vela",
     "slug": "vela",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "runtimeVersion": "1.0.0",
+    "runtimeVersion": "1.0.1",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.velawellness.app",
-      "buildNumber": "24",
+      "buildNumber": "25",
       "infoPlist": {
         "UIBackgroundModes": [
           "fetch",
