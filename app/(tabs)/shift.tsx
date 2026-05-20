@@ -11,7 +11,8 @@ export default function ShiftScreen() {
   const [newPost, setNewPost] = useState('');
   const [reportTarget, setReportTarget] = useState<{ id: number; user: string } | null>(null);
   const [reportReason, setReportReason] = useState('');
-  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [hasAcceptedTermsToPost, setHasAcceptedTermsToPost] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const pd = PHASES[phase ?? 'late'];
 
@@ -30,28 +31,6 @@ export default function ShiftScreen() {
     setReportTarget(null); setReportReason('');
     Alert.alert('Report submitted', 'Thanks. We review all reports within 24 hours.');
   };
-
-  if (!hasAcceptedTerms) {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
-        <View style={styles.header}>
-          <Text style={styles.logoText}>vela</Text>
-          <Text style={styles.subText}>your shift. your terms.</Text>
-        </View>
-        <View style={styles.termsGate}>
-          <Text style={styles.termsTitle}>Community Guidelines</Text>
-          <Text style={styles.termsBody}>
-            {'The Shift is a space for honest, supportive conversation. By joining you agree to our '}
-            <Text style={styles.termsLink} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
-            {'. Zero tolerance for harassment or abusive content.'}
-          </Text>
-          <TouchableOpacity delayPressIn={0} style={styles.termsBtn} onPress={() => setHasAcceptedTerms(true)} activeOpacity={0.85}>
-            <Text style={styles.termsBtnText}>I Agree — Enter The Shift</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -76,6 +55,19 @@ export default function ShiftScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        {/* Terms mini-banner */}
+        {!hasAcceptedTermsToPost && (
+          <View style={{ backgroundColor: Colors.parchmentDark, borderRadius: 14, padding: 14, marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.plum, flex: 1, lineHeight: 18 }}>
+              {'Read and share freely. To post, agree to our community guidelines.'}
+            </Text>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowTermsModal(true)}
+              style={{ backgroundColor: Colors.plum, borderRadius: 12, paddingVertical: 6, paddingHorizontal: 12 }}>
+              <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 12, color: Colors.parchment }}>Join</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View style={styles.composeCard}>
           <TextInput
@@ -157,6 +149,44 @@ export default function ShiftScreen() {
           </TouchableOpacity>
         </View>
       </Modal>
+      {/* Terms modal */}
+      <Modal visible={showTermsModal} animationType='slide' presentationStyle='pageSheet' onRequestClose={() => setShowTermsModal(false)}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.cream }} edges={['top']}>
+          <View style={{ padding: 24, flex: 1 }}>
+            <Text style={{ fontFamily: Fonts.serif, fontSize: 22, color: Colors.plum, marginBottom: 12 }}>Community Guidelines</Text>
+            <Text style={{ fontFamily: Fonts.sans, fontSize: 14, color: Colors.plum, lineHeight: 22, marginBottom: 16 }}>
+              {'The Shift is a space for honest, supportive conversation between women navigating perimenopause together.'}
+            </Text>
+            {[
+              'Be kind — everyone here is going through something hard',
+              'No medical advice — share your experience, not prescriptions',
+              'Zero tolerance for harassment or abusive content',
+              'Your posts are visible to all Vela members',
+            ].map((rule, i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
+                <Text style={{ color: Colors.teal, fontSize: 14 }}>✦</Text>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.plum, flex: 1, lineHeight: 20 }}>{rule}</Text>
+              </View>
+            ))}
+            <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist, marginTop: 8 }}>
+              {'By posting you agree to our '}
+              <Text style={{ color: Colors.teal, textDecorationLine: 'underline' }} onPress={() => Linking.openURL('https://macpplechic.github.io/vela/terms')}>Terms of Use</Text>
+            </Text>
+          </View>
+          <View style={{ padding: 24, paddingTop: 0 }}>
+            <TouchableOpacity delayPressIn={0}
+              onPress={() => { setHasAcceptedTermsToPost(true); setShowTermsModal(false); }}
+              style={{ backgroundColor: Colors.plum, borderRadius: 18, padding: 18, alignItems: 'center' }}>
+              <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 16, color: Colors.parchment }}>I agree — let me post</Text>
+            </TouchableOpacity>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowTermsModal(false)}
+              style={{ alignItems: 'center', paddingVertical: 14 }}>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist }}>Just browsing for now</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
     </SafeAreaView>
   );
 }
