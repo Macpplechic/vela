@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { router } from 'expo-router';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated, Linking, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
@@ -447,6 +448,16 @@ export default function CoolScreen() {
             {hotFlashCount > 0 && (
               <TouchableOpacity delayPressIn={0} onPress={() => setHotFlashCount(0)} style={{ alignItems: 'center', paddingVertical: 8 }}>
                 <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist }}>Reset today</Text>
+              </TouchableOpacity>
+            )}
+            {hotFlashCount > 0 && coolTab === 'log' && (
+              <TouchableOpacity delayPressIn={0} onPress={() => setCoolTab('breathe')} activeOpacity={0.85}
+                style={{ backgroundColor: Colors.teal, borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                <View>
+                  <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 14, color: '#fff' }}>Get relief now</Text>
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>Start Emergency Cool — 90 seconds</Text>
+                </View>
+                <Text style={{ fontSize: 20 }}>{'⚡'}</Text>
               </TouchableOpacity>
             )}
             <View style={{ backgroundColor: Colors.tealPale, borderRadius: 12, padding: 12, marginTop: 8 }}>

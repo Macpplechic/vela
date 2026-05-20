@@ -277,6 +277,16 @@ export default function RitualScreen() {
             })}
           </View>
           {symptoms.length > 0 && <Text style={styles.symptomNote}>{symptoms.length} symptom{symptoms.length !== 1 ? 's' : ''} logged today ✓</Text>}
+          {symptoms.length >= 2 && (
+            <TouchableOpacity delayPressIn={0} onPress={() => router.push('/(tabs)/flux')} activeOpacity={0.85}
+              style={{ backgroundColor: '#FDECEA', borderRadius: 14, padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <View>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 13, color: Colors.rose }}>See your symptom patterns</Text>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist, marginTop: 2 }}>FluxLog tracks these over time</Text>
+              </View>
+              <Text style={{ fontFamily: Fonts.sans, fontSize: 18, color: Colors.rose }}>{'→'}</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         }
