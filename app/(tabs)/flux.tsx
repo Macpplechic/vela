@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
 import { useEffect } from 'react';
@@ -73,6 +73,7 @@ export default function FluxScreen() {
   const [selectedFlow, setSelectedFlow] = useState<FlowType | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [todayLogged, setTodayLogged] = useState(false);
+  const [referralDismissed, setReferralDismissed] = useState(false);
 
   useEffect(() => {
     Purchases.configure({ apiKey: RC_API_KEY });
@@ -311,7 +312,36 @@ export default function FluxScreen() {
                   ))}
                 </View>
               </View>
+  
+            {/* ── Send to a friend nudge ── */}
+            {logs.length >= 7 && !referralDismissed && (
+              <View style={{ backgroundColor: Colors.plum, borderRadius: 20, padding: 18, marginBottom: 14 }}>
+                <TouchableOpacity
+                  delayPressIn={0}
+                  onPress={() => setReferralDismissed(true)}
+                  style={{ position: 'absolute', top: 12, right: 14, padding: 4 }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 16 }}>✕</Text>
+                </TouchableOpacity>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.gold, letterSpacing: 2, marginBottom: 6 }}>7 DAYS STRONG ✦</Text>
+                <Text style={{ fontFamily: Fonts.serif, fontSize: 17, color: '#fff', marginBottom: 6, lineHeight: 24 }}>
+                  Know someone who needs this?
+                </Text>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 18, marginBottom: 14 }}>
+                  You have been tracking for {logs.length} days. Share Vela with a friend who is navigating perimenopause.
+                </Text>
+                <TouchableOpacity
+                  delayPressIn={0}
+                  activeOpacity={0.85}
+                  onPress={() => Share.share({
+                    message: 'I have been using Vela to track my perimenopause symptoms and it is actually helping. Free 7-day trial — no card needed. https://apps.apple.com/app/id6761030710',
+                    title: 'Try Vela',
+                  })}
+                  style={{ backgroundColor: Colors.teal, borderRadius: 14, padding: 13, alignItems: 'center' }}>
+                  <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 14, color: Colors.cream }}>Send to a friend ↗</Text>
+                </TouchableOpacity>
+              </View>
             )}
+          )}
           </View>
         )}
 

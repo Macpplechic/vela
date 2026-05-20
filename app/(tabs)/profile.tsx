@@ -727,7 +727,7 @@ export default function ProfileScreen() {
               <Text allowFontScaling={false} style={styles.linkBoxLabel}>Your referral link</Text>
               <Text allowFontScaling={false} style={styles.linkBoxVal}>macpplechic.github.io/vela/support</Text>
             </View>
-            <TouchableOpacity delayPressIn={0} style={styles.plumBtn} onPress={() => require('react-native').Linking.openURL('mailto:hello@velaforwomen.com?subject=Creator%20Program%20Application')}>
+            <TouchableOpacity delayPressIn={0} style={styles.plumBtn} onPress={() => require('react-native').Linking.openURL('mailto:hellovelawellness@gmail.com?subject=Creator%20Program%20Application')}>
               <Text allowFontScaling={false} style={styles.plumBtnText}>Apply to join ✦</Text>
             </TouchableOpacity>
           </ScrollView>
