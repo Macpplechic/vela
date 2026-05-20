@@ -101,7 +101,7 @@ export default function QuizScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await setPhase(detectedPhase);
     await setOnboarded(true);
-    router.replace('/(tabs)/ritual');
+    router.replace('/firstwin');
   };
 
   // Phase reveal screen

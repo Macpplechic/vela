@@ -61,6 +61,7 @@ export default function RootLayout() {
           <Stack.Screen name="quiz" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="debug" />
+          <Stack.Screen name="firstwin" />
         </Stack>
       </VelaProvider>
     </SafeAreaProvider>
