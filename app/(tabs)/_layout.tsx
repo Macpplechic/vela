@@ -39,12 +39,13 @@ export default function TabLayout() {
       tabBarShowLabel: false,
       tabBarItemStyle: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 0 },
     }}>
-      <Tabs.Screen name="ritual" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◌" label="Ritual" focused={focused} /> }} />
-      <Tabs.Screen name="plate" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◈" label="Plate" focused={focused} /> }} />
+      <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen name="flux" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◎" label="FluxLog" focused={focused} showDot={!fluxActive} /> }} />
       <Tabs.Screen name="cool" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◇" label="CoolDown" focused={focused} showDot={!coolActive} /> }} />
-      <Tabs.Screen name="shift" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="⬡" label="The Shift" focused={focused} /> }} />
-      <Tabs.Screen name="profile" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◉" label="Profile" focused={focused} /> }} />
+      <Tabs.Screen name="ritual" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◌" label="Ritual" focused={focused} /> }} />
+      <Tabs.Screen name="plate" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◈" label="Nourish" focused={focused} /> }} />
+      <Tabs.Screen name="shift" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="⬡" label="Community" focused={focused} /> }} />
+      <Tabs.Screen name="profile" options={{ tabBarIcon: ({ focused }) => <TabIcon glyph="◉" label="Me" focused={focused} /> }} />
     </Tabs>
   );
 }
