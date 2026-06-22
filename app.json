@@ -23,7 +23,9 @@
         ],
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Vela uses your camera to scan food barcodes for instant nutrition logging.",
-        "NSPhotoLibraryUsageDescription": "Vela uses your photo library for meal photo logging."
+        "NSPhotoLibraryUsageDescription": "Vela uses your photo library for meal photo logging.",
+        "NSHealthShareUsageDescription": "Vela reads your sleep, steps, heart rate, and HRV from Apple Health to surface personalized hormone health insights — no data leaves your device.",
+        "NSHealthUpdateUsageDescription": "Vela does not write any data to Apple Health."
       }
     },
     "android": {

@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import AppleHealthCard from '../../components/AppleHealthCard';
+import VelaScoreCard from '../../components/VelaScoreCard';
+import { useVelaScore } from '../../hooks/useVelaScore';
+import { maybeRequestReview } from '../../hooks/useReviewPrompt';
+import { scheduleCheckInNotification } from '../../hooks/useNotifications';
 import { View, Text, ScrollView, FlatList, TouchableOpacity, Alert, TextInput, StyleSheet, Dimensions, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -82,6 +87,25 @@ export default function RitualScreen() {
   const greetingEmoji = hour < 12 ? "🌿" : hour < 17 ? "☀️" : "🌙";
   const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
+  // ── Vela Score ──────────────────────────────────────────────────────────────
+  const velaScore = useVelaScore({
+    phase, totals, foods, checkedSupps, mySupps, symptoms, sleepHistory, history,
+  });
+
+  // ── Schedule check-in notification once on first render ────────────────────
+  useState(() => { scheduleCheckInNotification(); });
+
+  const handleCheckInComplete = async (data: { mood: number; energy: number; sleep: number }) => {
+    // Persist check-in data into today's sleep log as a quick quality record
+    await saveSleepEntry(
+      { date: new Date().toISOString().split('T')[0], quality: data.sleep, nightSweats: false, wakeCount: 0, notes: `mood:${data.mood} energy:${data.energy}` },
+      sleepHistory
+    );
+    await incrementStreak(streak, lastStreakDate);
+    // Ask for a review after a solid streak
+    await maybeRequestReview(streak + 1);
+  };
+
   const toggleSymptom = async (s: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const next = symptoms.includes(s) ? symptoms.filter(x => x !== s) : [...symptoms, s];
@@ -92,7 +116,8 @@ export default function RitualScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const next = checkedSupps.includes(id) ? checkedSupps.filter(x => x !== id) : [...checkedSupps, id];
     await setCheckedSupps(next);
-    await incrementStreak(streak, lastStreakDate);
+    const newStreak = await incrementStreak(streak, lastStreakDate);
+    await maybeRequestReview(newStreak);
   };
 
   return (
@@ -147,7 +172,7 @@ export default function RitualScreen() {
 
         {velaHistory.length > 0 && (
           <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
-            {([
+            {([\
               { label: 'Streak', value: streak > 0 ? String(streak) + ' days' : '0', color: Colors.gold },
               { label: 'Symptoms', value: String(totalSymptoms), color: Colors.rose },
               { label: 'Sleep', value: avgSleep === 0 ? '-' : avgSleep <= 2 ? 'poor' : avgSleep === 3 ? 'good' : 'great', color: Colors.teal },
@@ -157,13 +182,22 @@ export default function RitualScreen() {
                 <Text style={{ fontFamily: Fonts.serif, fontSize: 20, color: stat.color, marginBottom: 3 }}>{stat.value}</Text>
                 <Text style={{ fontFamily: Fonts.sans, fontSize: 9, color: Colors.mist, textAlign: 'center' }}>{stat.label}</Text>
               </View>
-            ))}
+            ))}\
           </View>
         )}
+
+        {/* Vela Score + morning check-in */}
+        <VelaScoreCard
+          score={velaScore}
+          showCheckIn={session === 'morning'}
+          onCheckInComplete={handleCheckInComplete}
+        />
         <View style={[styles.ritualCard, { backgroundColor: pd.bg, borderLeftColor: pd.color }]}>
           <Text style={[styles.ritualLabel, { color: pd.color }]}>Today's ritual · {pd.label}</Text>
           <Text style={styles.ritualText}>{pd.ritual}</Text>
         </View>
+
+        <AppleHealthCard />
 
         {triggerInsight != null && (
           <View style={{ backgroundColor: '#FDF3DC', borderRadius: 16, padding: 16, marginBottom: 14, borderLeftWidth: 3, borderLeftColor: Colors.gold, flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>

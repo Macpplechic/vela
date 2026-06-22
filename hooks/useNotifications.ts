@@ -120,6 +120,36 @@ export async function scheduleVelaNotifications() {
   return true;
 }
 
+// ── Smart morning check-in notification ──────────────────────────────────────
+// Sent at 7:45am — lands between the 7:30 ritual reminder and 8:00 supp nudge.
+// Deep-links to the ritual tab so one tap opens the check-in card.
+export async function scheduleCheckInNotification(): Promise<void> {
+  const granted = await requestNotificationPermission();
+  if (!granted) return;
+
+  // Cancel any existing check-in notification before rescheduling
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  for (const n of scheduled) {
+    if (n.content.data?.type === 'checkin') {
+      await Notifications.cancelScheduledNotificationAsync(n.identifier);
+    }
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'Good morning ◐  Quick check-in',
+      body: 'How did you sleep? How is your energy? Tap to log in 3 taps.',
+      sound: true,
+      data: { type: 'checkin', screen: '/(tabs)/ritual', session: 'morning' },
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour: 7,
+      minute: 45,
+    },
+  });
+}
+
 // ── Update notification times (user-customizable) ──
 export async function updateNotificationTime(
   type: 'morning' | 'supplements' | 'sleep',
