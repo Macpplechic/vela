@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 390px; height: 844px; background: #3D1F3A; font-family: Georgia, serif; overflow: hidden; }
+  .status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .status-time { color: #C9A96E; font-size: 15px; font-family: Helvetica, sans-serif; font-weight: 600; }
+  .header { background: #3D1F3A; padding: 0 20px 16px; }
+  .logo { color: #C9A96E; font-size: 24px; letter-spacing: 4px; }
+  .sub { color: rgba(200,180,160,0.5); font-size: 10px; letter-spacing: 3px; font-family: Helvetica, sans-serif; text-transform: uppercase; }
+  .scroll { background: #F5F0E8; border-radius: 24px 24px 0 0; padding: 20px; height: calc(844px - 130px); overflow: hidden; }
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { background: #FAF7F2; border-radius: 14px; padding: 12px 8px; text-align: center; border: 0.5px solid #E2D9CC; }
+  .stat-v { font-size: 20px; color: #3D1F3A; }
+  .stat-l { font-size: 9px; color: #A89BB0; font-family: Helvetica, sans-serif; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+  .section-label { font-size: 9px; color: #A89BB0; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 8px; }
+  .tool-btn { border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; border-width: 0.5px; border-style: solid; }
+  .tool-icon { font-size: 20px; }
+  .tool-text { flex: 1; }
+  .tool-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .tool-sub { font-size: 10px; font-family: Helvetica, sans-serif; }
+  .tool-arrow { font-size: 16px; font-family: Helvetica, sans-serif; }
+</style>
+</head>
+<body>
+  <div class="status"><span class="status-time">9:41</span><span style="color:#C9A96E;font-family:Helvetica;font-size:13px">●●●</span></div>
+  <div class="header"><div class="logo">vela</div><div class="sub">your shift. your terms.</div></div>
+
+  <div class="scroll">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-v" style="color:#B8934A">47</div><div class="stat-l">Days</div></div>
+      <div class="stat"><div class="stat-v" style="color:#6A9E72">86%</div><div class="stat-l">Supps</div></div>
+      <div class="stat"><div class="stat-v" style="color:#C4645A">14</div><div class="stat-l">Streak 🔥</div></div>
+    </div>
+
+    <div class="section-label" style="margin-bottom:10px">Your tools</div>
+
+    <div class="tool-btn" style="background:#3D1F3A1A;border-color:rgba(61,31,58,0.2)">
+      <span class="tool-icon">✦</span>
+      <div class="tool-text">
+        <div class="tool-title" style="color:#3D1F3A">Vela Coach</div>
+        <div class="tool-sub" style="color:#A89BB0">On-device AI · reads your data · private</div>
+      </div>
+      <span class="tool-arrow" style="color:#3D1F3A">→</span>
+    </div>
+
+    <div class="tool-btn" style="background:#E6F3F31A;border-color:rgba(74,155,155,0.3)">
+      <span class="tool-icon">💊</span>
+      <div class="tool-text">
+        <div class="tool-title" style="color:#3D1F3A">HRT & Medications</div>
+        <div class="tool-sub" style="color:#A89BB0">Track what you take · see how symptoms change</div>
+      </div>
+      <span class="tool-arrow" style="color:#4A9B9B">→</span>
+    </div>
+
+    <div class="tool-btn" style="background:#EAF3DE1A;border-color:rgba(106,158,114,0.3)">
+      <span class="tool-icon">🦴</span>
+      <div class="tool-text">
+        <div class="tool-title" style="color:#3D1F3A">Bone Health Score</div>
+        <div class="tool-sub" style="color:#A89BB0">Calcium · D3 · exercise · DEXA tracker</div>
+      </div>
+      <span class="tool-arrow" style="color:#6A9E72">→</span>
+    </div>
+
+    <div class="tool-btn" style="background:#FDF3DC1A;border-color:rgba(184,147,74,0.3)">
+      <span class="tool-icon">🩺</span>
+      <div class="tool-text">
+        <div class="tool-title" style="color:#3D1F3A">Doctor Prep</div>
+        <div class="tool-sub" style="color:#A89BB0">Talking points · questions · shareable PDF</div>
+      </div>
+      <span class="tool-arrow" style="color:#B8934A">→</span>
+    </div>
+
+    <div class="tool-btn" style="background:#EEEDFE1A;border-color:rgba(91,107,173,0.3)">
+      <span class="tool-icon">📊</span>
+      <div class="tool-text">
+        <div class="tool-title" style="color:#3D1F3A">90-Day Trends</div>
+        <div class="tool-sub" style="color:#A89BB0">Symptom charts · sleep curve · nutrition</div>
+      </div>
+      <span class="tool-arrow" style="color:#5B6BAD">→</span>
+    </div>
+
+    <div class="tool-btn" style="background:#FDECEA1A;border-color:rgba(196,100,90,0.25)">
+      <span class="tool-icon">🤍</span>
+      <div class="tool-text">
+        <div class="tool-title" style="color:#3D1F3A">Partner Mode</div>
+        <div class="tool-sub" style="color:#A89BB0">Weekly digest for someone you trust</div>
+      </div>
+      <span class="tool-arrow" style="color:#C4645A">→</span>
+    </div>
+  </div>
+</body>
+</html>

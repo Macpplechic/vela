@@ -301,6 +301,32 @@ export default function ProfileScreen() {
               Talking points · questions · shareable PDF
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/cbt')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.tealPale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.teal + '40' }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.teal }]}>
+              🧠 CBT for Hot Flashes
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              6-week evidence-based program · reduces distress 50%
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/partner')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.rosePale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.rose + '30' }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.rose }]}>
+              🤍 Partner Mode
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              Weekly digest for someone you trust
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 390px; height: 844px; background: #3D1F3A; font-family: Georgia, serif; overflow: hidden; }
+  .status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .status-time { color: #C9A96E; font-size: 15px; font-family: Helvetica, sans-serif; font-weight: 600; }
+  .header { background: #3D1F3A; padding: 0 20px 16px; display: flex; align-items: center; gap: 12px; }
+  .back { color: #C9A96E; font-size: 20px; font-family: Helvetica, sans-serif; }
+  .header-text { flex: 1; }
+  .title { color: #C9A96E; font-size: 18px; }
+  .title-sub { color: rgba(200,180,160,0.55); font-size: 11px; font-family: Helvetica, sans-serif; margin-top: 1px; }
+  .mode-badge { background: #EAF3DE; border-radius: 20px; padding: 5px 12px; align-self: center; }
+  .mode-text { color: #3B6D11; font-size: 10px; font-family: Helvetica, sans-serif; }
+  .chat { background: #F5F0E8; border-radius: 24px 24px 0 0; padding: 20px; height: calc(844px - 130px); overflow: hidden; }
+  .bubble-coach { display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
+  .avatar { width: 28px; height: 28px; border-radius: 14px; background: #3D1F3A; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #B8934A; flex-shrink: 0; }
+  .bubble-c { background: #FAF7F2; border-radius: 18px 18px 18px 4px; padding: 12px 14px; max-width: 280px; border: 0.5px solid #E2D9CC; }
+  .bubble-u { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+  .bubble-u-inner { background: #3D1F3A; border-radius: 18px 18px 4px 18px; padding: 12px 14px; max-width: 260px; }
+  .chat-text { font-size: 13px; color: #3D1F3A; font-family: Helvetica, sans-serif; line-height: 1.6; }
+  .chat-text-u { font-size: 13px; color: #F5EDD8; font-family: Helvetica, sans-serif; line-height: 1.6; }
+  .suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip { background: #FAF7F2; border: 0.5px solid #E2D9CC; border-radius: 20px; padding: 7px 13px; font-size: 11px; color: #3D1F3A; font-family: Helvetica, sans-serif; }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; margin-top: 8px; }
+  .input { flex: 1; background: #FAF7F2; border-radius: 20px; border: 0.5px solid #E2D9CC; padding: 12px 16px; font-size: 13px; color: #A89BB0; font-family: Helvetica, sans-serif; }
+  .send { width: 40px; height: 40px; border-radius: 20px; background: #3D1F3A; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #F5EDD8; font-family: Helvetica, sans-serif; }
+  .callout { position: absolute; right: 16px; top: 340px; background: #3D1F3A; color: #C9A96E; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-family: Helvetica, sans-serif; border: 1px solid rgba(201,169,110,0.3); }
+  .callout2 { position: absolute; left: 16px; bottom: 120px; background: #6A9E72; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-family: Helvetica, sans-serif; }
+</style>
+</head>
+<body>
+  <div class="status"><span class="status-time">9:41</span><span style="color:#C9A96E;font-family:Helvetica;font-size:13px">●●●</span></div>
+  <div class="header">
+    <span class="back">←</span>
+    <div class="header-text">
+      <div class="title">Vela Coach</div>
+      <div class="title-sub">Your personal wellness coach</div>
+    </div>
+    <div class="mode-badge"><span class="mode-text">🔒 On-device · private</span></div>
+  </div>
+
+  <div class="chat">
+    <div class="bubble-coach">
+      <div class="avatar">✦</div>
+      <div class="bubble-c">
+        <div class="chat-text">Good morning. I can see you've been tracking Hot flash, Night sweats, and Brain fog recently. Ask me anything — I'll look at your data.</div>
+      </div>
+    </div>
+
+    <div class="suggest">
+      <div class="chip">Why am I getting hot flashes?</div>
+      <div class="chip">How is my sleep trending?</div>
+      <div class="chip">Help me prep for my doctor</div>
+    </div>
+
+    <div class="bubble-u">
+      <div class="bubble-u-inner">
+        <div class="chat-text-u">Why do I keep getting hot flashes after coffee?</div>
+      </div>
+    </div>
+
+    <div class="bubble-coach">
+      <div class="avatar">✦</div>
+      <div class="bubble-c">
+        <div class="chat-text">Looking at your last 30 days of logs, coffee appears on 18 of the 22 days you logged a hot flash — that's 82% overlap.<br><br>Caffeine raises core body temperature and constricts blood vessels, both of which trigger the hypothalamus to activate the cooling response (your hot flash).<br><br>Try switching to matcha — it has L-theanine which buffers the caffeine hit and dramatically reduces flash frequency for many women.</div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input">Ask your coach anything...</div>
+      <div class="send">↑</div>
+    </div>
+  </div>
+
+  <div class="callout">Reads YOUR data · not generic advice</div>
+  <div class="callout2">Apple Intelligence · zero API cost</div>
+</body>
+</html>

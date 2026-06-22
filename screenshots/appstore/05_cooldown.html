@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 390px; height: 844px; background: #3D1F3A; font-family: Georgia, serif; overflow: hidden; }
+  .status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .status-time { color: #C9A96E; font-size: 15px; font-family: Helvetica, sans-serif; font-weight: 600; }
+  .header { background: #3D1F3A; padding: 0 20px 16px; }
+  .logo { color: #C9A96E; font-size: 24px; letter-spacing: 4px; }
+  .sub { color: rgba(200,180,160,0.5); font-size: 10px; letter-spacing: 3px; font-family: Helvetica, sans-serif; text-transform: uppercase; }
+  .scroll { background: #F5F0E8; border-radius: 24px 24px 0 0; padding: 20px; height: calc(844px - 130px); overflow: hidden; }
+  .page-title { font-size: 26px; color: #3D1F3A; margin-bottom: 2px; }
+  .page-sub { font-size: 12px; color: #A89BB0; font-family: Helvetica, sans-serif; margin-bottom: 20px; }
+  .emergency-btn { background: #3D1F3A; border-radius: 20px; padding: 18px; text-align: center; margin-bottom: 16px; }
+  .emerg-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+  .emerg-title { color: #C9A96E; font-size: 17px; margin-bottom: 4px; }
+  .emerg-sub { color: rgba(245,239,230,0.6); font-size: 12px; font-family: Helvetica, sans-serif; }
+  .protocol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .protocol { background: #FAF7F2; border-radius: 16px; padding: 16px; border: 0.5px solid #E2D9CC; }
+  .proto-icon { font-size: 24px; display: block; margin-bottom: 6px; }
+  .proto-title { font-size: 14px; color: #3D1F3A; margin-bottom: 2px; }
+  .proto-dur { font-size: 11px; color: #A89BB0; font-family: Helvetica, sans-serif; margin-bottom: 6px; }
+  .proto-desc { font-size: 11px; color: #A89BB0; font-family: Helvetica, sans-serif; line-height: 1.5; }
+  .cbt-card { background: #E6F3F3; border-radius: 18px; padding: 16px; border: 0.5px solid rgba(74,155,155,0.3); margin-bottom: 12px; }
+  .cbt-label { font-size: 9px; color: #4A9B9B; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 6px; }
+  .cbt-title { font-size: 16px; color: #3D1F3A; margin-bottom: 4px; }
+  .cbt-sub { font-size: 12px; color: #A89BB0; font-family: Helvetica, sans-serif; line-height: 1.5; }
+  .progress-row { display: flex; gap: 6px; margin-top: 10px; }
+  .prog-dot { flex: 1; height: 6px; border-radius: 3px; background: #E2D9CC; }
+  .prog-done { background: #4A9B9B; }
+  .callout { position: absolute; right: 16px; top: 300px; background: #4A9B9B; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-family: Helvetica, sans-serif; }
+  .callout2 { position: absolute; left: 16px; top: 580px; background: #3D1F3A; color: #C9A96E; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-family: Helvetica, sans-serif; }
+</style>
+</head>
+<body>
+  <div class="status"><span class="status-time">9:41</span><span style="color:#C9A96E;font-family:Helvetica;font-size:13px">●●●</span></div>
+  <div class="header"><div class="logo">vela</div><div class="sub">your shift. your terms.</div></div>
+
+  <div class="scroll">
+    <div class="page-title">CoolDown ◌</div>
+    <div class="page-sub">Nervous system protocols for hot flash relief</div>
+
+    <div class="emergency-btn">
+      <span class="emerg-icon">⚡</span>
+      <div class="emerg-title">Emergency Cool</div>
+      <div class="emerg-sub">Hot flash right now? · 90 seconds</div>
+    </div>
+
+    <div class="protocol-grid">
+      <div class="protocol">
+        <span class="proto-icon">🌬</span>
+        <div class="proto-title">4-7-8 Breath</div>
+        <div class="proto-dur">4 minutes</div>
+        <div class="proto-desc">Activates parasympathetic system to lower core temp</div>
+      </div>
+      <div class="protocol">
+        <span class="proto-icon">〰️</span>
+        <div class="proto-title">Paced Breathing</div>
+        <div class="proto-dur">5 minutes</div>
+        <div class="proto-desc">Reduces flash frequency by 50% in clinical trials</div>
+      </div>
+      <div class="protocol">
+        <span class="proto-icon">⬜</span>
+        <div class="proto-title">Box Breathing</div>
+        <div class="proto-dur">4 minutes</div>
+        <div class="proto-desc">Navy SEAL stress control technique</div>
+      </div>
+      <div class="protocol">
+        <span class="proto-icon">🌊</span>
+        <div class="proto-title">Body Scan</div>
+        <div class="proto-dur">7 minutes</div>
+        <div class="proto-desc">Release heat from head to toe</div>
+      </div>
+    </div>
+
+    <div class="cbt-card">
+      <div class="cbt-label">🧠 CBT Program · Week 2 of 6</div>
+      <div class="cbt-title">Paced breathing mastery</div>
+      <div class="cbt-sub">Your most powerful tool — reduces hot flash distress by up to 50% in clinical trials. Day 3 of 5.</div>
+      <div class="progress-row">
+        <div class="prog-dot prog-done"></div>
+        <div class="prog-dot prog-done"></div>
+        <div class="prog-dot prog-done"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">50% reduction · clinical evidence</div>
+  <div class="callout2">6-week CBT program included</div>
+</body>
+</html>

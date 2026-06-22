@@ -144,13 +144,94 @@ export default function PlateScreen() {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ['images'] as any,
       quality: 0.5,
+      base64: true,
     });
     if (result.canceled) return;
-    setScannedImage(result.assets[0].uri);
-    
-    setSearch(''); // photo taken — user can type food name in search box
-            // search cleared
-          }
+    const asset = result.assets[0];
+    setScannedImage(asset.uri);
+    setApiLoading(true);
+
+    try {
+      // Send to Claude API for vision food identification
+      const base64 = asset.base64;
+      if (!base64) { setApiLoading(false); return; }
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: { type: 'base64', media_type: 'image/jpeg', data: base64 },
+              },
+              {
+                type: 'text',
+                text: `You are a nutrition expert analyzing a meal photo for a perimenopause wellness app. Identify all visible foods and estimate their nutritional content per typical serving.
+
+Return ONLY a valid JSON array with no other text, markdown, or explanation. Each item:
+{
+  "name": "Food name",
+  "protein": number (grams),
+  "fiber": number (grams),
+  "calcium": number (mg),
+  "magnesium": number (mg),
+  "omega3": number (grams),
+  "phyto": number (mg, phytoestrogens - high in soy/flax/legumes),
+  "cal": number (calories),
+  "ai": number (anti-inflammatory score 0-10, 10=most anti-inflammatory)
+}
+
+Focus on perimenopause-relevant nutrients. If you cannot identify specific foods, return an empty array [].`,
+              },
+            ],
+          }],
+        }),
+      });
+
+      const data = await response.json();
+      const text = data.content?.[0]?.text ?? '[]';
+      let foods: any[] = [];
+      try {
+        // Strip any accidental markdown
+        const clean = text.replace(/```json|```/g, '').trim();
+        foods = JSON.parse(clean);
+      } catch { foods = []; }
+
+      if (foods.length === 0) {
+        Alert.alert('Could not identify foods', 'Try a clearer photo or search manually below.');
+        setApiLoading(false);
+        return;
+      }
+
+      // Map to Food type and show as API results
+      const mapped = foods.map((f: any, i: number) => ({
+        id: `photo_${Date.now()}_${i}`,
+        name: f.name ?? 'Unknown food',
+        category: 'photo',
+        protein:   Math.round((f.protein   ?? 0) * 10) / 10,
+        fiber:     Math.round((f.fiber     ?? 0) * 10) / 10,
+        calcium:   Math.round(f.calcium    ?? 0),
+        magnesium: Math.round(f.magnesium  ?? 0),
+        omega3:    Math.round((f.omega3    ?? 0) * 10) / 10,
+        phyto:     Math.round(f.phyto      ?? 0),
+        cal:       Math.round(f.cal        ?? 0),
+        ai:        Math.min(10, Math.max(0, Math.round(f.ai ?? 5))),
+        phase:     ['early', 'late', 'post'] as any,
+      }));
+
+      setApiResults(mapped);
+      setSearch('');
+    } catch (e) {
+      Alert.alert('Analysis failed', 'Check your connection and try again.');
+    } finally {
+      setApiLoading(false);
+    }
+  };
   const filteredFoods: Food[] = [];
 
   const addFood = async (f: Food) => {

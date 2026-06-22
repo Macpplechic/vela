@@ -67,6 +67,8 @@ export default function RootLayout() {
           <Stack.Screen name="bone" options={{ presentation: 'modal' }} />
           <Stack.Screen name="trends" options={{ presentation: 'modal' }} />
           <Stack.Screen name="doctor" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="cbt" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="partner" options={{ presentation: 'modal' }} />
         </Stack>
       </VelaProvider>
     </SafeAreaProvider>

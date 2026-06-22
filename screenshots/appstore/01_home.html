@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 390px; height: 844px; background: #3D1F3A; font-family: Georgia, serif; overflow: hidden; }
+  .status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .status-time { color: #C9A96E; font-size: 15px; font-family: Helvetica, sans-serif; font-weight: 600; }
+  .header { background: #3D1F3A; padding: 0 20px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { color: #C9A96E; font-size: 28px; letter-spacing: 4px; }
+  .sub { color: rgba(200,180,160,0.5); font-size: 10px; letter-spacing: 3px; font-family: Helvetica, sans-serif; text-transform: uppercase; margin-top: 2px; }
+  .phase-badge { border: 1px solid rgba(201,169,110,0.4); border-radius: 20px; padding: 5px 14px; }
+  .phase-text { color: #C9A96E; font-size: 11px; font-family: Helvetica, sans-serif; }
+  .scroll { background: #F5F0E8; border-radius: 24px 24px 0 0; padding: 20px; height: calc(844px - 140px); overflow: hidden; }
+  .date { font-size: 10px; color: #A89BB0; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 4px; }
+  .greeting { font-size: 28px; color: #3D1F3A; margin-bottom: 4px; }
+  .hint { font-size: 13px; color: #A89BB0; font-family: Helvetica, sans-serif; margin-bottom: 20px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { background: #FAF7F2; border-radius: 14px; padding: 12px 8px; text-align: center; border: 0.5px solid #E2D9CC; }
+  .stat-val { font-size: 18px; color: #B8934A; display: block; margin-bottom: 2px; }
+  .stat-lab { font-size: 8px; color: #A89BB0; font-family: Helvetica, sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+  .score-card { background: #FAF7F2; border-radius: 18px; padding: 18px; margin-bottom: 12px; border: 0.5px solid #E2D9CC; display: flex; justify-content: space-between; align-items: center; }
+  .score-label { font-size: 9px; color: #A89BB0; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 4px; }
+  .score-num { font-size: 38px; color: #4A9B9B; line-height: 1; }
+  .score-tag { font-size: 13px; color: #4A9B9B; font-family: Helvetica, sans-serif; }
+  .score-trend { font-size: 12px; color: #6A9E72; font-family: Helvetica, sans-serif; margin-top: 4px; }
+  .ring { width: 68px; height: 68px; border-radius: 50%; border: 5px solid #4A9B9B; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .ring-n { font-size: 24px; color: #4A9B9B; }
+  .ritual-card { border-radius: 18px; padding: 16px; margin-bottom: 12px; border-left: 3px solid #4A9B9B; background: #E6F3F3; }
+  .ritual-label { font-size: 9px; color: #4A9B9B; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 6px; }
+  .ritual-text { font-size: 13px; color: #3D1F3A; font-family: Helvetica, sans-serif; line-height: 1.6; }
+  .week-card { background: #FAF7F2; border-radius: 18px; padding: 16px; border: 0.5px solid #E2D9CC; }
+  .week-title { font-size: 9px; color: #A89BB0; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 10px; }
+  .week-row { display: flex; justify-content: space-between; }
+  .day-box { width: 38px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 3px; }
+  .day-done { background: #3D1F3A; }
+  .day-today { border: 2px solid #B8934A; background: #FAF7F2; }
+  .day-empty { background: #F5F0E8; border: 0.5px solid #E2D9CC; }
+  .day-letter { font-size: 10px; font-family: Helvetica, sans-serif; }
+  .day-dot { font-size: 8px; color: #B8934A; }
+  .callout { position: absolute; right: 20px; top: 200px; background: #3D1F3A; color: #F5EDD8; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-family: Helvetica, sans-serif; white-space: nowrap; }
+  .callout2 { position: absolute; left: 20px; top: 390px; background: #4A9B9B; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-family: Helvetica, sans-serif; white-space: nowrap; }
+  .tagline { position: absolute; bottom: 30px; left: 0; right: 0; text-align: center; }
+  .tag1 { color: #C9A96E; font-size: 22px; letter-spacing: 3px; display: block; }
+  .tag2 { color: rgba(245,239,230,0.6); font-size: 11px; font-family: Helvetica, sans-serif; letter-spacing: 2px; text-transform: uppercase; display: block; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="status">
+    <span class="status-time">9:41</span>
+    <span style="color:#C9A96E;font-family:Helvetica,sans-serif;font-size:13px">●●●</span>
+  </div>
+  <div class="header">
+    <div>
+      <div class="logo">vela</div>
+      <div class="sub">your shift. your terms.</div>
+    </div>
+    <div class="phase-badge">
+      <span class="phase-text">🌙 Late perimenopause</span>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div class="date">Monday, June 22</div>
+    <div class="greeting">Good morning. 🌿</div>
+    <div class="hint">Late perimenopause · Take your supplements before your first meal</div>
+
+    <div class="stats">
+      <div class="stat"><span class="stat-val" style="color:#B8934A">14</span><span class="stat-lab">Streak</span></div>
+      <div class="stat"><span class="stat-val" style="color:#C4645A">3</span><span class="stat-lab">Symptoms</span></div>
+      <div class="stat"><span class="stat-val" style="color:#4A9B9B">good</span><span class="stat-lab">Sleep</span></div>
+      <div class="stat"><span class="stat-val" style="color:#6A9E72">47</span><span class="stat-lab">Days</span></div>
+    </div>
+
+    <div class="score-card">
+      <div>
+        <div class="score-label">Vela score</div>
+        <div class="score-num">74</div>
+        <div class="score-tag">strong</div>
+        <div class="score-trend">↑ up from 68 avg</div>
+      </div>
+      <div class="ring"><span class="ring-n">74</span></div>
+    </div>
+
+    <div class="ritual-card">
+      <div class="ritual-label">Today's ritual · Late perimenopause</div>
+      <div class="ritual-text">Focus on grounding today. Your nervous system responds well to routine — breathwork before coffee, protein before noon.</div>
+    </div>
+
+    <div class="week-card">
+      <div class="week-title">This week</div>
+      <div class="week-row">
+        <div class="day-box day-done"><span class="day-letter" style="color:#FAF7F2">S</span><span class="day-dot">✦</span></div>
+        <div class="day-box day-done"><span class="day-letter" style="color:#FAF7F2">M</span><span class="day-dot">✦</span></div>
+        <div class="day-box day-done"><span class="day-letter" style="color:#FAF7F2">T</span><span class="day-dot">✦</span></div>
+        <div class="day-box day-done"><span class="day-letter" style="color:#FAF7F2">W</span><span class="day-dot">✦</span></div>
+        <div class="day-box day-done"><span class="day-letter" style="color:#FAF7F2">T</span><span class="day-dot">✦</span></div>
+        <div class="day-box day-today"><span class="day-letter" style="color:#3D1F3A">F</span></div>
+        <div class="day-box day-empty"><span class="day-letter" style="color:#A89BB0">S</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">14-day streak 🔥</div>
+  <div class="callout2">Vela Score: 74 · strong</div>
+
+  <div class="tagline">
+    <span class="tag1">vela</span>
+    <span class="tag2">Perimenopause · your way</span>
+  </div>
+</body>
+</html>

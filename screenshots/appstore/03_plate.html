@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 390px; height: 844px; background: #3D1F3A; font-family: Georgia, serif; overflow: hidden; }
+  .status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .status-time { color: #C9A96E; font-size: 15px; font-family: Helvetica, sans-serif; font-weight: 600; }
+  .header { background: #3D1F3A; padding: 0 20px 16px; }
+  .logo { color: #C9A96E; font-size: 24px; letter-spacing: 4px; }
+  .sub { color: rgba(200,180,160,0.5); font-size: 10px; letter-spacing: 3px; font-family: Helvetica, sans-serif; text-transform: uppercase; }
+  .scroll { background: #F5F0E8; border-radius: 24px 24px 0 0; padding: 20px; height: calc(844px - 130px); overflow: hidden; }
+  .page-title { font-size: 26px; color: #3D1F3A; margin-bottom: 2px; }
+  .page-sub { font-size: 12px; color: #A89BB0; font-family: Helvetica, sans-serif; margin-bottom: 16px; }
+  .action-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .scan-btn { flex: 1; background: #3D1F3A; border-radius: 16px; padding: 14px; text-align: center; }
+  .scan-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .scan-label { color: #C9A96E; font-size: 12px; font-family: Helvetica, sans-serif; }
+  .search-btn { flex: 2; background: #FAF7F2; border-radius: 16px; padding: 14px; border: 0.5px solid #E2D9CC; display: flex; align-items: center; gap: 10px; }
+  .search-text { color: #A89BB0; font-size: 13px; font-family: Helvetica, sans-serif; }
+  .score-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .score-box { flex: 1; background: #FAF7F2; border-radius: 14px; padding: 14px; text-align: center; border: 0.5px solid #E2D9CC; }
+  .score-val { font-size: 28px; color: #3D1F3A; display: block; }
+  .score-denom { font-size: 11px; color: #A89BB0; font-family: Helvetica, sans-serif; }
+  .score-label { font-size: 10px; color: #A89BB0; font-family: Helvetica, sans-serif; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+  .nutrients { background: #FAF7F2; border-radius: 18px; padding: 16px; margin-bottom: 12px; border: 0.5px solid #E2D9CC; }
+  .nut-title { font-size: 9px; color: #A89BB0; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 12px; }
+  .nut-row { margin-bottom: 9px; }
+  .nut-labels { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .nut-name { font-size: 12px; color: #A89BB0; font-family: Helvetica, sans-serif; }
+  .nut-val { font-size: 12px; color: #3D1F3A; font-family: Helvetica, sans-serif; }
+  .bar { height: 5px; background: #E2D9CC; border-radius: 3px; }
+  .food-card { background: #FAF7F2; border-radius: 18px; padding: 14px; border: 0.5px solid #E2D9CC; }
+  .food-title { font-size: 9px; color: #A89BB0; letter-spacing: 2px; text-transform: uppercase; font-family: Helvetica, sans-serif; margin-bottom: 10px; }
+  .food-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid #E2D9CC; }
+  .food-name { font-size: 13px; color: #3D1F3A; font-family: Helvetica, sans-serif; }
+  .food-tag { background: #EAF3DE; border-radius: 10px; padding: 2px 8px; font-size: 10px; color: #3B6D11; font-family: Helvetica, sans-serif; }
+  .photo-badge { position: absolute; top: 220px; left: 20px; background: #B8934A; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-family: Helvetica, sans-serif; }
+  .callout { position: absolute; right: 16px; top: 350px; background: #3D1F3A; color: #F5EDD8; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-family: Helvetica, sans-serif; }
+</style>
+</head>
+<body>
+  <div class="status"><span class="status-time">9:41</span><span style="color:#C9A96E;font-family:Helvetica;font-size:13px">●●●</span></div>
+  <div class="header"><div class="logo">vela</div><div class="sub">your shift. your terms.</div></div>
+
+  <div class="scroll">
+    <div class="page-title">Peri Plate 🥗</div>
+    <div class="page-sub">Food scored for hormone health</div>
+
+    <div class="action-row">
+      <div class="scan-btn">
+        <span class="scan-icon">📸</span>
+        <span class="scan-label">Snap meal</span>
+      </div>
+      <div class="search-btn">
+        <span style="font-size:16px">🔍</span>
+        <span class="search-text">Search 500,000 foods...</span>
+      </div>
+    </div>
+
+    <div class="score-row">
+      <div class="score-box">
+        <span class="score-val" style="color:#6A9E72">78</span>
+        <span class="score-denom">/100</span>
+        <span class="score-label">Peri score</span>
+      </div>
+      <div class="score-box">
+        <span class="score-val" style="color:#4A9B9B">82</span>
+        <span class="score-denom">/100</span>
+        <span class="score-label">Anti-inflam.</span>
+      </div>
+      <div class="score-box">
+        <span class="score-val" style="color:#3D1F3A">1,640</span>
+        <span class="score-denom">kcal</span>
+        <span class="score-label">Today</span>
+      </div>
+    </div>
+
+    <div class="nutrients">
+      <div class="nut-title">Nutrients vs your targets</div>
+      <div class="nut-row"><div class="nut-labels"><span class="nut-name">Protein</span><span class="nut-val">94g / 120g</span></div><div class="bar"><div style="height:5px;width:78%;background:#C4645A;border-radius:3px"></div></div></div>
+      <div class="nut-row"><div class="nut-labels"><span class="nut-name">Fiber</span><span class="nut-val">28g / 35g</span></div><div class="bar"><div style="height:5px;width:80%;background:#6A9E72;border-radius:3px"></div></div></div>
+      <div class="nut-row"><div class="nut-labels"><span class="nut-name">Calcium</span><span class="nut-val">940mg / 1200mg</span></div><div class="bar"><div style="height:5px;width:78%;background:#B8934A;border-radius:3px"></div></div></div>
+      <div class="nut-row"><div class="nut-labels"><span class="nut-name">Omega-3</span><span class="nut-val">1.8g / 2g</span></div><div class="bar"><div style="height:5px;width:90%;background:#4A9B9B;border-radius:3px"></div></div></div>
+      <div class="nut-row" style="margin-bottom:0"><div class="nut-labels"><span class="nut-name">Phytoestrogens</span><span class="nut-val">45mg / 80mg</span></div><div class="bar"><div style="height:5px;width:56%;background:#5B6BAD;border-radius:3px"></div></div></div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-title">Today's food · 4 items</div>
+      <div class="food-item"><span class="food-name">🫐 Greek yogurt with berries</span><span class="food-tag">AI: 9</span></div>
+      <div class="food-item"><span class="food-name">🥑 Salmon & avocado bowl</span><span class="food-tag">AI: 10</span></div>
+      <div class="food-item"><span class="food-name">🥬 Kale & flaxseed smoothie</span><span class="food-tag">AI: 9</span></div>
+    </div>
+  </div>
+
+  <div class="photo-badge">📸 AI identifies foods from photo</div>
+  <div class="callout">Hormone-targeted nutrition</div>
+</body>
+</html>
