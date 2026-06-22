@@ -65,7 +65,7 @@ const PHASE_TIPS: Record<string, { title: string; tips: string[] }> = {
 };
 
 export default function FluxScreen() {
-  const { fluxActive, fluxLogs, setFluxLogs, unlockFlux, startFluxTrial, startBundleTrial, unlockBundle, bundleActive, phase } = useVelaStore();
+  const { fluxActive, fluxLogs, setFluxLogs, unlockFlux, startFluxTrial, startBundleTrial, unlockBundle, bundleActive, phase, sleepHistory, history } = useVelaStore();
   const [pkg, setPkg] = useState<any>(null);
   const [bundlePkg, setBundlePkg] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -180,22 +180,54 @@ export default function FluxScreen() {
 
   const phaseTip = PHASE_TIPS[phase ?? 'late'];
 
-  // ── Calendar grid ────────────────────────────────────────────
-  const calendarDays = useMemo(() => {
+  // ── Pattern calendar state ────────────────────────────────────
+  const [calMonthOffset, setCalMonthOffset] = useState(0);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+
+  const calTarget = useMemo(() => {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
+    return new Date(now.getFullYear(), now.getMonth() + calMonthOffset, 1);
+  }, [calMonthOffset]);
+
+  const calMonthLabel = useMemo(() =>
+    calTarget.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+  [calTarget]);
+
+  // ── Calendar grid (multi-month, with sleep + symptom data) ───
+  const calendarDays = useMemo(() => {
+    const year = calTarget.getFullYear();
+    const month = calTarget.getMonth();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const days = [];
+    const days: Array<null | { day: number; dateStr: string; log: any; sleepEntry: any; histEntry: any }> = [];
     for (let i = 0; i < firstDay; i++) days.push(null);
     for (let i = 1; i <= daysInMonth; i++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const log = logs.find((l: any) => l.date === dateStr);
-      days.push({ day: i, dateStr, log });
+      const log = logs.find((l: any) => l.date === dateStr) ?? null;
+      const sleepEntry = (sleepHistory ?? []).find((s: any) => s.date === dateStr) ?? null;
+      const histEntry = (history ?? []).find((h: any) => h.date === dateStr) ?? null;
+      days.push({ day: i, dateStr, log, sleepEntry, histEntry });
     }
     return days;
-  }, [logs]);
+  }, [logs, sleepHistory, history, calTarget]);
+
+  // Top symptoms for the visible month
+  const calPatterns = useMemo(() => {
+    const monthStr = `${calTarget.getFullYear()}-${String(calTarget.getMonth() + 1).padStart(2, '0')}`;
+    const monthLogs = logs.filter((l: any) => l.date.startsWith(monthStr));
+    const counts: Record<string, number> = {};
+    monthLogs.forEach((l: any) => (l.symptoms ?? []).forEach((s: string) => { counts[s] = (counts[s] ?? 0) + 1; }));
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [logs, calTarget]);
+
+  const selectedDayData = useMemo(() => {
+    if (!selectedDay) return null;
+    return {
+      log: logs.find((l: any) => l.date === selectedDay) ?? null,
+      sleepEntry: (sleepHistory ?? []).find((s: any) => s.date === selectedDay) ?? null,
+      histEntry: (history ?? []).find((h: any) => h.date === selectedDay) ?? null,
+    };
+  }, [selectedDay, logs, sleepHistory, history]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -347,42 +379,174 @@ export default function FluxScreen() {
 
         {/* ── Calendar Tab ── */}
         {fluxActive && activeTab === 'calendar' && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>📅 {new Date().toLocaleDateString('en', { month: 'long', year: 'numeric' })}</Text>
-            <Text style={styles.cardSub}>Your cycle this month</Text>
-            <View style={{ flexDirection: 'row', marginTop: 12, marginBottom: 4 }}>
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                <Text key={i} style={{ flex: 1, textAlign: 'center', fontFamily: Fonts.sansMedium, fontSize: 10, color: Colors.mist }}>{d}</Text>
-              ))}
+          <View>
+            {/* Month navigation */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <TouchableOpacity delayPressIn={0} onPress={() => { setCalMonthOffset(o => o - 1); setSelectedDay(null); }}
+                style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.cream, borderWidth: 0.5, borderColor: Colors.parchmentDark, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 16, color: Colors.plum }}>←</Text>
+              </TouchableOpacity>
+              <Text style={{ fontFamily: Fonts.serif, fontSize: 18, color: Colors.plum }}>{calMonthLabel}</Text>
+              <TouchableOpacity delayPressIn={0} onPress={() => { setCalMonthOffset(o => Math.min(0, o + 1)); setSelectedDay(null); }}
+                style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.cream, borderWidth: 0.5, borderColor: Colors.parchmentDark, alignItems: 'center', justifyContent: 'center',
+                  opacity: calMonthOffset >= 0 ? 0.3 : 1 }}>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 16, color: Colors.plum }}>→</Text>
+              </TouchableOpacity>
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-              {calendarDays.map((d, i) => (
-                <View key={i} style={{ width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 2 }}>
-                  {d ? (
-                    <View style={{ width: '100%', aspectRatio: 1, borderRadius: 100, alignItems: 'center', justifyContent: 'center',
-                      backgroundColor: d.log?.flow ? FLOW_COLORS[d.log.flow] + '33' : 'transparent',
-                      borderWidth: d.dateStr === today ? 2 : 0, borderColor: Colors.plum }}>
-                      <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: d.log ? Colors.plum : Colors.mist }}>{d.day}</Text>
-                      {d.log?.symptoms && d.log.symptoms.length > 0 && (
-                        <View style={{ position: 'absolute', bottom: 2, width: 3, height: 3, borderRadius: 2, backgroundColor: Colors.rose }} />
-                      )}
-                    </View>
-                  ) : null}
+
+            {/* Calendar grid */}
+            <View style={styles.card}>
+              {/* Day-of-week headers */}
+              <View style={{ flexDirection: 'row', marginBottom: 6 }}>
+                {['Su','Mo','Tu','We','Th','Fr','Sa'].map((d, i) => (
+                  <Text key={i} style={{ flex: 1, textAlign: 'center', fontFamily: Fonts.sansMedium, fontSize: 9, color: Colors.mist, letterSpacing: 0.5 }}>{d}</Text>
+                ))}
+              </View>
+
+              {/* Day cells */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {calendarDays.map((d, i) => {
+                  if (!d) return <View key={i} style={{ width: '14.28%', aspectRatio: 1 }} />;
+                  const isToday = d.dateStr === today;
+                  const isSelected = d.dateStr === selectedDay;
+                  const hasFlow = !!d.log?.flow;
+                  const symptomCount = d.log?.symptoms?.length ?? 0;
+                  const sleepQ = d.sleepEntry?.quality ?? null;
+
+                  // Sleep color band at top of cell
+                  const sleepColor = sleepQ === null ? 'transparent'
+                    : sleepQ <= 2 ? Colors.rose + '60'
+                    : sleepQ === 3 ? Colors.gold + '60'
+                    : Colors.teal + '60';
+
+                  return (
+                    <TouchableOpacity delayPressIn={0} key={i} onPress={() => setSelectedDay(isSelected ? null : d.dateStr)}
+                      style={{ width: '14.28%', aspectRatio: 1, padding: 2 }}
+                      activeOpacity={0.7}>
+                      <View style={{
+                        flex: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center',
+                        backgroundColor: isSelected ? Colors.plum : hasFlow ? FLOW_COLORS[d.log.flow] + '28' : Colors.cream,
+                        borderWidth: isToday ? 2 : 0.5,
+                        borderColor: isToday ? Colors.gold : isSelected ? Colors.plum : Colors.parchmentDark,
+                        overflow: 'hidden',
+                        position: 'relative',
+                      }}>
+                        {/* Sleep color band at top */}
+                        {sleepColor !== 'transparent' && !isSelected && (
+                          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: sleepColor }} />
+                        )}
+                        <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: isSelected ? Colors.parchment : (d.log || d.histEntry) ? Colors.plum : Colors.mist }}>
+                          {d.day}
+                        </Text>
+                        {/* Symptom dots */}
+                        {symptomCount > 0 && !isSelected && (
+                          <View style={{ flexDirection: 'row', gap: 2, marginTop: 2 }}>
+                            {[...Array(Math.min(3, symptomCount))].map((_, di) => (
+                              <View key={di} style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: Colors.rose }} />
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Legend */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14, paddingTop: 12, borderTopWidth: 0.5, borderTopColor: Colors.parchmentDark }}>
+                {Object.entries(FLOW_COLORS).map(([f, c]) => (
+                  <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: c + '55' }} />
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>{f}</Text>
+                  </View>
+                ))}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.rose }} />
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>symptoms</Text>
                 </View>
-              ))}
-            </View>
-            <View style={{ flexDirection: 'row', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
-              {Object.entries(FLOW_COLORS).map(([f, c]) => (
-                <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: c + '66' }} />
-                  <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>{f}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <View style={{ width: 12, height: 3, borderRadius: 1, backgroundColor: Colors.teal + '80' }} />
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>sleep quality</Text>
                 </View>
-              ))}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.rose }} />
-                <Text style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist }}>symptoms</Text>
               </View>
             </View>
+
+            {/* Selected day detail */}
+            {selectedDay && selectedDayData && (
+              <View style={[styles.card, { borderLeftWidth: 3, borderLeftColor: Colors.plum, borderRadius: 0, borderTopRightRadius: 18, borderBottomRightRadius: 18 }]}>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.mist, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
+                  {new Date(selectedDay + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </Text>
+                {selectedDayData.log?.flow && (
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.plum, marginBottom: 4 }}>
+                    Flow: {selectedDayData.log.flow}
+                  </Text>
+                )}
+                {selectedDayData.log?.symptoms?.length > 0 && (
+                  <View style={{ marginBottom: 4 }}>
+                    <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist, marginBottom: 4 }}>Symptoms:</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {selectedDayData.log.symptoms.map((s: string) => (
+                        <View key={s} style={{ backgroundColor: Colors.rosePale, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
+                          <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.rose }}>{s}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+                {selectedDayData.sleepEntry?.quality && (
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.plum, marginTop: 4 }}>
+                    Sleep: {['', 'restless', 'light', 'decent', 'deep', 'blissful'][selectedDayData.sleepEntry.quality]}
+                    {' '}({'★'.repeat(selectedDayData.sleepEntry.quality)}{'☆'.repeat(5 - selectedDayData.sleepEntry.quality)})
+                  </Text>
+                )}
+                {selectedDayData.histEntry?.totals?.protein > 0 && (
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.plum, marginTop: 4 }}>
+                    Protein: {Math.round(selectedDayData.histEntry.totals.protein)}g
+                  </Text>
+                )}
+                {!selectedDayData.log && !selectedDayData.sleepEntry && !selectedDayData.histEntry && (
+                  <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist }}>Nothing logged this day.</Text>
+                )}
+              </View>
+            )}
+
+            {/* Monthly pattern summary */}
+            {calPatterns.length > 0 && (
+              <View style={styles.card}>
+                <Text style={{ fontFamily: Fonts.sansMedium, fontSize: 11, color: Colors.mist, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10 }}>
+                  {calTarget.toLocaleDateString('en-US', { month: 'long' })} patterns
+                </Text>
+                {calPatterns.map(([symptom, count]) => {
+                  const daysInMonth = new Date(calTarget.getFullYear(), calTarget.getMonth() + 1, 0).getDate();
+                  const pct = Math.round((count / daysInMonth) * 100);
+                  return (
+                    <View key={symptom} style={{ marginBottom: 10 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
+                        <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.plum }}>{symptom}</Text>
+                        <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist }}>{count} days</Text>
+                      </View>
+                      <View style={{ height: 4, backgroundColor: Colors.parchmentDark, borderRadius: 2 }}>
+                        <View style={{ height: 4, width: `${pct}%` as any, backgroundColor: Colors.rose, borderRadius: 2 }} />
+                      </View>
+                    </View>
+                  );
+                })}
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.mist, marginTop: 4 }}>
+                  Tap any day to see details · Go back up to 12 months
+                </Text>
+              </View>
+            )}
+
+            {logs.length === 0 && (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                <Text style={{ fontSize: 28, marginBottom: 10 }}>📅</Text>
+                <Text style={{ fontFamily: Fonts.serif, fontSize: 16, color: Colors.plum, marginBottom: 6 }}>No logs yet</Text>
+                <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.mist, textAlign: 'center', lineHeight: 20 }}>
+                  Start logging in the Log tab and your pattern calendar will fill in automatically.
+                </Text>
+              </View>
+            )}
           </View>
         )}
 

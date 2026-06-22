@@ -63,6 +63,8 @@ export default function RootLayout() {
           <Stack.Screen name="debug" />
           <Stack.Screen name="firstwin" />
           <Stack.Screen name="coach" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="hrt" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="bone" options={{ presentation: 'modal' }} />
         </Stack>
       </VelaProvider>
     </SafeAreaProvider>

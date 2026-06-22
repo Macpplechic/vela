@@ -249,6 +249,32 @@ export default function ProfileScreen() {
               On-device AI · your data stays private
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/hrt')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.tealPale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.teal + '40' }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.teal }]}>
+              💊 HRT & Medications
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              Track what you take · see how symptoms change
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/bone')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.sagePale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.sage + '40' }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.sage }]}>
+              🦴 Bone Health Score
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              Calcium · D3 · exercise · DEXA tracker
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>
