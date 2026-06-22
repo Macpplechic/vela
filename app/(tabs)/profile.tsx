@@ -275,6 +275,32 @@ export default function ProfileScreen() {
               Calcium · D3 · exercise · DEXA tracker
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/trends')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.indigoPale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.indigo + '40' }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.indigo }]}>
+              📊 90-Day Trends
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              Symptom charts · sleep curve · nutrition adherence
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/doctor')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.goldPale ?? '#FDF3DC', marginTop: 10, borderWidth: 0.5, borderColor: Colors.gold + '40' }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.gold }]}>
+              🩺 Doctor Appointment Prep
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              Talking points · questions · shareable PDF
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>
