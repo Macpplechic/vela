@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -20,6 +20,12 @@ import {
 import { scheduleVelaNotifications } from '../hooks/useNotifications';
 import Purchases from 'react-native-purchases';
 import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const CURRENT_VERSION = '1.1.0';
+const WHATS_NEW_KEY = '@vela_whats_new_seen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,6 +49,34 @@ export default function RootLayout() {
     if (!isExpoGo) {
       Purchases.configure({ apiKey: 'appl_ZXvRoLscVYwTsOwsgaswQuLvRgC' });
     }
+  }, []);
+
+  // ── Show What's New once per version ──────────────────────────────────────
+  useEffect(() => {
+    AsyncStorage.getItem(WHATS_NEW_KEY).then(seen => {
+      if (seen !== CURRENT_VERSION) {
+        AsyncStorage.setItem(WHATS_NEW_KEY, CURRENT_VERSION);
+        setTimeout(() => {
+          try { router.push('/whatsnew'); } catch {}
+        }, 1500);
+      }
+    });
+  }, []);
+
+  // ── Notification deep linking ──────────────────────────────────────────────
+  useEffect(() => {
+    // Handle notification tap when app is backgrounded
+    const sub = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data as any;
+      if (!data) return;
+      try {
+        if (data.screen) {
+          // Small delay to let the layout mount
+          setTimeout(() => router.push(data.screen), 300);
+        }
+      } catch {}
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {
@@ -69,6 +103,7 @@ export default function RootLayout() {
           <Stack.Screen name="doctor" options={{ presentation: 'modal' }} />
           <Stack.Screen name="cbt" options={{ presentation: 'modal' }} />
           <Stack.Screen name="partner" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="whatsnew" options={{ presentation: 'modal', gestureEnabled: false }} />
         </Stack>
       </VelaProvider>
     </SafeAreaProvider>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vela",
     "slug": "vela",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "orientation": "portrait",
     "runtimeVersion": "1.0.1",
     "icon": "./assets/icon.png",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.velawellness.app",
-      "buildNumber": "25",
+      "buildNumber": "26",
       "infoPlist": {
         "UIBackgroundModes": [
           "fetch",
@@ -24,7 +24,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Vela uses your camera to scan food barcodes for instant nutrition logging.",
         "NSPhotoLibraryUsageDescription": "Vela uses your photo library for meal photo logging.",
-        "NSHealthShareUsageDescription": "Vela reads your sleep, steps, heart rate, and HRV from Apple Health to surface personalized hormone health insights — no data leaves your device.",
+        "NSHealthShareUsageDescription": "Vela reads your sleep, steps, heart rate, and HRV from Apple Health to surface personalized hormone health insights \u2014 no data leaves your device.",
         "NSHealthUpdateUsageDescription": "Vela does not write any data to Apple Health."
       }
     },
@@ -34,7 +34,7 @@
         "backgroundColor": "#3D1F3A"
       },
       "package": "com.velawellness.app",
-      "versionCode": 1
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png",
