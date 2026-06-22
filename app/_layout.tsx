@@ -62,6 +62,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="debug" />
           <Stack.Screen name="firstwin" />
+          <Stack.Screen name="coach" options={{ presentation: 'modal' }} />
         </Stack>
       </VelaProvider>
     </SafeAreaProvider>

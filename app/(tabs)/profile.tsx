@@ -236,6 +236,19 @@ export default function ProfileScreen() {
           <TouchableOpacity delayPressIn={0} onPress={() => { resetOnboarding(); router.replace('/onboarding'); }} style={styles.retakeBtn}>
             <Text allowFontScaling={false} style={styles.retakeBtnText}>✎ Retake phase quiz</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            delayPressIn={0}
+            onPress={() => router.push('/coach')}
+            style={[styles.retakeBtn, { backgroundColor: Colors.plum, marginTop: 10 }]}
+          >
+            <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.goldLight }]}>
+              ✦ Ask Vela Coach
+            </Text>
+            <Text allowFontScaling={false} style={{ fontFamily: Fonts.sans, fontSize: 10, color: Colors.mist, marginTop: 2, textAlign: 'center' }}>
+              On-device AI · your data stays private
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>
