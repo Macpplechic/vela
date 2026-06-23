@@ -99,10 +99,11 @@ export function useAppleHealth() {
     }
 
     try {
-      // Dynamic import so the app doesn't crash on Android or simulators
-      // where HealthKit isn't available.
-      const AppleHealthKit = (await import('react-native-health')).default;
-      const { Permissions } = await import('react-native-health');
+      // Use require() so Metro bundles it statically — react-native-health is in package.json
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const AppleHealthKit = require('react-native-health').default;
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { Permissions } = require('react-native-health');
 
       const options = {
         permissions: {
@@ -202,8 +203,10 @@ export function useAppleHealth() {
       return;
     }
     try {
-      const AppleHealthKit = (await import('react-native-health')).default;
-      const { Permissions } = await import('react-native-health');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const AppleHealthKit = require('react-native-health').default;
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { Permissions } = require('react-native-health');
       await fetchAllMetrics(AppleHealthKit, Permissions);
     } catch (e) {
       console.warn('[Vela HealthKit] Refresh failed:', e);

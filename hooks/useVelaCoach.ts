@@ -49,8 +49,9 @@ export interface VelaCoachContext {
 async function checkAppleIntelligence(): Promise<boolean> {
   if (Platform.OS !== 'ios') return false;
   try {
-    const { isFoundationModelsEnabled } = await import('react-native-apple-llm');
-    const status = await isFoundationModelsEnabled();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('react-native-apple-llm');
+    const status = await mod.isFoundationModelsEnabled();
     return status === 'available';
   } catch {
     return false;
@@ -62,7 +63,8 @@ async function queryAppleIntelligence(
   systemInstructions: string,
   sessionRef: React.MutableRefObject<any>
 ): Promise<string> {
-  const { AppleLLMSession } = await import('react-native-apple-llm');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { AppleLLMSession } = require('react-native-apple-llm');
   if (!sessionRef.current) {
     sessionRef.current = new AppleLLMSession();
     await sessionRef.current.configure({ instructions: systemInstructions });

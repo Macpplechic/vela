@@ -41,7 +41,8 @@
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
     "react-native-view-shot": "4.0.3",
-    "scheduler": "^0.27.0"
+    "scheduler": "^0.27.0",
+    "react-native-health": "1.19.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

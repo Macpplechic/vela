@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, ScrollView, Alert, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, ScrollView, Alert, TouchableOpacity, StyleSheet, Modal, Share } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -117,13 +117,10 @@ export default function ProfileScreen() {
         fluxLogs, streak, lastStreakDate,
       };
       const json = JSON.stringify(backup, null, 2);
-      const LegacyFS = await import('expo-file-system/legacy');
-      const docDir = LegacyFS.documentDirectory ?? '';
-      const path = docDir + 'vela_backup.json';
-      await LegacyFS.writeAsStringAsync(path, json);
-      await Sharing.shareAsync(path, {
-        mimeType: 'application/json',
-        dialogTitle: 'Save your Vela backup',
+      // Share as text — avoids filesystem write entirely, works on all Expo SDK versions
+      await Share.share({
+        message: json,
+        title: 'vela_backup.json',
       });
     } catch (e) {
       Alert.alert('Backup failed', 'Could not create backup file.');
