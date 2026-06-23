@@ -247,7 +247,7 @@ export default function TrendsScreen() {
     if (mySupps.length === 0) return [];
     const weeks = [];
     for (let w = Math.min(11, Math.floor(range / 7)) - 1; w >= 0; w--) {
-      const weekDays = [];
+      const weekDays: string[] = [];
       for (let d = 6; d >= 0; d--) {
         const offset = w * 7 + d;
         if (offset >= range) continue;

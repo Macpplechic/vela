@@ -344,7 +344,8 @@ export default function FluxScreen() {
                   ))}
                 </View>
               </View>
-  
+            )}
+
             {/* ── Send to a friend nudge ── */}
             {logs.length >= 7 && !referralDismissed && (
               <View style={{ backgroundColor: Colors.plum, borderRadius: 20, padding: 18, marginBottom: 14 }}>
@@ -373,7 +374,6 @@ export default function FluxScreen() {
                 </TouchableOpacity>
               </View>
             )}
-          )}
           </View>
         )}
 
@@ -482,11 +482,11 @@ export default function FluxScreen() {
                     Flow: {selectedDayData.log.flow}
                   </Text>
                 )}
-                {selectedDayData.log?.symptoms?.length > 0 && (
+                {(selectedDayData.log?.symptoms?.length ?? 0) > 0 && (
                   <View style={{ marginBottom: 4 }}>
                     <Text style={{ fontFamily: Fonts.sans, fontSize: 12, color: Colors.mist, marginBottom: 4 }}>Symptoms:</Text>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                      {selectedDayData.log.symptoms.map((s: string) => (
+                      {(selectedDayData.log?.symptoms ?? []).map((s: string) => (
                         <View key={s} style={{ backgroundColor: Colors.rosePale, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
                           <Text style={{ fontFamily: Fonts.sans, fontSize: 11, color: Colors.rose }}>{s}</Text>
                         </View>
@@ -500,9 +500,9 @@ export default function FluxScreen() {
                     {' '}({'★'.repeat(selectedDayData.sleepEntry.quality)}{'☆'.repeat(5 - selectedDayData.sleepEntry.quality)})
                   </Text>
                 )}
-                {selectedDayData.histEntry?.totals?.protein > 0 && (
+                {(selectedDayData.histEntry?.totals?.protein ?? 0) > 0 && (
                   <Text style={{ fontFamily: Fonts.sans, fontSize: 13, color: Colors.plum, marginTop: 4 }}>
-                    Protein: {Math.round(selectedDayData.histEntry.totals.protein)}g
+                    Protein: {Math.round(selectedDayData.histEntry?.totals?.protein ?? 0)}g
                   </Text>
                 )}
                 {!selectedDayData.log && !selectedDayData.sleepEntry && !selectedDayData.histEntry && (

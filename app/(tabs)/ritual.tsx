@@ -172,7 +172,7 @@ export default function RitualScreen() {
 
         {velaHistory.length > 0 && (
           <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
-            {([\
+            {([
               { label: 'Streak', value: streak > 0 ? String(streak) + ' days' : '0', color: Colors.gold },
               { label: 'Symptoms', value: String(totalSymptoms), color: Colors.rose },
               { label: 'Sleep', value: avgSleep === 0 ? '-' : avgSleep <= 2 ? 'poor' : avgSleep === 3 ? 'good' : 'great', color: Colors.teal },
@@ -182,7 +182,7 @@ export default function RitualScreen() {
                 <Text style={{ fontFamily: Fonts.serif, fontSize: 20, color: stat.color, marginBottom: 3 }}>{stat.value}</Text>
                 <Text style={{ fontFamily: Fonts.sans, fontSize: 9, color: Colors.mist, textAlign: 'center' }}>{stat.label}</Text>
               </View>
-            ))}\
+            ))}
           </View>
         )}
 

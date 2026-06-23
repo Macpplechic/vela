@@ -118,7 +118,7 @@ export function useAppleHealth() {
       };
 
       return new Promise(resolve => {
-        AppleHealthKit.initHealthKit(options, async (err: string) => {
+        AppleHealthKit.initHealthKit(options, async (err: string | null) => {
           if (err) {
             console.warn('[Vela HealthKit] Permission denied or error:', err);
             setPermissionStatus('denied');

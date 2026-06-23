@@ -117,8 +117,10 @@ export default function ProfileScreen() {
         fluxLogs, streak, lastStreakDate,
       };
       const json = JSON.stringify(backup, null, 2);
-      const path = FileSystem.documentDirectory + 'vela_backup.json';
-      await FileSystem.writeAsStringAsync(path, json);
+      const LegacyFS = await import('expo-file-system/legacy');
+      const docDir = LegacyFS.documentDirectory ?? '';
+      const path = docDir + 'vela_backup.json';
+      await LegacyFS.writeAsStringAsync(path, json);
       await Sharing.shareAsync(path, {
         mimeType: 'application/json',
         dialogTitle: 'Save your Vela backup',
@@ -239,7 +241,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/coach')}
+            onPress={() => router.push('/coach' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.plum, marginTop: 10 }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.goldLight }]}>
@@ -252,7 +254,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/hrt')}
+            onPress={() => router.push('/hrt' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.tealPale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.teal + '40' }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.teal }]}>
@@ -265,7 +267,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/bone')}
+            onPress={() => router.push('/bone' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.sagePale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.sage + '40' }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.sage }]}>
@@ -278,7 +280,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/trends')}
+            onPress={() => router.push('/trends' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.indigoPale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.indigo + '40' }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.indigo }]}>
@@ -291,7 +293,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/doctor')}
+            onPress={() => router.push('/doctor' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.goldPale ?? '#FDF3DC', marginTop: 10, borderWidth: 0.5, borderColor: Colors.gold + '40' }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.gold }]}>
@@ -304,7 +306,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/cbt')}
+            onPress={() => router.push('/cbt' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.tealPale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.teal + '40' }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.teal }]}>
@@ -317,7 +319,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             delayPressIn={0}
-            onPress={() => router.push('/partner')}
+            onPress={() => router.push('/partner' as any)}
             style={[styles.retakeBtn, { backgroundColor: Colors.rosePale, marginTop: 10, borderWidth: 0.5, borderColor: Colors.rose + '30' }]}
           >
             <Text allowFontScaling={false} style={[styles.retakeBtnText, { color: Colors.rose }]}>

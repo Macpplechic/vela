@@ -57,7 +57,7 @@ export default function RootLayout() {
       if (seen !== CURRENT_VERSION) {
         AsyncStorage.setItem(WHATS_NEW_KEY, CURRENT_VERSION);
         setTimeout(() => {
-          try { router.push('/whatsnew'); } catch {}
+          try { router.push('/whatsnew' as any); } catch {}
         }, 1500);
       }
     });
