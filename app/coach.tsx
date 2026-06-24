@@ -1,7 +1,7 @@
 /**
  * app/coach.tsx
  * Vela AI Coach screen.
- * Navigate to it with: router.push('/coach')
+ * Navigate to it with: router.push('/coach' as any)
  * Add a tab or button wherever makes sense — profile tab is a good home.
  */
 
