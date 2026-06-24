@@ -49,6 +49,10 @@
     </dict>
     <key>NSCameraUsageDescription</key>
     <string>Vela uses your camera to scan food barcodes.</string>
+    <key>NSHealthShareUsageDescription</key>
+    <string>Vela reads your sleep, steps, heart rate, and HRV from Apple Health to surface personalized hormone health insights — no data leaves your device.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Vela does not write any data to Apple Health.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSPhotoLibraryUsageDescription</key>
