@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.velawellness.app",
-      "buildNumber": "27",
+      "buildNumber": "29",
       "infoPlist": {
         "UIBackgroundModes": [
           "fetch",

@@ -11,6 +11,7 @@ import { useVelaStore } from '../../hooks/useVelaStore';
 export default function PlateScreen() {
   const { phase, foods, setFoods, totals } = useVelaStore();
   const [search, setSearch] = useState('');
+  const [showFormula, setShowFormula] = useState(false);
 
   const [scannedImage, setScannedImage] = useState<string | null>(null);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
@@ -24,6 +25,20 @@ export default function PlateScreen() {
 
   const pct = (v: number, m: number) => Math.min(100, Math.round((v / m) * 100));
   const aiScore = foods.length > 0 ? Math.min(100, Math.round((totals.ai / (foods.length * 10)) * 100)) : 0;
+
+  // ── Macro calories (4 cal/g protein & carbs, 9 cal/g fat) ──
+  const macroCal = {
+    protein: (totals.protein || 0) * 4,
+    carbs:   (totals.carbs   || 0) * 4,
+    fat:     (totals.fat     || 0) * 9,
+  };
+  const macroCalTotal = macroCal.protein + macroCal.carbs + macroCal.fat;
+  const pctOfCal = (c: number) => (macroCalTotal > 0 ? Math.round((c / macroCalTotal) * 100) : 0);
+  const macroRows = [
+    { key: 'protein', label: 'Protein', val: totals.protein || 0, target: pd.targets.protein, cals: macroCal.protein, color: Colors.rose },
+    { key: 'carbs',   label: 'Carbs',   val: totals.carbs   || 0, target: pd.targets.carbs,   cals: macroCal.carbs,   color: Colors.gold },
+    { key: 'fat',     label: 'Fat',     val: totals.fat     || 0, target: pd.targets.fat,     cals: macroCal.fat,     color: Colors.teal },
+  ];
   const searchUSDA = async (query: string) => {
     if (query.length < 2) { setApiResults([]); return; }
     setApiLoading(true);
@@ -44,6 +59,8 @@ export default function PlateScreen() {
           name: f.description?.split(',')[0]?.replace(/raw$/i, '').trim() ?? f.description,
           category: 'usda',
           protein: get('protein'),
+          carbs: get('carbohydrate'),
+          fat: get('total lipid') || get('total fat'),
           fiber: get('fiber'),
           calcium: get('calcium'),
           magnesium: get('magnesium'),
@@ -110,6 +127,8 @@ export default function PlateScreen() {
           name: (p.product_name || p.generic_name || 'Scanned product').slice(0, 60),
           category: 'scanned',
           protein:   Math.round((n.proteins_100g   ?? 0) * per * 10) / 10,
+          carbs:     Math.round((n.carbohydrates_100g ?? 0) * per * 10) / 10,
+          fat:       Math.round((n.fat_100g         ?? 0) * per * 10) / 10,
           fiber:     Math.round((n.fiber_100g       ?? 0) * per * 10) / 10,
           calcium:   Math.round((n.calcium_100g     ?? 0) * per * 10) / 10,
           magnesium: Math.round((n.magnesium_100g   ?? 0) * per * 10) / 10,
@@ -177,6 +196,8 @@ Return ONLY a valid JSON array with no other text, markdown, or explanation. Eac
 {
   "name": "Food name",
   "protein": number (grams),
+  "carbs": number (grams, total carbohydrate),
+  "fat": number (grams, total fat),
   "fiber": number (grams),
   "calcium": number (mg),
   "magnesium": number (mg),
@@ -214,6 +235,8 @@ Focus on perimenopause-relevant nutrients. If you cannot identify specific foods
         name: f.name ?? 'Unknown food',
         category: 'photo',
         protein:   Math.round((f.protein   ?? 0) * 10) / 10,
+        carbs:     Math.round((f.carbs     ?? 0) * 10) / 10,
+        fat:       Math.round((f.fat       ?? 0) * 10) / 10,
         fiber:     Math.round((f.fiber     ?? 0) * 10) / 10,
         calcium:   Math.round(f.calcium    ?? 0),
         magnesium: Math.round(f.magnesium  ?? 0),
@@ -286,32 +309,55 @@ Focus on perimenopause-relevant nutrients. If you cannot identify specific foods
 
         {/* ── Macros ── */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Macros</Text>
-          <View style={{gap:10, marginTop:8}}>
-            {[
-              {label:'Protein', val:totals.protein, goal:80, color:Colors.rose, unit:'g'},
-              {label:'Fiber',   val:totals.fiber,   goal:25, color:Colors.sage, unit:'g'},
-              {label:'Calcium', val:totals.calcium,  goal:1200, color:Colors.gold, unit:'mg'},
-              {label:'Omega-3', val:totals.omega3,   goal:2, color:Colors.teal, unit:'g'},
-              {label:'Magnesium', val:totals.magnesium, goal:320, color:Colors.plum, unit:'mg'},
-            ].map(m => {
-              const pct = Math.min(100, Math.round(((m.val||0) / m.goal) * 100));
+          <View style={styles.macroHeaderRow}>
+            <Text style={styles.cardTitle}>Macros</Text>
+            <TouchableOpacity delayPressIn={0} onPress={() => setShowFormula(v => !v)} activeOpacity={0.7}>
+              <Text style={styles.formulaToggle}>{showFormula ? '× close' : 'ⓘ how this works'}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.macroCalLine}>
+            {Math.round(macroCalTotal)} cal from macros
+            {totals.cal > 0 && Math.abs(Math.round(totals.cal) - Math.round(macroCalTotal)) > 20
+              ? `  ·  ${Math.round(totals.cal)} cal logged`
+              : ''}
+          </Text>
+
+          <View style={{ gap: 12, marginTop: 12 }}>
+            {macroRows.map(m => {
+              const pctTarget = Math.min(100, Math.round((m.val / m.target) * 100));
               return (
-                <View key={m.label}>
-                  <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom:4}}>
-                    <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.plum}}>{m.label}</Text>
-                    <Text style={{fontFamily:Fonts.sans, fontSize:12, color:Colors.mist}}>
-                      {Math.round(m.val||0)}{m.unit} <Text style={{color:pct>=100?m.color:Colors.mist}}>/ {m.goal}{m.unit}</Text>
+                <View key={m.key}>
+                  <View style={styles.macroRowTop}>
+                    <Text style={styles.macroLabel}>{m.label}</Text>
+                    <Text style={styles.macroVals}>
+                      {Math.round(m.val)}g <Text style={{ color: pctTarget >= 100 ? m.color : Colors.mist }}>/ {m.target}g</Text>
+                      <Text style={styles.macroPctCal}>  ·  {pctOfCal(m.cals)}% of cal</Text>
                     </Text>
                   </View>
-                  <View style={{height:8, backgroundColor:Colors.parchmentDark, borderRadius:4, overflow:'hidden'}}>
-                    <View style={{height:8, borderRadius:4, backgroundColor:m.color, width:`${pct}%` as any}} />
+                  <View style={styles.macroBarTrack}>
+                    <View style={[styles.macroBarFill, { backgroundColor: m.color, width: `${pctTarget}%` as any }]} />
                   </View>
-                  {pct >= 100 && <Text style={{fontFamily:Fonts.sans, fontSize:10, color:m.color, marginTop:2}}>✓ goal met</Text>}
                 </View>
               );
             })}
           </View>
+
+          {showFormula && (
+            <View style={styles.formulaBox}>
+              <Text style={styles.formulaTitle}>HOW THIS IS CALCULATED</Text>
+              <Text style={styles.formulaLine}>• Calories per gram:  Protein 4  ·  Carbs 4  ·  Fat 9</Text>
+              <Text style={styles.formulaLine}>
+                • Macro calories = grams × cal/g.  Example: {Math.round(totals.protein || 0)}g protein × 4 = {Math.round(macroCal.protein)} cal.
+              </Text>
+              <Text style={styles.formulaLine}>• % of calories = a macro's calories ÷ total macro calories × 100.</Text>
+              <Text style={styles.formulaLine}>
+                • Your daily targets ({pd.label}):  Protein {pd.targets.protein}g  ·  Carbs {pd.targets.carbs}g  ·  Fat {pd.targets.fat}g.
+              </Text>
+              <Text style={styles.formulaLine}>• Each food scales with portion:  amount = per-100g value × (serving g ÷ 100).</Text>
+              <Text style={styles.formulaNote}>Targets are general guidance for your phase — not medical advice.</Text>
+            </View>
+          )}
         </View>
 
         {/* Nutrient rings (simplified as bars for native) */}
@@ -512,6 +558,19 @@ const styles = StyleSheet.create({
   ringVal: { fontFamily: Fonts.sans, fontSize:12, color: Colors.plum },
   card: { backgroundColor: Colors.cream, borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:18, padding:18, marginBottom:12 },
   cardTitle: { fontFamily: Fonts.serif, fontSize:18, color: Colors.plum, marginBottom:12 },
+  macroHeaderRow: { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:2 },
+  formulaToggle: { fontFamily: Fonts.sans, fontSize:11, color: Colors.teal, marginBottom:12 },
+  macroCalLine: { fontFamily: Fonts.sans, fontSize:12, color: Colors.mist },
+  macroRowTop: { flexDirection:'row', justifyContent:'space-between', alignItems:'flex-end', marginBottom:4 },
+  macroLabel: { fontFamily: Fonts.sansMedium, fontSize:13, color: Colors.plum },
+  macroVals: { fontFamily: Fonts.sans, fontSize:12, color: Colors.mist },
+  macroPctCal: { fontFamily: Fonts.sans, fontSize:11, color: Colors.mist },
+  macroBarTrack: { height:8, backgroundColor: Colors.parchmentDark, borderRadius:4, overflow:'hidden' },
+  macroBarFill: { height:8, borderRadius:4 },
+  formulaBox: { marginTop:14, backgroundColor: Colors.parchment, borderRadius:12, padding:12, borderWidth:0.5, borderColor: Colors.parchmentDark, gap:6 },
+  formulaTitle: { fontFamily: Fonts.sansMedium, fontSize:10, color: Colors.plum, letterSpacing:1.5, marginBottom:2 },
+  formulaLine: { fontFamily: Fonts.sans, fontSize:12, color: Colors.plum, lineHeight:18 },
+  formulaNote: { fontFamily: Fonts.sans, fontSize:10.5, color: Colors.mist, marginTop:2, fontStyle:'italic' },
   searchInput: { borderWidth:0.5, borderColor: Colors.parchmentDark, borderRadius:12, padding:10, fontSize:13, fontFamily: Fonts.sans, color: Colors.plum, backgroundColor: Colors.parchment, marginBottom:10 },
   foodRow: { padding:11, marginBottom:6, borderRadius:12, borderWidth:0.5, borderColor: Colors.parchmentDark, backgroundColor: Colors.parchment },
   foodName: { fontFamily: Fonts.sansMedium, fontSize:13, color: Colors.plum, marginBottom:2 },

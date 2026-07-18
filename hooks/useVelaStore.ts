@@ -14,7 +14,8 @@ export interface DailyEntry {
 }
 
 export interface NutrientTotals {
-  protein: number; fiber: number; calcium: number;
+  protein: number; carbs: number; fat: number;
+  fiber: number; calcium: number;
   magnesium: number; omega3: number; phyto: number;
   cal: number; ai: number;
 }
@@ -74,16 +75,18 @@ const DEFAULT_SUPPS: string[] = [];
 const calcTotals = (foods: Food[]): NutrientTotals =>
   foods.reduce(
     (a, f) => ({
-      protein:   a.protein   + f.protein,
-      fiber:     a.fiber     + f.fiber,
-      calcium:   a.calcium   + f.calcium,
-      magnesium: a.magnesium + f.magnesium,
-      omega3:    a.omega3    + f.omega3,
-      phyto:     a.phyto     + f.phyto,
-      cal:       a.cal       + f.cal,
-      ai:        a.ai        + f.ai,
+      protein:   a.protein   + (f.protein   ?? 0),
+      carbs:     a.carbs     + (f.carbs     ?? 0),
+      fat:       a.fat       + (f.fat       ?? 0),
+      fiber:     a.fiber     + (f.fiber     ?? 0),
+      calcium:   a.calcium   + (f.calcium   ?? 0),
+      magnesium: a.magnesium + (f.magnesium ?? 0),
+      omega3:    a.omega3    + (f.omega3    ?? 0),
+      phyto:     a.phyto     + (f.phyto     ?? 0),
+      cal:       a.cal       + (f.cal       ?? 0),
+      ai:        a.ai        + (f.ai        ?? 0),
     }),
-    { protein:0, fiber:0, calcium:0, magnesium:0, omega3:0, phyto:0, cal:0, ai:0 }
+    { protein:0, carbs:0, fat:0, fiber:0, calcium:0, magnesium:0, omega3:0, phyto:0, cal:0, ai:0 }
   );
 
 export interface SleepEntry {
@@ -352,20 +355,24 @@ export function useVelaStore() {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 30);
     const recent = history.filter(e => new Date(e.date) >= cutoff && e.foods.length > 0);
-    if (recent.length === 0) return { protein:0, fiber:0, calcium:0, magnesium:0, omega3:0, phyto:0, cal:0, ai:0 };
+    if (recent.length === 0) return { protein:0, carbs:0, fat:0, fiber:0, calcium:0, magnesium:0, omega3:0, phyto:0, cal:0, ai:0 };
     const sum = recent.reduce((a, e) => ({
-      protein:   a.protein   + e.totals.protein,
-      fiber:     a.fiber     + e.totals.fiber,
-      calcium:   a.calcium   + e.totals.calcium,
-      magnesium: a.magnesium + e.totals.magnesium,
-      omega3:    a.omega3    + e.totals.omega3,
-      phyto:     a.phyto     + e.totals.phyto,
-      cal:       a.cal       + e.totals.cal,
-      ai:        a.ai        + e.totals.ai,
-    }), { protein:0, fiber:0, calcium:0, magnesium:0, omega3:0, phyto:0, cal:0, ai:0 });
+      protein:   a.protein   + (e.totals.protein   ?? 0),
+      carbs:     a.carbs     + (e.totals.carbs     ?? 0),
+      fat:       a.fat       + (e.totals.fat       ?? 0),
+      fiber:     a.fiber     + (e.totals.fiber     ?? 0),
+      calcium:   a.calcium   + (e.totals.calcium   ?? 0),
+      magnesium: a.magnesium + (e.totals.magnesium ?? 0),
+      omega3:    a.omega3    + (e.totals.omega3    ?? 0),
+      phyto:     a.phyto     + (e.totals.phyto     ?? 0),
+      cal:       a.cal       + (e.totals.cal       ?? 0),
+      ai:        a.ai        + (e.totals.ai        ?? 0),
+    }), { protein:0, carbs:0, fat:0, fiber:0, calcium:0, magnesium:0, omega3:0, phyto:0, cal:0, ai:0 });
     const n = recent.length;
     return {
       protein:   sum.protein   / n,
+      carbs:     sum.carbs     / n,
+      fat:       sum.fat       / n,
       fiber:     sum.fiber     / n,
       calcium:   sum.calcium   / n,
       magnesium: sum.magnesium / n,

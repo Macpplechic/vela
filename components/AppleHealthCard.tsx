@@ -126,10 +126,10 @@ export default function AppleHealthCard() {
             setConnecting(true);
             const ok = await requestPermissions();
             setConnecting(false);
-            if (!ok && permissionStatus === 'denied') {
+            if (!ok) {
               Alert.alert(
-                'Permission required',
-                'Open Settings → Privacy & Security → Health → Vela and enable all read permissions.',
+                'Connect Apple Health',
+                "We couldn't read your Health data. Open Settings → Privacy & Security → Health → Vela and turn on Steps, Sleep, Heart Rate, Resting Heart Rate, and Heart Rate Variability. If you don't see Vela there, make sure Health is set up on this device.",
                 [{ text: 'OK' }]
               );
             }

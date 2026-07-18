@@ -15,6 +15,8 @@ export type Phase = {
   bg: string;
   targets: {
     protein: number;
+    carbs: number;
+    fat: number;
     fiber: number;
     calcium: number;
     magnesium: number;
@@ -28,6 +30,8 @@ export type Food = {
   name: string;
   category: string;
   protein: number;
+  carbs?: number;
+  fat?: number;
   fiber: number;
   calcium: number;
   magnesium: number;
@@ -88,7 +92,7 @@ export const PHASES: Record<PhaseKey, Phase> = {
     ritual: 'Start your morning with 2 minutes of stillness before checking your phone. Notice what your body needs today — not what your calendar demands.',
     color: '#B8934A',
     bg: '#F5EDD8',
-    targets: { protein: 100, fiber: 25, calcium: 1000, magnesium: 320, omega3: 2, phyto: 50 },
+    targets: { protein: 100, carbs: 180, fat: 60, fiber: 25, calcium: 1000, magnesium: 320, omega3: 2, phyto: 50 },
   },
   late: {
     key: 'late',
@@ -98,7 +102,7 @@ export const PHASES: Record<PhaseKey, Phase> = {
     ritual: 'Place your hand on your heart for 30 seconds before rising. Breathe slowly and set one gentle intention. You are adapting, not breaking.',
     color: '#C4645A',
     bg: '#FAEAE9',
-    targets: { protein: 110, fiber: 28, calcium: 1200, magnesium: 350, omega3: 2.5, phyto: 60 },
+    targets: { protein: 110, carbs: 175, fat: 65, fiber: 28, calcium: 1200, magnesium: 350, omega3: 2.5, phyto: 60 },
   },
   post: {
     key: 'post',
@@ -108,7 +112,7 @@ export const PHASES: Record<PhaseKey, Phase> = {
     ritual: 'Spend 5 minutes outside or near a window. Natural light helps regulate your circadian rhythm and supports mood and bone health.',
     color: '#6A9E72',
     bg: '#EBF3EC',
-    targets: { protein: 120, fiber: 30, calcium: 1200, magnesium: 420, omega3: 3, phyto: 70 },
+    targets: { protein: 120, carbs: 170, fat: 65, fiber: 30, calcium: 1200, magnesium: 420, omega3: 3, phyto: 70 },
   },
 };
 
